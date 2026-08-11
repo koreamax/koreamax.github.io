@@ -88,7 +88,6 @@ section{padding:52px 0}
 .btn:hover{background:var(--primary);color:#fff}
 .btn.soon{border-color:var(--card-line);color:var(--muted);cursor:default}
 .btn.soon:hover{background:none;color:var(--muted)}
-.shot{margin-top:16px;border-radius:14px;background:var(--surface);border:1.5px dashed #CBE6F2;padding:26px;text-align:center;font-size:12.5px;font-weight:600;color:#79B4CB}
 
 /* rows */
 .list{background:var(--surface);border-radius:var(--radius);padding:8px 20px}
@@ -147,11 +146,11 @@ footer{border-top:1px solid var(--card-line);padding:40px 0 56px;margin-top:24px
    <div class="hero-text">
     <span class="eyebrow">동국대학교 정보통신공학전공 4학년</span>
     <h1>입력부터 응답까지,<br><span class="hl">AI 에이전트의 흐름을 설계하는</span><br>개발자 이민형입니다.</h1>
-    <p class="sub">FastAPI로 AI 모델을 서빙하고, MLOps 관점에서 배포와 운영 흐름까지 설계합니다. Spring Boot 백엔드와 AWS 클라우드 경험이 그 기반입니다.</p>
+    <p class="sub">FastAPI로 AI 모델을 서빙하고, AgentOps 관점에서 배포와 운영 흐름까지 설계합니다. Spring Boot 백엔드와 AWS 클라우드 경험이 그 기반입니다.</p>
 
     <div class="notes">
       <div class="note y"><b>AI Serving · FastAPI</b><span>AI 모델을 API로 서빙해 에이전트로 연결합니다.</span></div>
-      <div class="note p"><b>MLOps &amp; Cloud</b><span>AWS 위에서 배포부터 운영까지 흐름을 만듭니다.</span></div>
+      <div class="note p"><b>AgentOps &amp; Cloud</b><span>AWS 위에서 배포부터 운영까지 흐름을 만듭니다.</span></div>
     </div>
 
     <div class="pipe" aria-label="핵심 역량 흐름">
@@ -170,7 +169,7 @@ footer{border-top:1px solid var(--card-line);padding:40px 0 56px;margin-top:24px
 
   <section id="projects">
     <div class="wrap">
-      <div class="sec-head"><h2>Projects</h2><span class="count">AI AGENT · 5</span></div>
+      <div class="sec-head"><h2>Projects</h2><span class="count">AI AGENT · 3</span></div>
 
       <article class="proj">
         <div class="proj-top"><h3>산책 추천 에이전트</h3></div>
@@ -185,7 +184,6 @@ footer{border-top:1px solid var(--card-line);padding:40px 0 56px;margin-top:24px
           <span class="node">경로 추천</span>
         </div>
         <a class="btn" href="https://github.com/koreamax/walk_web" target="_blank" rel="noopener">GitHub 보기 →</a>
-        <div class="shot">화면 이미지 추가 예정</div>
       </article>
 
       <article class="proj">
@@ -201,7 +199,6 @@ footer{border-top:1px solid var(--card-line);padding:40px 0 56px;margin-top:24px
           <span class="node">TTS</span>
         </div>
         <a class="btn" href="https://github.com/koreamax/wilson_chatbot" target="_blank" rel="noopener">GitHub 보기 →</a>
-        <div class="shot">화면 이미지 추가 예정</div>
       </article>
 
       <article class="proj">
@@ -217,39 +214,6 @@ footer{border-top:1px solid var(--card-line);padding:40px 0 56px;margin-top:24px
           <span class="node">Gemini 민원 생성</span>
         </div>
         <a class="btn" href="https://github.com/koreamax/TECH4GOOD_OH" target="_blank" rel="noopener">GitHub 보기 →</a>
-        <div class="shot">화면 이미지 추가 예정</div>
-      </article>
-
-      <article class="proj">
-        <div class="proj-top"><h3>거리뷰 간판 탐지·인식 파이프라인</h3></div>
-        <p>Computer Security &amp; Distributed Computing LAB 학부연구. Google Street View 이미지에서 간판을 탐지하고, OCR과 VLM으로 텍스트를 인식·해석하는 파이프라인 연구.</p>
-        <div class="pipe" aria-label="파이프라인">
-          <span class="node src">Google Street View</span>
-          <span class="link-line" aria-hidden="true"></span>
-          <span class="node">간판 탐지</span>
-          <span class="link-line" aria-hidden="true"></span>
-          <span class="node">OCR</span>
-          <span class="link-line" aria-hidden="true"></span>
-          <span class="node">VLM</span>
-        </div>
-        <span class="btn soon">GitHub 준비 중</span>
-        <div class="shot">화면 이미지 추가 예정</div>
-      </article>
-
-      <article class="proj">
-        <div class="proj-top"><h3>한이음 · 시각장애인 보행 보조 AI</h3></div>
-        <p>한이음 프로젝트. Jetson Orin Nano 온디바이스 환경에서 YOLO와 Optical Flow로 보행 환경을 인식하고, VLM 해석 결과를 TTS로 안내하는 시스템.</p>
-        <div class="pipe" aria-label="파이프라인">
-          <span class="node src">Camera</span>
-          <span class="link-line" aria-hidden="true"></span>
-          <span class="node">YOLO &amp; Optical Flow</span>
-          <span class="link-line" aria-hidden="true"></span>
-          <span class="node">VLM</span>
-          <span class="link-line" aria-hidden="true"></span>
-          <span class="node">TTS</span>
-        </div>
-        <span class="btn soon">GitHub 준비 중</span>
-        <div class="shot">화면 이미지 추가 예정</div>
       </article>
 
     </div>
@@ -281,11 +245,10 @@ footer{border-top:1px solid var(--card-line);padding:40px 0 56px;margin-top:24px
 
   <section id="quals">
     <div class="wrap">
-      <div class="sec-head"><h2>Qualifications</h2><span class="count">3</span></div>
+      <div class="sec-head"><h2>Qualifications</h2><span class="count">2</span></div>
       <div class="list">
         <div class="row"><span class="date">2026.08</span><span class="name">AWS Certified Cloud Practitioner</span><span class="role plain">AWS Training and Certification</span></div>
         <div class="row"><span class="date">2025.04</span><span class="name">네트워크관리사 2급</span><span class="role plain">한국정보통신자격협회</span></div>
-        <div class="row"><span class="date">2023.02</span><span class="name">COSPRO (C) 2급</span><span class="role plain">YBM IT</span></div>
       </div>
     </div>
   </section>
