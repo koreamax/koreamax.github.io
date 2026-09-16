@@ -158,3 +158,15 @@ body { font-family: 'Nanum Gothic', sans-serif; color: #ffffff; }
 @media (max-width: 900px) { .giant-word { font-size: 26vw !important; } }
 @media (max-width: 1340px) { .hero-card { display: none !important; } }
 @keyframes statusPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.7); } }
+
+/* 스킬 카드: 데스크톱에서는 5개를 한 줄에 */
+.skills-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .skills-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .skills-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .skills-grid { grid-template-columns: 1fr; } }
+
+/* 연락처 버튼: 호버 시 각 서비스 브랜드 색 */
+.dc .btn-email:hover { background: #ea4335 !important; color: #ffffff; border-color: #ea4335; }
+.dc .btn-github:hover { background: #ffffff !important; color: #24292f; border-color: #ffffff; }
+.dc .btn-velog:hover { background: #20c997 !important; color: #0b1f19; border-color: #20c997; }
+.dc .btn-linkedin:hover { background: #0a66c2 !important; color: #ffffff; border-color: #0a66c2; }

@@ -18,6 +18,9 @@ import {
 /* ───────────────────────── 공통 스타일 ───────────────────────── */
 
 const RED = "#da291c";
+const GREEN = "#22c55e";
+/** 프로젝트/활동 상태 색: 진행 중 = 초록, 종료/완료 = 빨강 */
+const statusColor = (status: string) => (status.includes("진행") ? GREEN : RED);
 const BHS = "'Black Han Sans', sans-serif";
 const MONO = "'Nanum Gothic Coding', monospace";
 
@@ -179,10 +182,10 @@ function ImageSlot({ src, placeholder, radius = 0 }: { src?: string; placeholder
 
 /* ───────────────────────── 타임라인 진행 상태 ───────────────────────── */
 
-const FLUX_ONGOING = { "--flux-from": "#da291c", "--flux-to": "#ff8a7a" } as CSSProperties;
-const FLUX_DONE = { "--flux-from": "rgba(255,255,255,0.28)", "--flux-to": "rgba(255,255,255,0.5)" } as CSSProperties;
+const FLUX_ONGOING = { "--flux-from": "#16a34a", "--flux-to": "#4ade80" } as CSSProperties;
+const FLUX_DONE = { "--flux-from": "#da291c", "--flux-to": "#ff8a7a" } as CSSProperties;
 
-/** 하고 있는 활동은 빨간 바가 계속 흐르고, 끝난 활동은 회색 바가 꽉 찬 채로 멈춰 있다 */
+/** 하고 있는 활동은 초록 바가 계속 흐르고, 끝난 활동은 빨간 바가 꽉 찬 채로 멈춰 있다 */
 function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
@@ -193,7 +196,7 @@ function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
             fontSize: 11,
             fontWeight: 700,
             letterSpacing: 1,
-            color: ongoing ? RED : "rgba(255,255,255,0.45)",
+            color: ongoing ? GREEN : RED,
             display: "inline-flex",
             alignItems: "center",
             gap: 6,
@@ -205,8 +208,8 @@ function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
               width: 6,
               height: 6,
               borderRadius: 9999,
-              background: ongoing ? RED : "rgba(255,255,255,0.35)",
-              boxShadow: ongoing ? `0 0 8px ${RED}` : "none",
+              background: ongoing ? GREEN : RED,
+              boxShadow: ongoing ? `0 0 8px ${GREEN}` : "none",
               animation: ongoing ? "statusPulse 1.4s ease-in-out infinite" : "none",
             }}
           />
@@ -674,7 +677,7 @@ export default function Portfolio() {
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "18px 0 6px" }}>
                 <p style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: RED }}>{p.tag}</p>
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 9999, padding: "4px 10px" }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: statusColor(p.status), border: `1px solid ${statusColor(p.status)}`, borderRadius: 9999, padding: "4px 10px" }}>
                   {p.status}
                 </span>
               </div>
@@ -696,7 +699,7 @@ export default function Portfolio() {
               <span style={{ fontSize: 17, fontWeight: 700 }}>{m.title}</span>
               <span style={{ fontSize: 14, lineHeight: 1.5, color: "rgba(255,255,255,0.55)" }}>{m.desc}</span>
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: RED }}>{m.tag}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>{m.status}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: statusColor(m.status) }}>{m.status}</span>
             </a>
           ))}
         </div>
@@ -779,9 +782,9 @@ export default function Portfolio() {
       <section id="skills" style={{ maxWidth: 1280, margin: "0 auto", padding: "112px 24px" }}>
         <p style={eyebrow}>Skills</p>
         <h2 style={{ margin: "0 0 48px", fontFamily: BHS, fontSize: 48, lineHeight: 1.1 }}>다섯 개의 무기</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 24 }}>
+        <div className="skills-grid" style={{ display: "grid", gap: 16 }}>
           {skills.map((g) => (
-            <div key={g.num} className="skill-card" style={{ background: "#1f1f1f", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 4, padding: 28 }}>
+            <div key={g.num} className="skill-card" style={{ background: "#1f1f1f", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 4, padding: 22 }}>
               <p style={{ margin: 0, fontFamily: BHS, fontSize: 40, color: RED }}>{g.num}</p>
               <h3 style={{ margin: "12px 0 16px", fontSize: 20, fontWeight: 700 }}>{g.area}</h3>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -799,23 +802,23 @@ export default function Portfolio() {
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "120px 24px 64px", textAlign: "center" }}>
           <h2 style={{ margin: "0 0 32px", fontFamily: BHS, fontSize: 72, lineHeight: 1.1 }}>같이 만들어볼까요?</h2>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="mailto:koreamax012@gmail.com" className="btn-red" style={{ ...contactBtn, background: RED }}>
+            <a href="mailto:koreamax012@gmail.com" className="btn-red btn-email" style={{ ...contactBtn, background: RED }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
               </svg>
               Email
             </a>
-            <a href="https://github.com/koreamax" target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
+            <a href="https://github.com/koreamax" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-github" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
               </svg>
               GitHub
             </a>
-            <a href="https://velog.io/@koreamax01/posts" target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
+            <a href="https://velog.io/@koreamax01/posts" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-velog" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
               <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 18, height: 18, borderRadius: 3, background: "#20c997", color: "#161616", fontFamily: MONO, fontWeight: 700, fontSize: 13 }}>V</span>
               Velog
             </a>
-            <a href="https://www.linkedin.com/in/koreamax" target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
+            <a href="https://www.linkedin.com/in/koreamax" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-linkedin" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
               </svg>
