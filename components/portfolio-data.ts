@@ -28,14 +28,7 @@ export interface Project {
 }
 
 export const projects: Project[] = [
-  {
-    ph: "VIAssist 사진",
-    tag: "Embedded · AI",
-    status: "종료",
-    title: "VIAssist",
-    desc: "한이음 프로젝트 — Jetson Orin Nano 기반 YOLO + Optical Flow + VLM + TTS 시각장애인 보행 보조 웨어러블.",
-    repo: "https://github.com/koreamax/VIAssist_Total",
-  },
+  // 온 더 스크린 대표 3개 = 지금 진행 중인 프로젝트
   {
     ph: "Goliath Crane 사진",
     tag: "Embedded",
@@ -45,12 +38,20 @@ export const projects: Project[] = [
     repo: "https://github.com/koreamax/Hanhwa-Ocean-Goliath-Crane",
   },
   {
-    ph: "LLM ROUTER 사진",
+    ph: "GSV Paper 사진",
     tag: "AI",
-    status: "종료",
-    title: "LLM ROUTER",
-    desc: "SKT Efficient LLM Routing Challenge — 질문에 맞는 모델로 라우팅해 비용과 품질을 동시에 잡는 라우터.",
-    repo: "https://github.com/koreamax/SKTLLMROUTER0.710",
+    status: "진행 중",
+    title: "GSV Paper",
+    desc: "구글 스트리트뷰 간판을 YOLO로 검출하고 OCR + VLM으로 텍스트를 추출하는 파이프라인.",
+    repo: "https://github.com/koreamax/GSV_SIGNBOARD",
+  },
+  {
+    ph: "JeokjaeJeokso 사진",
+    tag: "Embedded",
+    status: "진행 중",
+    title: "JeokjaeJeokso",
+    desc: "현대자동차 임베디드 SW 공모전 — 라즈베리파이 센서로 트럭 적재물을 측정하고 디지털 트윈으로 시각화.",
+    repo: "https://github.com/koreamax/2026ESWContest_mobility_JeokjaeJeokso",
   },
 ];
 
@@ -64,18 +65,18 @@ export interface MoreProject {
 
 export const moreProjects: MoreProject[] = [
   {
-    title: "GSV Paper",
-    desc: "구글 스트리트뷰 간판을 YOLO로 검출하고 OCR + VLM으로 텍스트를 추출하는 파이프라인",
-    tag: "AI",
-    status: "진행 중",
-    repo: "https://github.com/koreamax/GSV_SIGNBOARD",
+    title: "VIAssist",
+    desc: "한이음 프로젝트 — Jetson Orin Nano 기반 YOLO + Optical Flow + VLM + TTS 시각장애인 보행 보조 웨어러블",
+    tag: "Embedded · AI",
+    status: "종료",
+    repo: "https://github.com/koreamax/VIAssist_Total",
   },
   {
-    title: "JeokjaeJeokso",
-    desc: "현대자동차 임베디드 SW 공모전 — 라즈베리파이 센서로 트럭 적재물을 측정하고 디지털 트윈으로 시각화",
-    tag: "Embedded",
-    status: "진행 중",
-    repo: "https://github.com/koreamax/2026ESWContest_mobility_JeokjaeJeokso",
+    title: "LLM ROUTER",
+    desc: "SKT Efficient LLM Routing Challenge — 질문에 맞는 모델로 라우팅해 비용과 품질을 동시에 잡는 라우터",
+    tag: "AI",
+    status: "종료",
+    repo: "https://github.com/koreamax/SKTLLMROUTER0.710",
   },
   {
     title: "beautytalk",

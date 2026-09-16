@@ -167,6 +167,6 @@ body { font-family: 'Nanum Gothic', sans-serif; color: #ffffff; }
 
 /* 연락처 버튼: 호버 시 각 서비스 브랜드 색 */
 .dc .btn-email:hover { background: #ea4335 !important; color: #ffffff; border-color: #ea4335; }
-.dc .btn-github:hover { background: #ffffff !important; color: #24292f; border-color: #ffffff; }
+.dc .btn-github:hover { background: #000000 !important; color: #ffffff; border-color: #ffffff; }
 .dc .btn-velog:hover { background: #20c997 !important; color: #0b1f19; border-color: #20c997; }
 .dc .btn-linkedin:hover { background: #0a66c2 !important; color: #ffffff; border-color: #0a66c2; }

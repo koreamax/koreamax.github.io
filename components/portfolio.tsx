@@ -19,6 +19,51 @@ import {
 
 const RED = "#da291c";
 const GREEN = "#22c55e";
+/** 분야 태그 색 (Web / App / AI / Cloud / Embedded) */
+const TAG_COLORS: Record<string, string> = {
+  AI: "#a78bfa",
+  WEB: "#60a5fa",
+  APP: "#22d3ee",
+  "WEB/APP": "#60a5fa",
+  CLOUD: "#fbbf24",
+  EMBEDDED: "#34d399",
+};
+
+/** "Cloud · AI · Web" 같은 태그 문자열을 색 칩으로 */
+function TagChips({ tag, size = "sm" }: { tag: string; size?: "sm" | "xs" }) {
+  const parts = tag.split("·").map((t) => t.trim()).filter(Boolean);
+  const h = size === "sm" ? 22 : 20;
+  return (
+    <span style={{ display: "inline-flex", gap: 6, flexWrap: "wrap" }}>
+      {parts.map((t) => {
+        const c = TAG_COLORS[t.toUpperCase()] ?? "rgba(255,255,255,0.6)";
+        return (
+          <span
+            key={t}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              height: h,
+              padding: "0 9px",
+              borderRadius: 6,
+              background: `color-mix(in srgb, ${c} 16%, transparent)`,
+              border: `1px solid color-mix(in srgb, ${c} 55%, transparent)`,
+              color: c,
+              fontSize: size === "sm" ? 11 : 10.5,
+              fontWeight: 700,
+              letterSpacing: 1.2,
+              textTransform: "uppercase",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {t}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
 /** 프로젝트/활동 상태 색: 진행 중 = 초록, 종료/완료 = 빨강 */
 const statusColor = (status: string) => (status.includes("진행") ? GREEN : RED);
 const BHS = "'Black Han Sans', sans-serif";
@@ -676,7 +721,7 @@ export default function Portfolio() {
                 <ImageSlot src={p.image} placeholder={p.ph} />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "18px 0 6px" }}>
-                <p style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: RED }}>{p.tag}</p>
+                <TagChips tag={p.tag} />
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: statusColor(p.status), border: `1px solid ${statusColor(p.status)}`, borderRadius: 9999, padding: "4px 10px" }}>
                   {p.status}
                 </span>
@@ -698,7 +743,7 @@ export default function Portfolio() {
             >
               <span style={{ fontSize: 17, fontWeight: 700 }}>{m.title}</span>
               <span style={{ fontSize: 14, lineHeight: 1.5, color: "rgba(255,255,255,0.55)" }}>{m.desc}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: RED }}>{m.tag}</span>
+              <TagChips tag={m.tag} size="xs" />
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: statusColor(m.status) }}>{m.status}</span>
             </a>
           ))}
@@ -802,7 +847,7 @@ export default function Portfolio() {
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "120px 24px 64px", textAlign: "center" }}>
           <h2 style={{ margin: "0 0 32px", fontFamily: BHS, fontSize: 72, lineHeight: 1.1 }}>같이 만들어볼까요?</h2>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="mailto:koreamax012@gmail.com" className="btn-red btn-email" style={{ ...contactBtn, background: RED }}>
+            <a href="mailto:koreamax012@gmail.com" className="btn-ghost btn-email" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
               </svg>
