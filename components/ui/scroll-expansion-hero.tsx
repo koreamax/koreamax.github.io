@@ -49,11 +49,26 @@ const ScrollExpandMedia = ({
   }, [mediaType]);
 
   useEffect(() => {
+    // 이 섹션이 페이지 최상단이 아니어도 동작하도록, "0" 대신 섹션의 상단 위치에 스크롤을 고정한다.
+    const getTop = (): number => {
+      const el = sectionRef.current;
+      return el ? Math.round(el.getBoundingClientRect().top + window.scrollY) : 0;
+    };
+
     const handleWheel = (e: WheelEvent) => {
-      if (mediaFullyExpanded && e.deltaY < 0 && window.scrollY <= 5) {
-        setMediaFullyExpanded(false);
-        e.preventDefault();
-      } else if (!mediaFullyExpanded) {
+      const top = getTop();
+      if (mediaFullyExpanded) {
+        if (e.deltaY < 0 && window.scrollY <= top + 5) {
+          setMediaFullyExpanded(false);
+          e.preventDefault();
+        }
+      } else if (window.scrollY < top - 2) {
+        // 아직 섹션에 도달하기 전: 위 콘텐츠는 그냥 일반 스크롤
+        return;
+      } else if (scrollProgress <= 0 && e.deltaY < 0) {
+        // 섹션 상단에서 더 위로 올리는 경우: 일반 스크롤로 되돌려 보낸다
+        return;
+      } else {
         e.preventDefault();
         const scrollDelta = e.deltaY * 0.0009;
         const newProgress = Math.min(
@@ -80,11 +95,20 @@ const ScrollExpandMedia = ({
 
       const touchY = e.touches[0].clientY;
       const deltaY = touchStartY - touchY;
+      const top = getTop();
 
-      if (mediaFullyExpanded && deltaY < -20 && window.scrollY <= 5) {
-        setMediaFullyExpanded(false);
-        e.preventDefault();
-      } else if (!mediaFullyExpanded) {
+      if (mediaFullyExpanded) {
+        if (deltaY < -20 && window.scrollY <= top + 5) {
+          setMediaFullyExpanded(false);
+          e.preventDefault();
+        }
+      } else if (window.scrollY < top - 2) {
+        setTouchStartY(touchY);
+        return;
+      } else if (scrollProgress <= 0 && deltaY < 0) {
+        setTouchStartY(touchY);
+        return;
+      } else {
         e.preventDefault();
         // Increase sensitivity for mobile, especially when scrolling back
         const scrollFactor = deltaY < 0 ? 0.008 : 0.005; // Higher sensitivity for scrolling back
@@ -112,7 +136,8 @@ const ScrollExpandMedia = ({
 
     const handleScroll = (): void => {
       if (!mediaFullyExpanded) {
-        window.scrollTo(0, 0);
+        const top = getTop();
+        if (window.scrollY > top) window.scrollTo(0, top);
       }
     };
 

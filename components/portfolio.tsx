@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
   awards,
   corridorTitles,
@@ -139,9 +139,16 @@ function Corridor() {
 /* ───────────────────────── 이미지 슬롯 ───────────────────────── */
 
 function ImageSlot({ src, placeholder, radius = 0 }: { src?: string; placeholder: string; radius?: number }) {
-  if (src) {
+  const [failed, setFailed] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+  // SSR 로 그려진 <img> 는 하이드레이션 전에 error 이벤트가 끝나 있을 수 있으므로 마운트 시 한 번 더 확인
+  useEffect(() => {
+    const el = imgRef.current;
+    if (el && el.complete && el.naturalWidth === 0) setFailed(true);
+  }, [src]);
+  if (src && !failed) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={placeholder} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: radius }} />;
+    return <img ref={imgRef} src={src} alt={placeholder} onError={() => setFailed(true)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: radius }} />;
   }
   return (
     <div
@@ -185,7 +192,7 @@ const MARQUEE_ITEMS = ["WEB/APP", "AI", "CLOUD", "EMBEDDED"];
 
 /* ───────────────────────── 컴포넌트 ───────────────────────── */
 
-export default function Portfolio() {
+export default function Portfolio({ afterHero }: { afterHero?: ReactNode }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const wordRef = useRef<HTMLDivElement>(null);
@@ -463,6 +470,9 @@ export default function Portfolio() {
           </div>
         </div>
       </header>
+
+      {/* ── 얼굴 히어로 다음에 오는 스크롤 확장 연출 ── */}
+      {afterHero}
 
       {/* ── MARQUEE ── */}
       <div style={{ overflow: "hidden", background: RED, padding: "14px 0", display: "flex" }}>

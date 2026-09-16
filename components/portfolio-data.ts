@@ -6,14 +6,14 @@ export type SpreadCard =
   | { kind: "label"; label: string; num: string; w: number; h: number; z: number };
 
 export const spreadCards: SpreadCard[] = [
-  // src에 "/uploads/파일명.png" 을 넣으면 활동 사진이 표시된다. (비우면 플레이스홀더)
-  { kind: "image", ph: "활동 사진 1", w: 17, h: 22, z: 2 },
+  // 활동 사진: public/uploads/ 에 아래 파일명으로 저장하면 표시된다. (파일이 없으면 플레이스홀더)
+  { kind: "image", src: "/uploads/activity-khtml-aws.jpg", ph: "K-HTML 해커톤 · AWS", w: 17, h: 22, z: 2 },
   { kind: "label", label: "Web/App", num: "01", w: 16, h: 20, z: 3 },
-  { kind: "image", ph: "활동 사진 2", w: 15, h: 26, z: 4 },
+  { kind: "image", src: "/uploads/activity-skt-best.jpg", ph: "SKT FLY AI 최우수상", w: 15, h: 26, z: 4 },
   { kind: "label", label: "AI", num: "02", w: 18, h: 22, z: 5 },
-  { kind: "image", ph: "활동 사진 3", w: 16, h: 24, z: 6 },
+  { kind: "image", src: "/uploads/activity-skt-project.jpg", ph: "SKT FLY AI 프로젝트 우수상", w: 16, h: 24, z: 6 },
   { kind: "label", label: "Cloud", num: "03", w: 16, h: 20, z: 7 },
-  { kind: "image", ph: "활동 사진 4", w: 17, h: 22, z: 8 },
+  { kind: "image", src: "/uploads/activity-piuda.jpg", ph: "피우다 프로젝트 장려상", w: 17, h: 22, z: 8 },
   { kind: "label", label: "Embedded", num: "04", w: 15, h: 20, z: 9 },
 ];
 

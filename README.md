@@ -23,5 +23,13 @@ npm run build    # out/ 에 정적 파일 생성
 
 ## 이미지 슬롯 채우기
 
-활동 사진 4장과 대표 프로젝트 3장은 아직 비어 있다. `public/uploads/` 에 이미지를 넣고
-`components/portfolio-data.ts` 의 `spreadCards[].src`, `projects[].image` 에 `/uploads/파일명` 을 적으면 된다.
+활동 사진 4장은 `public/uploads/` 에 아래 파일명으로 저장하면 바로 표시된다 (파일이 없으면 플레이스홀더).
+
+| 파일명 | 사진 |
+| --- | --- |
+| `activity-khtml-aws.jpg` | K-HTML 해커톤 우수상 (AWS 벽 앞 단체) |
+| `activity-skt-best.jpg` | SKT FLY AI 9기 개인 최우수상 (무대 시상) |
+| `activity-skt-project.jpg` | SKT FLY AI 9기 프로젝트 우수상 (팀 단체) |
+| `activity-piuda.jpg` | 제15회 피우다 프로젝트 장려상 (단체) |
+
+대표 프로젝트 3장은 `components/portfolio-data.ts` 의 `projects[].image` 에 `/uploads/파일명` 을 적으면 된다.
