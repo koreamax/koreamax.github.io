@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import ScrollShrinkHero from "@/components/ui/scroll-shrink-hero";
 import {
   awards,
   corridorTitles,
@@ -192,7 +193,7 @@ const MARQUEE_ITEMS = ["WEB/APP", "AI", "CLOUD", "EMBEDDED"];
 
 /* ───────────────────────── 컴포넌트 ───────────────────────── */
 
-export default function Portfolio({ afterHero }: { afterHero?: ReactNode }) {
+export default function Portfolio() {
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const wordRef = useRef<HTMLDivElement>(null);
@@ -389,7 +390,8 @@ export default function Portfolio({ afterHero }: { afterHero?: ReactNode }) {
         </div>
       </nav>
 
-      {/* ── HERO ── */}
+      {/* ── HERO (스크롤하면 이 화면 전체가 작아지며 아래로 내려온다) ── */}
+      <ScrollShrinkHero>
       <header id="top" ref={headerRef} style={{ position: "relative", overflow: "hidden", padding: "48px 24px 0" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 600, letterSpacing: 2, color: "rgba(255,255,255,0.4)" }}>
           <span>01 &nbsp;WEB/APP</span>
@@ -470,9 +472,7 @@ export default function Portfolio({ afterHero }: { afterHero?: ReactNode }) {
           </div>
         </div>
       </header>
-
-      {/* ── 얼굴 히어로 다음에 오는 스크롤 확장 연출 ── */}
-      {afterHero}
+      </ScrollShrinkHero>
 
       {/* ── MARQUEE ── */}
       <div style={{ overflow: "hidden", background: RED, padding: "14px 0", display: "flex" }}>
