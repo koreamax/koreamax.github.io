@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import ScrollShrinkHero from "@/components/ui/scroll-shrink-hero";
+import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
+import TechBadge from "@/components/tech-badge";
 import {
   awards,
   corridorTitles,
@@ -175,6 +177,53 @@ function ImageSlot({ src, placeholder, radius = 0 }: { src?: string; placeholder
   );
 }
 
+/* ───────────────────────── 타임라인 진행 상태 ───────────────────────── */
+
+const FLUX_ONGOING = { "--flux-from": "#da291c", "--flux-to": "#ff8a7a" } as CSSProperties;
+const FLUX_DONE = { "--flux-from": "rgba(255,255,255,0.28)", "--flux-to": "rgba(255,255,255,0.5)" } as CSSProperties;
+
+/** 하고 있는 활동은 빨간 바가 계속 흐르고, 끝난 활동은 회색 바가 꽉 찬 채로 멈춰 있다 */
+function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>{kind}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", justifyContent: "flex-end" }}>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: 1,
+            color: ongoing ? RED : "rgba(255,255,255,0.45)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: 9999,
+              background: ongoing ? RED : "rgba(255,255,255,0.35)",
+              boxShadow: ongoing ? `0 0 8px ${RED}` : "none",
+              animation: ongoing ? "statusPulse 1.4s ease-in-out infinite" : "none",
+            }}
+          />
+          {ongoing ? "진행 중" : "완료"}
+        </span>
+        <div style={{ width: 96, ...(ongoing ? FLUX_ONGOING : FLUX_DONE) }}>
+          {ongoing ? (
+            <ProgressiveFluxLoader showLabel={false} duration={4} loop className="max-w-none gap-0" barClassName="h-1.5 bg-white/10 shadow-none" />
+          ) : (
+            <ProgressiveFluxLoader showLabel={false} value={100} className="max-w-none gap-0" barClassName="h-1.5 bg-white/10 shadow-none" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ───────────────────────── 스크롤 연출 설정 ───────────────────────── */
 
 const CFG = [
@@ -203,6 +252,19 @@ export default function Portfolio() {
   const spreadTextRef = useRef<HTMLDivElement>(null);
   const spreadHintRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const shrinkRef = useRef<HTMLDivElement>(null);
+  const [shrinkNatural, setShrinkNatural] = useState(0);
+
+  // 작아지는 블록(얼굴+이름+소개)의 원래 높이를 재서, 작아진 만큼 아래 여백을 당겨 올린다
+  useEffect(() => {
+    const el = shrinkRef.current;
+    if (!el) return;
+    const measure = () => setShrinkNatural(el.offsetHeight);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -392,6 +454,10 @@ export default function Portfolio() {
 
       {/* ── HERO (스크롤하면 이 화면 전체가 작아지며 아래로 내려온다) ── */}
       <ScrollShrinkHero>
+      {(p) => {
+        const scale = 1 - p * 0.58;
+        const sinkPx = p * 120;
+        return (
       <header id="top" ref={headerRef} style={{ position: "relative", overflow: "hidden", padding: "48px 24px 0" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 600, letterSpacing: 2, color: "rgba(255,255,255,0.4)" }}>
           <span>01 &nbsp;WEB/APP</span>
@@ -399,7 +465,7 @@ export default function Portfolio() {
           <span>03 &nbsp;CLOUD</span>
           <span>04 &nbsp;EMBEDDED</span>
         </div>
-        <div style={{ position: "relative", maxWidth: 1280, margin: "0 auto", minHeight: "calc(100vh - 140px)" }}>
+        <div style={{ position: "relative", display: "flow-root", maxWidth: 1280, margin: "0 auto", minHeight: `max(600px, calc((100vh - 140px) * ${(1 - p * 0.5).toFixed(3)}))` }}>
           <div
             ref={wordRef}
             className="giant-word"
@@ -420,6 +486,17 @@ export default function Portfolio() {
           >
             멀티플레이어
           </div>
+          {/* 스크롤하면 이 블록(얼굴 + 이름 + 소개)만 작아지며 아래로 내려온다 */}
+          <div
+            ref={shrinkRef}
+            style={{
+              position: "relative",
+              transformOrigin: "50% 0%",
+              transform: `translateY(${sinkPx}px) scale(${scale})`,
+              marginBottom: shrinkNatural ? -(shrinkNatural * (1 - scale)) + sinkPx : 0,
+              willChange: "transform",
+            }}
+          >
           <div style={{ position: "absolute", left: "50%", top: 30, transform: "translateX(-50%)", height: 560, animation: "heroFloat 5s ease-in-out infinite" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -453,6 +530,7 @@ export default function Portfolio() {
               </a>
             </div>
           </div>
+          </div>
           <div
             className="hero-card"
             style={{
@@ -472,6 +550,8 @@ export default function Portfolio() {
           </div>
         </div>
       </header>
+        );
+      }}
       </ScrollShrinkHero>
 
       {/* ── MARQUEE ── */}
@@ -511,7 +591,7 @@ export default function Portfolio() {
             <p style={{ margin: "16px 0 0", fontSize: 15, color: "rgba(255,255,255,0.55)", maxWidth: 480 }}>
               Web/App · AI · Cloud · Embedded
               <br />
-              문제가 부르는 곳이 제 자리입니다
+              전부 다 수상으로 증명
             </p>
           </div>
           {spreadCards.map((c, i) => (
@@ -625,20 +705,20 @@ export default function Portfolio() {
       {/* ── TIMELINE ── */}
       <section id="timeline" style={{ maxWidth: 1280, margin: "0 auto", padding: "64px 24px" }}>
         <p style={eyebrow}>Latest</p>
-        <h2 style={{ margin: "0 0 48px", fontFamily: BHS, fontSize: 48, lineHeight: 1.1 }}>민형은 지금 어디에?</h2>
+        <h2 style={{ margin: "0 0 48px", fontFamily: BHS, fontSize: 48, lineHeight: 1.1 }}>지금 어디에?</h2>
         <div>
           {events.map((e) => (
             <div
               key={e.date + e.title}
               className="row-hover"
-              style={{ display: "grid", gridTemplateColumns: "150px minmax(0,1fr) auto", gap: 32, alignItems: "baseline", padding: "28px 12px", borderTop: "1px solid rgba(255,255,255,0.12)" }}
+              style={{ display: "grid", gridTemplateColumns: "150px minmax(0,1fr) 200px", gap: 32, alignItems: "baseline", padding: "28px 12px", borderTop: "1px solid rgba(255,255,255,0.12)" }}
             >
               <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, color: RED }}>{e.date}</span>
               <div>
                 <h3 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>{e.title}</h3>
                 <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "rgba(255,255,255,0.55)", maxWidth: 640 }}>{e.desc}</p>
               </div>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>{e.kind}</span>
+              <StatusMeter kind={e.kind} ongoing={e.ongoing} />
             </div>
           ))}
         </div>
@@ -695,19 +775,6 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* ── QUOTE ── */}
-      <section style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ maxWidth: 880, margin: "0 auto", padding: "120px 24px", textAlign: "center" }}>
-          <div style={{ fontFamily: BHS, fontSize: 88, lineHeight: 0.5, color: RED }}>{"“"}</div>
-          <blockquote style={{ margin: "32px 0 0", fontFamily: "'Nanum Myeongjo', serif", fontWeight: 400, fontSize: 38, lineHeight: 1.45 }}>
-            스택은 도구일 뿐,
-            <br />
-            문제를 끝까지 푸는 게 제 일입니다
-          </blockquote>
-          <p style={{ margin: "28px 0 0", fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>이민형 — Multiplayer Developer</p>
-        </div>
-      </section>
-
       {/* ── SKILLS ── */}
       <section id="skills" style={{ maxWidth: 1280, margin: "0 auto", padding: "112px 24px" }}>
         <p style={eyebrow}>Skills</p>
@@ -719,12 +786,7 @@ export default function Portfolio() {
               <h3 style={{ margin: "12px 0 16px", fontSize: 20, fontWeight: 700 }}>{g.area}</h3>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {g.items.map((it) => (
-                  <span
-                    key={it}
-                    style={{ display: "inline-flex", alignItems: "center", height: 28, padding: "0 12px", borderRadius: 9999, border: "1px solid rgba(255,255,255,0.2)", fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.75)" }}
-                  >
-                    {it}
-                  </span>
+                  <TechBadge key={it} name={it} />
                 ))}
               </div>
             </div>

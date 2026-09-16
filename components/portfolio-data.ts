@@ -126,6 +126,8 @@ export interface TimelineEvent {
   title: string;
   desc: string;
   kind: string;
+  /** true = 아직 하고 있는 활동, false = 끝난 활동 */
+  ongoing: boolean;
 }
 
 export const events: TimelineEvent[] = [
@@ -134,48 +136,56 @@ export const events: TimelineEvent[] = [
     title: "IoT Microprocessor 강의 조교",
     desc: "동국대학교 IoT 마이크로프로세서 강의 Teaching Assistant.",
     kind: "TA",
+    ongoing: true,
   },
   {
     date: "2026.06 – 09",
     title: "SKT FLY AI CHALLENGER 9기",
     desc: "AI & Cloud Developer — 개인 최우수상·프로젝트 부문 SK텔레콤 대표이사상 수상.",
     kind: "Program",
+    ongoing: false,
   },
   {
     date: "2026.05 ~",
     title: "AWS Student Builder Groups at DGU 1기",
     desc: "Core Member(운영진)로 커뮤니티 운영.",
     kind: "Community",
+    ongoing: true,
   },
   {
     date: "2026.03 – 06",
     title: "Computer Architecture 강의 조교",
     desc: "컴퓨터 구조 강의 Teaching Assistant.",
     kind: "TA",
+    ongoing: false,
   },
   {
     date: "2025.07 ~",
     title: "Computer Security & Distributed Computing LAB",
     desc: "학부연구생 — 보안·분산 컴퓨팅 연구.",
     kind: "Research",
+    ongoing: true,
   },
   {
     date: "2025.07 – 2026.04",
     title: "AWS Cloud Club at DGU 1기",
     desc: "General Member로 클라우드 커뮤니티 활동.",
     kind: "Community",
+    ongoing: false,
   },
   {
     date: "2025.03 – 12",
     title: "FARM SYSTEM 4기 웹/보안 트랙",
     desc: "Backend Developer.",
     kind: "Program",
+    ongoing: false,
   },
   {
     date: "2023.01 – 06",
     title: "코리아 IT 아카데미 JSP & Spring Boot 백엔드 과정",
     desc: "Backend Developer 과정 수료.",
     kind: "Program",
+    ongoing: false,
   },
 ];
 
