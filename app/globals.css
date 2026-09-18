@@ -177,11 +177,9 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 .intro { position: fixed; inset: 0; z-index: 1000; background: #161616; color: #ffffff; overflow: hidden; }
 .intro-stage { position: absolute; inset: 0; }
 .intro-word { position: absolute; display: inline-flex; align-items: baseline; font-family: 'Black Han Sans', sans-serif; font-weight: 400; letter-spacing: 0.01em; line-height: 1; white-space: nowrap; will-change: transform; opacity: 0; }
-.intro-rest { display: none; }
 .intro[data-state="word"] .intro-stage { display: flex; align-items: center; justify-content: center; }
 .intro[data-state="word"] .intro-word { position: static; font-size: clamp(96px, 24vw, 360px); letter-spacing: 0.02em; }
-.intro[data-state="scatter"] .intro-word, .intro[data-state="words"] .intro-word { position: absolute; }
-.intro[data-state="words"] .intro-rest { display: inline-flex; }
+.intro[data-state="scatter"] .intro-word { position: absolute; }
 .intro .w-b { left: 8vw; top: 18vh; font-size: clamp(64px, 13vw, 200px); }
 .intro .w-a { left: 12vw; top: 61vh; font-size: clamp(56px, 10.5vw, 160px); }
 .intro .w-c { left: 58vw; top: 13vh; font-size: clamp(48px, 9vw, 140px); }
@@ -192,7 +190,6 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .intro .w-c { left: 40vw; top: 58vh; }
   .intro .w-e { left: 8vw; top: 76vh; }
 }
-.intro-ch { display: inline-block; }
 
 /* ───────────── 모바일 보정 ───────────── */
 @media (max-width: 900px) {
@@ -204,17 +201,17 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 }
 
 /* ───────────── 히어로: 왼쪽 BACE 스택 / 오른쪽 얼굴 ───────────── */
-.hero-grid { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr); gap: 40px; align-items: center; min-height: 620px; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr); gap: 40px; align-items: center; min-height: clamp(330px, 44vh, 450px); }
 
-.bace-stack { position: relative; padding-left: 26px; margin-bottom: 40px; }
+.bace-stack { position: relative; padding-left: 24px; }
 .bace-stack::before { content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; width: 4px; border-radius: 4px; background: linear-gradient(#da291c, #ff6a3d); box-shadow: 0 0 22px rgba(218, 41, 28, 0.55); }
 .bace-row { display: flex; align-items: baseline; font-family: 'Black Han Sans', sans-serif; line-height: 1.04; white-space: nowrap; letter-spacing: 0.01em; }
-.bace-ini { display: inline-block; min-width: 0.78em; font-size: clamp(56px, 6.6vw, 96px); color: #da291c; text-shadow: 0 0 34px rgba(218, 41, 28, 0.5); }
-.bace-rest { font-size: clamp(30px, 3.6vw, 52px); color: #ffffff; }
+.bace-ini { display: inline-block; min-width: 0.78em; font-size: clamp(46px, 5.4vw, 82px); color: #da291c; text-shadow: 0 0 34px rgba(218, 41, 28, 0.5); }
+.bace-rest { font-size: clamp(25px, 3vw, 45px); color: #ffffff; }
 
-.hero-name { font-size: clamp(52px, 6vw, 88px); }
+.hero-name { font-size: clamp(44px, 5vw, 74px); }
 .hero-right { position: relative; display: flex; justify-content: center; }
-.face-wrap { position: relative; z-index: 1; height: clamp(380px, 46vw, 600px); }
+.face-wrap { position: relative; z-index: 1; height: clamp(300px, 33vw, 440px); }
 
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; gap: 8px; text-align: center; min-height: 0; }
@@ -224,4 +221,15 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .hero-sub { margin-left: auto !important; margin-right: auto !important; }
   .hero-ctas { justify-content: center; }
   .hero-right { order: -1; }
+}
+
+/* 히어로 가운데 블록 (이름 · 소개 · 버튼) */
+.hero-center { text-align: center; padding: 0 0 8px; }
+@media (max-width: 900px) { .hero-center { padding-top: 20px; } }
+@media (max-width: 600px) {
+  .face-wrap { height: 250px !important; }
+  .bace-ini { font-size: 40px !important; }
+  .bace-rest { font-size: 22px !important; }
+  .hero-name { font-size: 46px !important; }
+  .hero-sub { font-size: 14.5px !important; }
 }

@@ -549,28 +549,13 @@ export default function Portfolio() {
             <div className="hero-left">
               <div className="bace-stack">
                 {BACE.map((k) => (
-                  <span key={k.ini} className={`bace-row br-${k.ini.toLowerCase()}`} data-flip-id={`kw-${k.ini}`}>
-                    <span className="bace-ini">{k.ini}</span>
+                  <span key={k.ini} className={`bace-row br-${k.ini.toLowerCase()}`}>
+                    <span className="bace-ini" data-flip-id={`kw-${k.ini}`}>
+                      {k.ini}
+                    </span>
                     <span className="bace-rest">{k.rest}</span>
                   </span>
                 ))}
-              </div>
-              <div data-hero-item>
-                <h1 className="hero-name" style={{ margin: 0, fontFamily: BHS, lineHeight: 1.05, letterSpacing: "0.01em" }}>
-                  이민형
-                </h1>
-                <p className="hero-sub" style={{ margin: "18px 0 0", maxWidth: 520, fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.65)" }}>
-                  Backend부터 AI, Cloud, Embedded까지 모두를 아우를 수 있는
-                  <br />이 시대의 멀티플레이어 개발자
-                </p>
-              </div>
-              <div data-hero-item className="hero-ctas" style={{ display: "flex", gap: 12, marginTop: 30, flexWrap: "wrap" }}>
-                <a href="#work" className="btn-red" style={{ ...pillBtn, background: RED }}>
-                  프로젝트 보기
-                </a>
-                <a href="#contact" className="btn-ghost" style={{ ...pillBtn, border: "1px solid rgba(255,255,255,0.35)" }}>
-                  이력서 받기
-                </a>
               </div>
             </div>
 
@@ -595,6 +580,26 @@ export default function Portfolio() {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="hero-center">
+            <div data-hero-item>
+              <h1 className="hero-name" style={{ margin: 0, fontFamily: BHS, lineHeight: 1.05, letterSpacing: "0.01em" }}>
+                이민형
+              </h1>
+              <p className="hero-sub" style={{ margin: "16px auto 0", maxWidth: 560, fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.65)" }}>
+                Backend부터 AI, Cloud, Embedded까지 모두를 아우를 수 있는
+                <br />이 시대의 멀티플레이어 개발자
+              </p>
+            </div>
+            <div data-hero-item className="hero-ctas" style={{ display: "flex", gap: 12, marginTop: 26, flexWrap: "wrap", justifyContent: "center" }}>
+              <a href="#work" className="btn-red" style={{ ...pillBtn, background: RED }}>
+                프로젝트 보기
+              </a>
+              <a href="#contact" className="btn-ghost" style={{ ...pillBtn, border: "1px solid rgba(255,255,255,0.35)" }}>
+                이력서 받기
+              </a>
             </div>
           </div>
           </div>

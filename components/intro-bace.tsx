@@ -19,10 +19,10 @@ gsap.registerPlugin(Flip);
  */
 
 const WORDS = [
-  { l: "B", rest: "ackend", cls: "w-b" },
-  { l: "A", rest: "I", cls: "w-a" },
-  { l: "C", rest: "loud", cls: "w-c" },
-  { l: "E", rest: "mbedded", cls: "w-e" },
+  { l: "B", cls: "w-b" },
+  { l: "A", cls: "w-a" },
+  { l: "C", cls: "w-c" },
+  { l: "E", cls: "w-e" },
 ] as const;
 
 const KEY = "bace-intro-played";
@@ -67,9 +67,10 @@ export default function IntroBace() {
     const overlay = overlayRef.current;
     if (!overlay) return;
     const words = gsap.utils.toArray<HTMLElement>(".intro-word", overlay);
-    const chars = gsap.utils.toArray<HTMLElement>(".intro-ch", overlay);
+
     const heroItems = gsap.utils.toArray<HTMLElement>("[data-hero-item]");
-    const heroKw = gsap.utils.toArray<HTMLElement>("[data-flip-id].bace-row");
+    const heroIni = gsap.utils.toArray<HTMLElement>("[data-flip-id].bace-ini");
+    const heroRest = gsap.utils.toArray<HTMLElement>(".bace-rest");
 
     document.documentElement.classList.add("intro-lock");
     // 히어로 요소는 인트로가 걷힐 때 등장하도록 미리 숨겨 둔다 (오버레이 뒤라 보이지 않음)
@@ -105,49 +106,41 @@ export default function IntroBace() {
       Flip.from(state, { duration: 1.0, ease: "power3.inOut", stagger: 0.06, scale: true });
     }, 1.0);
 
-    // STEP 3 — 글자 옆에 나머지가 붙어 키워드가 됨
-    tl.add(() => {
-      overlay.dataset.state = "words";
-      gsap.fromTo(
-        chars,
-        { opacity: 0, y: 32 },
-        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.028 },
-      );
-    }, 2.0);
-
-    // STEP 4 — 네 단어가 실제 히어로의 키워드 칩으로 날아가고 배경이 걷힘
+    // STEP 3 — 흩어진 그 글자들이 곧바로 홈 화면의 B·A·C·E 자리로 날아가고 배경이 걷힘
     tl.add(() => {
       const state = Flip.getState(words, { props: "color" });
       gsap.set(words, { display: "none" });
-      gsap.set(heroKw, { opacity: 1 });
+      gsap.set(heroIni, { opacity: 1 });
+      gsap.set(heroRest, { opacity: 0, x: -14 });
       Flip.from(state, {
-        targets: heroKw,
-        duration: 0.95,
+        targets: heroIni,
+        duration: 0.9,
         ease: "power3.inOut",
         scale: true,
         stagger: 0.05,
         props: "color",
         onComplete: () => {
-          gsap.set(heroKw, { clearProps: "all" });
-          // 착지하면서 첫 글자 B·A·C·E 가 빨갛게 켜진다
+          gsap.set(heroIni, { clearProps: "all" });
+          // 착지한 자리에서 나머지 글자가 붙고, 첫 글자가 빨갛게 켜진다
+          gsap.to(heroRest, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out", stagger: 0.06, clearProps: "all" });
           gsap.fromTo(
-            heroKw.map((el) => el.querySelector(".bace-ini")),
+            heroIni,
             { color: "#ffffff", textShadow: "0 0 0 rgba(218,41,28,0)" },
             { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.5, ease: "power2.out", stagger: 0.07, clearProps: "color,textShadow" },
           );
         },
       });
-      gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.7, ease: "power2.inOut" });
+      gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.6, ease: "power2.inOut" });
       gsap.set(overlay, { pointerEvents: "none" });
-    }, 2.85);
+    }, 2.0);
 
     // 히어로 요소 순차 등장 (nav → 헤드라인 → 소개 → CTA → 얼굴)
     tl.add(() => {
       gsap.to(heroItems, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.12, clearProps: "transform,opacity" });
       if (portrait) gsap.to(portrait, { scale: 1, duration: 0.9, ease: "power3.out", clearProps: "transform" });
-    }, 3.05);
+    }, 2.2);
 
-    tl.add(() => {}, 3.9); // 완료 시점
+    tl.add(() => {}, 3.2); // 완료 시점
 
     return () => {
       alive = false;
@@ -170,14 +163,7 @@ export default function IntroBace() {
       <div className="intro-stage">
         {WORDS.map((w) => (
           <div key={w.l} className={`intro-word ${w.cls}`} data-flip-id={`kw-${w.l}`}>
-            <span className="intro-letter">{w.l}</span>
-            <span className="intro-rest">
-              {w.rest.split("").map((c, i) => (
-                <span key={i} className="intro-ch">
-                  {c}
-                </span>
-              ))}
-            </span>
+            {w.l}
           </div>
         ))}
       </div>
