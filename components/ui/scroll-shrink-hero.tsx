@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
  * 맨 위 화면의 스크롤 연출 컨트롤러.
@@ -19,6 +19,9 @@ export default function ScrollShrinkHero({
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
   const [touchStartY, setTouchStartY] = useState(0);
+  // 앵커 클릭 직후의 scroll 이벤트가 곧바로 맨 위로 되돌리지 않도록 동기적으로 읽는 값
+  const doneRef = useRef(false);
+  doneRef.current = done;
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
@@ -64,8 +67,29 @@ export default function ScrollShrinkHero({
     const handleTouchEnd = () => setTouchStartY(0);
 
     const handleScroll = () => {
-      if (!done && window.scrollY > 0) window.scrollTo(0, 0);
+      if (!doneRef.current && window.scrollY > 0) window.scrollTo(0, 0);
     };
+
+    // 헤더의 섹션 링크: 잠금을 풀어 해당 위치로 실제 이동하게 한다
+    const handleAnchor = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement | null)?.closest?.("a[href^='#']") as HTMLAnchorElement | null;
+      if (!a) return;
+      const hash = a.getAttribute("href") || "";
+      if (hash.length < 2) return;
+      if (hash === "#top") {
+        // 로고를 누르면 처음 상태(펼쳐진 히어로)로 되돌린다
+        e.preventDefault();
+        doneRef.current = false;
+        setDone(false);
+        setProgress(0);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      doneRef.current = true;
+      setDone(true);
+      setProgress(1);
+    };
+    document.addEventListener("click", handleAnchor, true);
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("scroll", handleScroll);
@@ -78,6 +102,7 @@ export default function ScrollShrinkHero({
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("click", handleAnchor, true);
     };
   }, [progress, done, touchStartY]);
 

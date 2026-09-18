@@ -118,6 +118,36 @@ const logoBox: CSSProperties = {
   background: "#ffffff",
 };
 
+/** 연락처 버튼 묶음 — 히어로 첫 화면에 둔다 */
+function Contacts() {
+  return (
+    <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+      <a href="mailto:koreamax012@gmail.com" className="btn-ghost btn-email" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+        </svg>
+        Email
+      </a>
+      <a href="https://github.com/koreamax" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-github" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+        </svg>
+        GitHub
+      </a>
+      <a href="https://velog.io/@koreamax01/posts" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-velog" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 18, height: 18, borderRadius: 3, background: "#20c997", color: "#161616", fontFamily: MONO, fontWeight: 700, fontSize: 13 }}>V</span>
+        Velog
+      </a>
+      <a href="https://www.linkedin.com/in/koreamax" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-linkedin" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+        </svg>
+        LinkedIn
+      </a>
+    </div>
+  );
+}
+
 /* ───────────────────────── 3D 프로젝트 복도 ───────────────────────── */
 
 const P = { persp: 30, cardH: 25, birth: 2.6, exit: 46, rb: -11, re: 44, fan: 3.3, tb: 6, te: 28, stops: 24 };
@@ -277,14 +307,14 @@ function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
 /* ───────────────────────── 스크롤 연출 설정 ───────────────────────── */
 
 const CFG = [
-  { sx: -8, sy: -10, sr: -18, x: -20, y: -34 },
-  { sx: 14, sy: -10, sr: 20, x: 32, y: -30 },
+  { sx: -8, sy: -10, sr: -18, x: -27, y: -41 },
+  { sx: 14, sy: -10, sr: 20, x: 34, y: -33 },
   { sx: -16, sy: 0, sr: -4, x: -36, y: -2 },
-  { sx: 1, sy: -10, sr: -2, x: 6, y: -32 },
+  { sx: 1, sy: -10, sr: -2, x: 19, y: -43 },
   { sx: 18, sy: 1, sr: 6, x: 37, y: 6 },
-  { sx: -6, sy: 10, sr: 6, x: -24, y: 34 },
-  { sx: 8, sy: 7, sr: 3, x: 2, y: 36 },
-  { sx: 20, sy: 12, sr: -7, x: 30, y: 34 },
+  { sx: -6, sy: 10, sr: 6, x: -34, y: 37 },
+  { sx: 8, sy: 7, sr: 3, x: -6, y: 45 },
+  { sx: 20, sy: 12, sr: -7, x: 33, y: 37 },
 ];
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -473,7 +503,7 @@ export default function Portfolio() {
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: 9999,
-            padding: "8px 8px 8px 24px",
+            padding: "8px 14px 8px 24px",
           }}
         >
           <a href="#top" style={{ fontFamily: MONO, fontWeight: 700, fontSize: 17, letterSpacing: 0.5, marginRight: 16 }}>
@@ -484,18 +514,12 @@ export default function Portfolio() {
             ["#timeline", "Timeline"],
             ["#awards", "Awards"],
             ["#skills", "Skills"],
+            ["#contact", "Contact"],
           ].map(([href, label]) => (
-            <a key={href} href={href} style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", padding: "10px 14px" }}>
+            <a key={href} href={href} className="nav-link" style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", padding: "10px 16px", borderRadius: 9999 }}>
               {label}
             </a>
           ))}
-          <a
-            href="#contact"
-            className="btn-red-nav"
-            style={{ display: "inline-flex", alignItems: "center", height: 40, padding: "0 22px", borderRadius: 9999, background: RED, color: "#ffffff", fontSize: 12, fontWeight: 700, letterSpacing: 1.4, textTransform: "uppercase" }}
-          >
-            Get in Touch
-          </a>
         </div>
       </nav>
 
@@ -559,7 +583,7 @@ export default function Portfolio() {
               </div>
             </div>
 
-            <div className="hero-right">
+            <div className="hero-face">
               <div className="face-wrap" style={{ animation: "heroFloat 5s ease-in-out infinite" }}>
                 {/* gsap 입장 애니메이션은 안쪽 래퍼에만 걸어 레이아웃을 건드리지 않는다 */}
                 <div data-hero-item data-hero-portrait style={{ height: "100%" }}>
@@ -581,26 +605,23 @@ export default function Portfolio() {
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="hero-center">
-            <div data-hero-item>
+            <div className="hero-copy" data-hero-item>
               <h1 className="hero-name" style={{ margin: 0, fontFamily: BHS, lineHeight: 1.05, letterSpacing: "0.01em" }}>
                 이민형
               </h1>
-              <p className="hero-sub" style={{ margin: "16px auto 0", maxWidth: 560, fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.65)" }}>
-                Backend부터 AI, Cloud, Embedded까지 모두를 아우를 수 있는
+              <p className="hero-sub" style={{ margin: "16px 0 0", fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.65)" }}>
+                Backend부터 AI, Cloud, Embedded까지
+                <br />
+                모두를 아우를 수 있는
                 <br />이 시대의 멀티플레이어 개발자
               </p>
             </div>
-            <div data-hero-item className="hero-ctas" style={{ display: "flex", gap: 12, marginTop: 26, flexWrap: "wrap", justifyContent: "center" }}>
-              <a href="#work" className="btn-red" style={{ ...pillBtn, background: RED }}>
-                프로젝트 보기
-              </a>
-              <a href="#contact" className="btn-ghost" style={{ ...pillBtn, border: "1px solid rgba(255,255,255,0.35)" }}>
-                이력서 받기
-              </a>
-            </div>
+          </div>
+
+          {/* 연락처 버튼 (원래 맨 아래에 있던 것) */}
+          <div className="hero-center" data-hero-item>
+            <Contacts />
           </div>
           </div>
         </div>
@@ -610,8 +631,8 @@ export default function Portfolio() {
       </ScrollShrinkHero>
 
       {/* ── MARQUEE ── */}
-      <div style={{ overflow: "hidden", background: RED, padding: "14px 0", display: "flex" }}>
-        <div style={{ display: "flex", flex: "none", width: "max-content", alignItems: "center", animation: "marquee 24s linear infinite", fontFamily: BHS, fontSize: 16, letterSpacing: 2, color: "#ffffff" }}>
+      <div className="band" style={{ overflow: "hidden", background: RED, padding: "14px 0", display: "flex" }}>
+        <div style={{ display: "flex", flex: "none", width: "max-content", alignItems: "center", animation: "marquee 46s linear infinite", fontFamily: BHS, fontSize: 16, letterSpacing: 2, color: "#ffffff" }}>
           {[0, 1].map((g) => (
             <div key={g} style={{ display: "flex", flex: "none", alignItems: "center" }}>
               {Array.from({ length: 4 }).map((_, r) =>
@@ -633,21 +654,31 @@ export default function Portfolio() {
         data-spread
         style={{ position: "relative", height: "260vh", background: "#111111", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
       >
+        {/* 헤더의 Awards 는 카드가 다 펼쳐진 지점으로 보낸다 */}
+        <span id="awards" style={{ position: "absolute", top: "52%", left: 0, width: 1, height: 1 }} />
         <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}>
-          <div
-            ref={spreadTextRef}
-            style={{ position: "absolute", inset: 0, zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", opacity: 0, pointerEvents: "none", padding: "0 24px" }}
-          >
-            <h2 style={{ margin: 0, fontFamily: BHS, fontSize: 64, lineHeight: 1.15 }}>
+          <div ref={spreadTextRef} className="spread-text">
+            <h2 className="spread-h2" style={{ margin: 0, fontFamily: BHS, lineHeight: 1.15 }}>
               하나의 스택에
               <br />
               갇히지 않습니다
             </h2>
-            <p style={{ margin: "16px 0 0", fontSize: 15, color: "rgba(255,255,255,0.55)", maxWidth: 480 }}>
-              Web/App · AI · Cloud · Embedded
-              <br />
-              전부 다 수상으로 증명
-            </p>
+            <div className="spread-awards">
+              {awards.map((a, i) => (
+                <a key={i} href={a.repo} target="_blank" rel="noopener noreferrer" className="sp-award">
+                  <span className="sp-logo">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={a.logo} alt="" />
+                  </span>
+                  <span style={{ minWidth: 0, flex: 1 }}>
+                    <span className="sp-t">{a.title}</span>
+                    <span className="sp-s">
+                      {a.prize} · {a.date}
+                    </span>
+                  </span>
+                </a>
+              ))}
+            </div>
           </div>
           {spreadCards.map((c, i) => (
             <div
@@ -673,9 +704,14 @@ export default function Portfolio() {
                   <ImageSlot src={c.src} placeholder={c.ph} radius={8} />
                 </div>
               ) : (
-                <div style={{ position: "absolute", inset: 0, background: "#1f1f1f", border: "1px solid rgba(255,255,255,0.12)", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 18 }}>
-                  <span style={{ fontFamily: BHS, fontSize: 26, color: RED }}>{c.num}</span>
-                  <span style={{ fontFamily: BHS, fontSize: 24, color: "#ffffff" }}>{c.label}</span>
+                <div className="spread-label" style={{ position: "absolute", inset: 0, background: "#1f1f1f", border: "1px solid rgba(255,255,255,0.12)", display: "flex", flexDirection: "column", gap: 6, padding: 16 }}>
+                  <span style={{ fontFamily: BHS, fontSize: 20, color: RED, lineHeight: 1 }}>{c.num}</span>
+                  <span style={{ fontFamily: BHS, fontSize: 22, color: "#ffffff", lineHeight: 1, marginBottom: 2 }}>{c.label}</span>
+                  <span className="sp-stack">
+                    {c.items.map((it) => (
+                      <TechBadge key={it} name={it} />
+                    ))}
+                  </span>
                 </div>
               )}
             </div>
@@ -779,54 +815,26 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* ── AWARDS / QUALIFICATIONS ── */}
-      <section id="awards" style={{ background: "#111111", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "112px 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(400px,1fr))", gap: 64 }}>
-          <div>
-            <p style={eyebrow}>Awards</p>
-            <h2 style={{ margin: "0 0 32px", fontFamily: BHS, fontSize: 40, lineHeight: 1.1 }}>수상</h2>
-            {awards.map((a, i) => (
-              <a
-                key={i}
-                href={a.repo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="row-hover"
-                style={{ display: "flex", gap: 16, alignItems: "center", padding: "20px 12px", borderTop: "1px solid rgba(255,255,255,0.12)", color: "#ffffff" }}
-              >
-                <span style={{ ...logoBox, padding: 8 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={a.logo} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+      {/* ── QUALIFICATIONS ── */}
+      <section id="quals" style={{ background: "#111111", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ maxWidth: 760, margin: "0 auto", padding: "112px 24px" }}>
+          <p style={eyebrow}>Qualifications</p>
+          <h2 style={{ margin: "0 0 32px", fontFamily: BHS, fontSize: 40, lineHeight: 1.1 }}>자격증</h2>
+          {quals.map((q) => (
+            <div key={q.title} className="row-hover" style={{ display: "flex", gap: 16, alignItems: "center", padding: "20px 12px", borderTop: "1px solid rgba(255,255,255,0.12)" }}>
+              <span style={{ ...logoBox, padding: 6 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={q.logo} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+              </span>
+              <span style={{ minWidth: 0, flex: 1 }}>
+                <span style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "baseline" }}>
+                  <span style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.4 }}>{q.title}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: RED, whiteSpace: "nowrap" }}>{q.date}</span>
                 </span>
-                <span style={{ minWidth: 0, flex: 1 }}>
-                  <span style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "baseline" }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.4 }}>{a.title}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: RED, whiteSpace: "nowrap" }}>{a.date}</span>
-                  </span>
-                  <span style={{ display: "block", marginTop: 6, fontSize: 13, color: "rgba(255,255,255,0.55)" }}>{a.prize}</span>
-                </span>
-              </a>
-            ))}
-          </div>
-          <div>
-            <p style={eyebrow}>Qualifications</p>
-            <h2 style={{ margin: "0 0 32px", fontFamily: BHS, fontSize: 40, lineHeight: 1.1 }}>자격증</h2>
-            {quals.map((q) => (
-              <div key={q.title} className="row-hover" style={{ display: "flex", gap: 16, alignItems: "center", padding: "20px 12px", borderTop: "1px solid rgba(255,255,255,0.12)" }}>
-                <span style={{ ...logoBox, padding: 6 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={q.logo} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
-                </span>
-                <span style={{ minWidth: 0, flex: 1 }}>
-                  <span style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "baseline" }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.4 }}>{q.title}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: RED, whiteSpace: "nowrap" }}>{q.date}</span>
-                  </span>
-                  <span style={{ display: "block", marginTop: 6, fontSize: 13, color: "rgba(255,255,255,0.55)" }}>{q.org}</span>
-                </span>
-              </div>
-            ))}
-          </div>
+                <span style={{ display: "block", marginTop: 6, fontSize: 13, color: "rgba(255,255,255,0.55)" }}>{q.org}</span>
+              </span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -853,30 +861,6 @@ export default function Portfolio() {
       <footer id="contact" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "120px 24px 64px", textAlign: "center" }}>
           <h2 style={{ margin: "0 0 32px", fontFamily: BHS, fontSize: 72, lineHeight: 1.1 }}>같이 만들어볼까요?</h2>
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="mailto:koreamax012@gmail.com" className="btn-ghost btn-email" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-              </svg>
-              Email
-            </a>
-            <a href="https://github.com/koreamax" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-github" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-              </svg>
-              GitHub
-            </a>
-            <a href="https://velog.io/@koreamax01/posts" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-velog" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
-              <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 18, height: 18, borderRadius: 3, background: "#20c997", color: "#161616", fontFamily: MONO, fontWeight: 700, fontSize: 13 }}>V</span>
-              Velog
-            </a>
-            <a href="https://www.linkedin.com/in/koreamax" target="_blank" rel="noopener noreferrer" className="btn-ghost btn-linkedin" style={{ ...contactBtn, border: "1px solid rgba(255,255,255,0.3)" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-              </svg>
-              LinkedIn
-            </a>
-          </div>
           <p style={{ margin: "24px 0 0", fontSize: 13, color: "rgba(255,255,255,0.45)" }}>koreamax012@gmail.com</p>
         </div>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(255,255,255,0.08)", flexWrap: "wrap", gap: 12 }}>
