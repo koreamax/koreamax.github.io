@@ -37,8 +37,8 @@ const LANDMARKS = {
 } as const;
 
 /* 최대 이동량 (화면 CSS px 기준) */
-const MAX = { eyeX: 11, eyeY: 5.5, mouthX: 5, mouthY: 2.5 };
-const HARD = { eyeX: 13, eyeY: 7, mouthX: 6, mouthY: 3 };
+const MAX = { eyeX: 7, eyeY: 3.5, mouthX: 3, mouthY: 1.5 };
+const HARD = { eyeX: 8, eyeY: 4, mouthX: 3.5, mouthY: 1.8 };
 
 const VERT = `
 attribute vec2 aPos;
@@ -68,13 +68,13 @@ float fall(vec2 p, vec2 c, vec2 r, float inner){
 
 /* 눈: 넓은 눈 영역은 절반만, 홍채 부근은 전부 따라가서 '시선이 움직이는' 느낌 */
 float eyeW(vec2 p, vec2 c){
-  return 0.35 * fall(p, c, vec2(120.0, 64.0), 0.12) + 0.65 * fall(p, c, vec2(40.0, 32.0), 0.45);
+  return 0.06 * fall(p, c, vec2(140.0, 74.0), 0.1) + 0.94 * fall(p, c, vec2(31.0, 26.0), 0.55);
 }
 
 void main(){
   vec2 p = vUv * uImg;
   float we = eyeW(p, uEyeL) + eyeW(p, uEyeR);
-  float wm = fall(p, uMouth, vec2(150.0, 60.0), 0.3);
+  float wm = fall(p, uMouth, vec2(170.0, 70.0), 0.25);
   vec2 d = uEyeOff * we + uMouthOff * wm;
   vec2 uv = (p - d) / uImg;
   gl_FragColor = texture2D(uTex, uv);
@@ -94,6 +94,11 @@ function compile(gl: WebGLRenderingContext, type: number, src: string) {
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+/** 가까울 땐 거의 1:1, 멀어질수록 점점 덜 늘어나는 포화 곡선 (끝에서 과한 왜곡 방지) */
+const soft = (v: number) => {
+  const a = Math.min(1, Math.abs(v));
+  return Math.sign(v) * (1 - Math.exp(-2.2 * a)) / (1 - Math.exp(-2.2));
+};
 
 interface Spring {
   x: number;
@@ -262,8 +267,8 @@ export default function MouseTrackFace({ src, alt, width, height, style, ref, ..
       const cy = r.top + r.height * (LANDMARKS.eyeL[1] / height);
       const rangeX = clamp(window.innerWidth * 0.4, 260, 900);
       const rangeY = clamp(window.innerHeight * 0.45, 200, 600);
-      targetX = clamp((e.clientX - cx) / rangeX, -1, 1);
-      targetY = clamp((e.clientY - cy) / rangeY, -1, 1);
+      targetX = soft((e.clientX - cx) / rangeX);
+      targetY = soft((e.clientY - cy) / rangeY);
       active = true;
     };
     const onLeave = () => {
