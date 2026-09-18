@@ -2,9 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { Flip } from "gsap/Flip";
-
-gsap.registerPlugin(Flip);
 
 /**
  * 사이트 최초 진입 시 1회 재생되는 BACE 오프닝.
@@ -111,31 +108,33 @@ export default function IntroBace() {
       0.2,
     );
 
-    // STEP 2 — 가운데 BACE 가 그대로 홈 화면의 제자리로 날아가고 배경이 걷힌다
+    // STEP 2 — 가운데 BACE 가 그대로 홈 화면의 제자리로 날아가고 배경이 걷힌다.
+    // 글자마다 자기 타임라인을 갖고, 도착하기 전에 자기 단어가 이어 붙기 시작한다.
     tl.add(() => {
-      const state = Flip.getState(words, { props: "color" });
+      const from = words.map((w) => w.getBoundingClientRect());
+      const to = heroIni.map((e) => e.getBoundingClientRect());
       gsap.set(words, { display: "none" });
       // 막대는 글자가 이동하는 동안 계속 자라다가 풀네임이 다 나오면 멈춘다
       if (rule) gsap.to(rule, { scaleY: 1, duration: 2.0, ease: "none" });
-      gsap.set(heroIni, { opacity: 1 });
-      gsap.set(heroRest, { opacity: 0, x: -14 });
-      Flip.from(state, {
-        targets: heroIni,
-        duration: 1.25,
-        ease: "power2.inOut",
-        scale: true,
-        absolute: true,
-        stagger: { each: 0.08, ease: "power1.inOut" },
-        props: "color",
-        onComplete: () => gsap.set(heroIni, { clearProps: "transform" }),
+
+      heroIni.forEach((el, i) => {
+        const a = from[i];
+        const b = to[i];
+        if (!a || !b || !b.height) return;
+        const rest = el.parentElement?.querySelector<HTMLElement>(".bace-rest") || null;
+        const scale = a.height / b.height;
+        const dx = a.left + a.width / 2 - (b.left + b.width / 2);
+        const dy = a.top + a.height / 2 - (b.top + b.height / 2);
+
+        gsap.set(el, { x: dx, y: dy, scale, transformOrigin: "50% 50%", opacity: 1, color: "#ffffff", textShadow: "0 0 0 rgba(218,41,28,0)" });
+        if (rest) gsap.set(rest, { opacity: 0, x: -12 });
+
+        const t = gsap.timeline({ delay: i * 0.075 });
+        t.to(el, { x: 0, y: 0, scale: 1, duration: 1.15, ease: "power2.inOut", clearProps: "transform,transformOrigin" });
+        // 아직 날아오는 중에 색이 물들고 단어가 이어진다 — 멈춤 없이 한 흐름
+        t.to(el, { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.7, ease: "power1.out", clearProps: "color,textShadow" }, 0.55);
+        if (rest) t.to(rest, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out", clearProps: "all" }, 0.62);
       });
-      // 나머지 글자와 첫 글자 점등은 비행이 끝나기 전에 겹쳐 시작해 끊김을 없앤다
-      gsap.to(heroRest, { opacity: 1, x: 0, duration: 0.75, ease: "power2.out", stagger: 0.09, delay: 0.6, clearProps: "all" });
-      gsap.fromTo(
-        heroIni,
-        { color: "#ffffff", textShadow: "0 0 0 rgba(218,41,28,0)" },
-        { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.85, ease: "power1.inOut", stagger: 0.09, delay: 0.5, clearProps: "color,textShadow" },
-      );
       gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.9, ease: "power1.inOut" });
       gsap.set(overlay, { pointerEvents: "none" });
     }, 1.9);
