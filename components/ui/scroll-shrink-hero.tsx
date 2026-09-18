@@ -117,10 +117,9 @@ export default function ScrollShrinkHero({
       <div
         style={{
           position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 20,
-          textAlign: "center",
+          right: 24,
+          bottom: 14,
+          textAlign: "right",
           fontSize: 11,
           fontWeight: 700,
           letterSpacing: 2,

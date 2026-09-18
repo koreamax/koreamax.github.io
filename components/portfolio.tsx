@@ -12,7 +12,6 @@ import {
   moreProjects,
   projects,
   quals,
-  skills,
   spreadCards,
 } from "@/components/portfolio-data";
 
@@ -510,11 +509,9 @@ export default function Portfolio() {
             이민형<span style={{ color: RED }}>.</span>
           </a>
           {[
+            ["#awards", "Awards"],
             ["#work", "Projects"],
             ["#timeline", "Timeline"],
-            ["#awards", "Awards"],
-            ["#skills", "Skills"],
-            ["#contact", "Contact"],
           ].map(([href, label]) => (
             <a key={href} href={href} className="nav-link" style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", padding: "10px 16px", borderRadius: 9999 }}>
               {label}
@@ -529,14 +526,14 @@ export default function Portfolio() {
         const scale = 1 - p * 0.58;
         const sinkPx = p * 120;
         return (
-      <header id="top" ref={headerRef} style={{ position: "relative", overflow: "hidden", padding: "48px 24px 0" }}>
+      <header id="top" ref={headerRef} style={{ position: "relative", overflow: "hidden", padding: "80px 24px 0" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 600, letterSpacing: 2, color: "rgba(255,255,255,0.4)" }}>
           <span>01 &nbsp;BACKEND</span>
           <span>02 &nbsp;AI</span>
           <span>03 &nbsp;CLOUD</span>
           <span>04 &nbsp;EMBEDDED</span>
         </div>
-        <div style={{ position: "relative", display: "flow-root", maxWidth: 1280, margin: "0 auto", minHeight: `max(600px, calc((100vh - 140px) * ${(1 - p * 0.5).toFixed(3)}))` }}>
+        <div style={{ position: "relative", display: "flow-root", maxWidth: 1280, margin: "0 auto", minHeight: `max(440px, calc((100vh - 330px) * ${(1 - p * 0.5).toFixed(3)}))` }}>
           <div
             ref={wordRef}
             className="giant-word"
@@ -670,12 +667,11 @@ export default function Portfolio() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={a.logo} alt="" />
                   </span>
-                  <span style={{ minWidth: 0, flex: 1 }}>
-                    <span className="sp-t">{a.title}</span>
-                    <span className="sp-s">
-                      {a.prize} · {a.date}
-                    </span>
+                  <span className="sp-t">
+                    {a.title}
+                    <span className="sp-p">({a.prize})</span>
                   </span>
+                  <span className="sp-d">{a.date}</span>
                 </a>
               ))}
             </div>
@@ -705,8 +701,8 @@ export default function Portfolio() {
                 </div>
               ) : (
                 <div className="spread-label" style={{ position: "absolute", inset: 0, background: "#1f1f1f", border: "1px solid rgba(255,255,255,0.12)", display: "flex", flexDirection: "column", gap: 6, padding: 16 }}>
-                  <span style={{ fontFamily: BHS, fontSize: 20, color: RED, lineHeight: 1 }}>{c.num}</span>
-                  <span style={{ fontFamily: BHS, fontSize: 22, color: "#ffffff", lineHeight: 1, marginBottom: 2 }}>{c.label}</span>
+                  <span style={{ fontFamily: BHS, fontSize: 16, color: RED, lineHeight: 1 }}>{c.num}</span>
+                  <span style={{ fontFamily: BHS, fontSize: 18, color: "#ffffff", lineHeight: 1, marginBottom: 2 }}>{c.label}</span>
                   <span className="sp-stack">
                     {c.items.map((it) => (
                       <TechBadge key={it} name={it} />
@@ -838,31 +834,8 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* ── SKILLS ── */}
-      <section id="skills" style={{ maxWidth: 1280, margin: "0 auto", padding: "112px 24px" }}>
-        <p style={eyebrow}>Skills</p>
-        <h2 style={{ margin: "0 0 48px", fontFamily: BHS, fontSize: 48, lineHeight: 1.1 }}>다섯 개의 무기</h2>
-        <div className="skills-grid" style={{ display: "grid", gap: 16 }}>
-          {skills.map((g) => (
-            <div key={g.num} className="skill-card" style={{ background: "#1f1f1f", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 4, padding: 22 }}>
-              <p style={{ margin: 0, fontFamily: BHS, fontSize: 40, color: RED }}>{g.num}</p>
-              <h3 style={{ margin: "12px 0 16px", fontSize: 20, fontWeight: 700 }}>{g.area}</h3>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {g.items.map((it) => (
-                  <TechBadge key={it} name={it} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── CONTACT / FOOTER ── */}
       <footer id="contact" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "120px 24px 64px", textAlign: "center" }}>
-          <h2 style={{ margin: "0 0 32px", fontFamily: BHS, fontSize: 72, lineHeight: 1.1 }}>같이 만들어볼까요?</h2>
-          <p style={{ margin: "24px 0 0", fontSize: 13, color: "rgba(255,255,255,0.45)" }}>koreamax012@gmail.com</p>
-        </div>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(255,255,255,0.08)", flexWrap: "wrap", gap: 12 }}>
           <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 15 }}>
             이민형<span style={{ color: RED }}>.</span>

@@ -91,20 +91,34 @@ export default function IntroBace() {
       },
     });
 
-    // STEP 1 — BACE 등장 (0.2s) 후 잠시 정지
+    // STEP 1 — BACE 가 부드럽게 떠오르고 잠시 머문다
     tl.fromTo(
       words,
-      { opacity: 0, y: 24 },
-      { opacity: 1, y: 0, duration: 0.55, ease: "power3.out", stagger: 0.04 },
+      { opacity: 0, y: 34, scale: 0.94, filter: "blur(10px)" },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        filter: "blur(0px)",
+        duration: 1.0,
+        ease: "power2.out",
+        stagger: { each: 0.07, ease: "power1.inOut" },
+      },
       0.2,
     );
 
-    // STEP 2 — 같은 글자들이 흩어짐 (FLIP)
+    // STEP 2 — 같은 글자들이 천천히 흩어진다 (FLIP)
     tl.add(() => {
       const state = Flip.getState(words);
       overlay.dataset.state = "scatter";
-      Flip.from(state, { duration: 1.0, ease: "power3.inOut", stagger: 0.06, scale: true });
-    }, 1.0);
+      Flip.from(state, {
+        duration: 1.5,
+        ease: "power2.inOut",
+        stagger: { each: 0.09, ease: "power1.inOut" },
+        scale: true,
+        absolute: true,
+      });
+    }, 1.5);
 
     // STEP 3 — 흩어진 그 글자들이 곧바로 홈 화면의 B·A·C·E 자리로 날아가고 배경이 걷힘
     tl.add(() => {
@@ -114,33 +128,34 @@ export default function IntroBace() {
       gsap.set(heroRest, { opacity: 0, x: -14 });
       Flip.from(state, {
         targets: heroIni,
-        duration: 0.9,
-        ease: "power3.inOut",
+        duration: 1.25,
+        ease: "power2.inOut",
         scale: true,
-        stagger: 0.05,
+        absolute: true,
+        stagger: { each: 0.08, ease: "power1.inOut" },
         props: "color",
         onComplete: () => {
           gsap.set(heroIni, { clearProps: "all" });
           // 착지한 자리에서 나머지 글자가 붙고, 첫 글자가 빨갛게 켜진다
-          gsap.to(heroRest, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out", stagger: 0.06, clearProps: "all" });
+          gsap.to(heroRest, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out", stagger: 0.08, clearProps: "all" });
           gsap.fromTo(
             heroIni,
             { color: "#ffffff", textShadow: "0 0 0 rgba(218,41,28,0)" },
-            { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.5, ease: "power2.out", stagger: 0.07, clearProps: "color,textShadow" },
+            { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.7, ease: "power1.inOut", stagger: 0.09, clearProps: "color,textShadow" },
           );
         },
       });
-      gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.6, ease: "power2.inOut" });
+      gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.9, ease: "power1.inOut" });
       gsap.set(overlay, { pointerEvents: "none" });
-    }, 2.0);
+    }, 3.4);
 
     // 히어로 요소 순차 등장 (nav → 헤드라인 → 소개 → CTA → 얼굴)
     tl.add(() => {
-      gsap.to(heroItems, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.12, clearProps: "transform,opacity" });
+      gsap.to(heroItems, { opacity: 1, y: 0, duration: 0.9, ease: "power2.out", stagger: 0.14, clearProps: "transform,opacity" });
       if (portrait) gsap.to(portrait, { scale: 1, duration: 0.9, ease: "power3.out", clearProps: "transform" });
-    }, 2.2);
+    }, 3.7);
 
-    tl.add(() => {}, 3.2); // 완료 시점
+    tl.add(() => {}, 4.9); // 완료 시점
 
     return () => {
       alive = false;
