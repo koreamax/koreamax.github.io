@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import ScrollShrinkHero from "@/components/ui/scroll-shrink-hero";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import TechBadge from "@/components/tech-badge";
+import MouseTrackFace from "@/components/mouse-track-face";
 import {
   awards,
   corridorTitles,
@@ -294,7 +295,7 @@ export default function Portfolio() {
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const wordRef = useRef<HTMLDivElement>(null);
-  const faceRef = useRef<HTMLImageElement>(null);
+  const faceRef = useRef<HTMLDivElement>(null);
   const peekRef = useRef<HTMLImageElement>(null);
   const spreadRef = useRef<HTMLElement>(null);
   const spreadTextRef = useRef<HTMLDivElement>(null);
@@ -546,17 +547,15 @@ export default function Portfolio() {
             }}
           >
           <div style={{ position: "absolute", left: "50%", top: 30, transform: "translateX(-50%)", height: 560, animation: "heroFloat 5s ease-in-out infinite" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            {/* 마우스를 따라 눈·입만 움직이는 얼굴 (머리·오브젝트는 고정) */}
+            <MouseTrackFace
               ref={faceRef}
               data-hero-face
               src="/uploads/pasted-1789519232538-0.png"
               alt="이민형"
+              width={1086}
+              height={1448}
               style={{
-                height: "100%",
-                width: "auto",
-                maxWidth: "none",
-                objectFit: "contain",
                 filter: "drop-shadow(0 24px 48px rgba(0,0,0,0.5))",
                 willChange: "transform",
                 animation: "dropIn 1s cubic-bezier(0.16,1,0.3,1) both",
