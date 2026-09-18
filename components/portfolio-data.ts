@@ -8,7 +8,7 @@ export type SpreadCard =
 export const spreadCards: SpreadCard[] = [
   // 활동 사진: public/uploads/ 에 아래 파일명으로 저장하면 표시된다. (파일이 없으면 플레이스홀더)
   { kind: "image", src: "/uploads/activity-khtml-aws.jpg", ph: "K-HTML 해커톤 · AWS", w: 17, h: 22, z: 2 },
-  { kind: "label", label: "Web/App", num: "01", w: 16, h: 20, z: 3 },
+  { kind: "label", label: "Backend", num: "01", w: 16, h: 20, z: 3 },
   { kind: "image", src: "/uploads/activity-skt-best.jpg", ph: "SKT FLY AI 최우수상", w: 15, h: 26, z: 4 },
   { kind: "label", label: "AI", num: "02", w: 18, h: 22, z: 5 },
   { kind: "image", src: "/uploads/activity-skt-project.jpg", ph: "SKT FLY AI 프로젝트 우수상", w: 16, h: 24, z: 6 },
