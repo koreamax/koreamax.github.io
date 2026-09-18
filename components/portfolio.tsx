@@ -218,6 +218,51 @@ function Corridor() {
   );
 }
 
+/* ───────────────────────── 프로젝트 수 카운터 ───────────────────────── */
+
+const TOTAL_PROJECTS = projects.length + moreProjects.length;
+
+/** 화면에 들어오면 0 → to 까지 빨갛게 올라간다 */
+function CountUp({ to, duration = 1400 }: { to: number; duration?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.textContent = String(to);
+      return;
+    }
+    let raf = 0;
+    let start = 0;
+    const run = (now: number) => {
+      if (!start) start = now;
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = String(Math.round(eased * to));
+      if (t < 1) raf = requestAnimationFrame(run);
+    };
+    const io = new IntersectionObserver(
+      (es) => {
+        if (es[0].isIntersecting) {
+          io.disconnect();
+          raf = requestAnimationFrame(run);
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [to, duration]);
+  return (
+    <span ref={ref} className="proj-count-num">
+      0
+    </span>
+  );
+}
+
 /* ───────────────────────── 이미지 슬롯 ───────────────────────── */
 
 function ImageSlot({ src, placeholder, radius = 0 }: { src?: string; placeholder: string; radius?: number }) {
@@ -305,16 +350,17 @@ function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
 
 /* ───────────────────────── 스크롤 연출 설정 ───────────────────────── */
 
-/* 최종 위치는 화면 안(±50vw / ±50vh)에 머물면서 가운데(수상 목록) 를 비운다 */
+/* 최종 위치는 화면 안(±50vw / ±50vh)에 머물면서 가운데(수상 목록) 를 비운다.
+   번호가 붙은 카드는 01 02 / 03 04 로 읽히도록 네 모서리에 놓는다. */
 const CFG = [
-  { sx: -8, sy: -10, sr: -18, x: -30, y: -30 },
-  { sx: 14, sy: -10, sr: 20, x: 30, y: -30 },
+  { sx: -8, sy: -10, sr: -18, x: 0, y: -36 },
+  { sx: 14, sy: -10, sr: 20, x: -31, y: -32 },
   { sx: -16, sy: 0, sr: -4, x: -37, y: 2 },
-  { sx: 1, sy: -10, sr: -2, x: 0, y: 37 },
+  { sx: 1, sy: -10, sr: -2, x: 31, y: -32 },
   { sx: 18, sy: 1, sr: 6, x: 37, y: 2 },
-  { sx: -6, sy: 10, sr: 6, x: -30, y: 31 },
-  { sx: 8, sy: 7, sr: 3, x: 0, y: -35 },
-  { sx: 20, sy: 12, sr: -7, x: 30, y: 31 },
+  { sx: -6, sy: 10, sr: 6, x: -31, y: 32 },
+  { sx: 8, sy: 7, sr: 3, x: 0, y: 38 },
+  { sx: 20, sy: 12, sr: -7, x: 31, y: 32 },
 ];
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -334,7 +380,6 @@ export default function Portfolio() {
   const headerRef = useRef<HTMLElement>(null);
   const wordRef = useRef<HTMLDivElement>(null);
   const faceRef = useRef<HTMLImageElement>(null);
-  const peekRef = useRef<HTMLImageElement>(null);
   const spreadRef = useRef<HTMLElement>(null);
   const spreadTextRef = useRef<HTMLDivElement>(null);
   const spreadHintRef = useRef<HTMLDivElement>(null);
@@ -385,11 +430,9 @@ export default function Portfolio() {
     const face = faceRef.current;
     const faceEntranceDone = true;
 
-    let peeked = false;
     const onScroll = () => {
       const word = wordRef.current;
       const heroEl = headerRef.current;
-      const peek = peekRef.current;
       const spreadSec = spreadRef.current;
       const txt = spreadTextRef.current;
       const hint = spreadHintRef.current;
@@ -406,15 +449,6 @@ export default function Portfolio() {
           pp > 0
             ? "translateY(" + (pp * 110).toFixed(1) + "px) translateX(" + (pp * 42).toFixed(1) + "px) scale(" + (1 - pp * 0.11).toFixed(3) + ") rotate(" + (pp * 3).toFixed(2) + "deg)"
             : "none";
-      }
-
-      if (peek && !peeked && peek.parentElement) {
-        const r = peek.parentElement.getBoundingClientRect();
-        if (r.top < window.innerHeight * 0.6 && r.bottom > 0) {
-          peeked = true;
-          peek.style.transition = "transform .9s cubic-bezier(.34,1.56,.64,1)";
-          peek.style.transform = "translateY(38%) rotate(-4deg)";
-        }
       }
 
       if (spreadSec) {
@@ -564,6 +598,7 @@ export default function Portfolio() {
           <div className="hero-grid">
             <div className="hero-left">
               <div className="bace-stack">
+                <span className="bace-rule" aria-hidden />
                 {BACE.map((k) => (
                   <span key={k.ini} className={`bace-row br-${k.ini.toLowerCase()}`}>
                     <span className="bace-ini" data-flip-id={`kw-${k.ini}`}>
@@ -723,16 +758,13 @@ export default function Portfolio() {
           style={{ position: "relative", height: "56vh", minHeight: 360, overflow: "hidden", marginBottom: 72, containerType: "inline-size", borderRadius: 8, background: "#0d0d0d" }}
         >
           <Corridor />
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
-            <span style={{ fontFamily: BHS, fontSize: "min(9vw,110px)", letterSpacing: "0.02em", color: "#ffffff", textShadow: "0 4px 40px rgba(0,0,0,0.7)" }}>PROJECTS</span>
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, pointerEvents: "none" }}>
+            <span style={{ fontFamily: BHS, fontSize: "min(8vw,96px)", letterSpacing: "0.02em", color: "#ffffff", textShadow: "0 4px 40px rgba(0,0,0,0.7)", lineHeight: 1 }}>PROJECTS</span>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            ref={peekRef}
-            src="/uploads/pasted-1789519232538-0.png"
-            alt=""
-            style={{ position: "absolute", right: "6%", bottom: 0, height: 190, width: "auto", maxWidth: "none", transform: "translateY(105%)", zIndex: 5, pointerEvents: "none", filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.5))" }}
-          />
+          <div className="proj-count">
+            <CountUp to={TOTAL_PROJECTS} />
+            <span className="proj-count-label">Projects shipped</span>
+          </div>
         </div>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 40 }}>
           <div>

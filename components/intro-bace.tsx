@@ -64,6 +64,7 @@ export default function IntroBace() {
       return;
     }
 
+
     const overlay = overlayRef.current;
     if (!overlay) return;
     const words = gsap.utils.toArray<HTMLElement>(".intro-word", overlay);
@@ -71,8 +72,11 @@ export default function IntroBace() {
     const heroItems = gsap.utils.toArray<HTMLElement>("[data-hero-item]");
     const heroIni = gsap.utils.toArray<HTMLElement>("[data-flip-id].bace-ini");
     const heroRest = gsap.utils.toArray<HTMLElement>(".bace-rest");
+    const rule = document.querySelector<HTMLElement>(".bace-rule");
 
     document.documentElement.classList.add("intro-lock");
+    // 빨간 막대는 처음엔 없다가 글자가 제자리를 잡는 동안 계속 자라난다
+    if (rule) gsap.set(rule, { scaleY: 0, transformOrigin: "50% 0%" });
     // 히어로 요소는 인트로가 걷힐 때 등장하도록 미리 숨겨 둔다 (오버레이 뒤라 보이지 않음)
     gsap.set(heroItems, { opacity: 0, y: 30 });
     const portrait = document.querySelector<HTMLElement>("[data-hero-portrait]");
@@ -107,23 +111,12 @@ export default function IntroBace() {
       0.2,
     );
 
-    // STEP 2 — 같은 글자들이 천천히 흩어진다 (FLIP)
-    tl.add(() => {
-      const state = Flip.getState(words);
-      overlay.dataset.state = "scatter";
-      Flip.from(state, {
-        duration: 1.5,
-        ease: "power2.inOut",
-        stagger: { each: 0.09, ease: "power1.inOut" },
-        scale: true,
-        absolute: true,
-      });
-    }, 1.5);
-
-    // STEP 3 — 흩어진 그 글자들이 곧바로 홈 화면의 B·A·C·E 자리로 날아가고 배경이 걷힘
+    // STEP 2 — 가운데 BACE 가 그대로 홈 화면의 제자리로 날아가고 배경이 걷힌다
     tl.add(() => {
       const state = Flip.getState(words, { props: "color" });
       gsap.set(words, { display: "none" });
+      // 막대는 글자가 이동하는 동안 계속 자라다가 풀네임이 다 나오면 멈춘다
+      if (rule) gsap.to(rule, { scaleY: 1, duration: 2.0, ease: "none" });
       gsap.set(heroIni, { opacity: 1 });
       gsap.set(heroRest, { opacity: 0, x: -14 });
       Flip.from(state, {
@@ -147,15 +140,15 @@ export default function IntroBace() {
       });
       gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.9, ease: "power1.inOut" });
       gsap.set(overlay, { pointerEvents: "none" });
-    }, 3.4);
+    }, 1.9);
 
     // 히어로 요소 순차 등장 (nav → 헤드라인 → 소개 → CTA → 얼굴)
     tl.add(() => {
       gsap.to(heroItems, { opacity: 1, y: 0, duration: 0.9, ease: "power2.out", stagger: 0.14, clearProps: "transform,opacity" });
       if (portrait) gsap.to(portrait, { scale: 1, duration: 0.9, ease: "power3.out", clearProps: "transform" });
-    }, 3.7);
+    }, 2.3);
 
-    tl.add(() => {}, 4.9); // 완료 시점
+    tl.add(() => {}, 4.1); // 완료 시점
 
     return () => {
       alive = false;
