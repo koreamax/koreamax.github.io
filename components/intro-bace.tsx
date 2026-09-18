@@ -127,17 +127,15 @@ export default function IntroBace() {
         absolute: true,
         stagger: { each: 0.08, ease: "power1.inOut" },
         props: "color",
-        onComplete: () => {
-          gsap.set(heroIni, { clearProps: "all" });
-          // 착지한 자리에서 나머지 글자가 붙고, 첫 글자가 빨갛게 켜진다
-          gsap.to(heroRest, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out", stagger: 0.08, clearProps: "all" });
-          gsap.fromTo(
-            heroIni,
-            { color: "#ffffff", textShadow: "0 0 0 rgba(218,41,28,0)" },
-            { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.7, ease: "power1.inOut", stagger: 0.09, clearProps: "color,textShadow" },
-          );
-        },
+        onComplete: () => gsap.set(heroIni, { clearProps: "transform" }),
       });
+      // 나머지 글자와 첫 글자 점등은 비행이 끝나기 전에 겹쳐 시작해 끊김을 없앤다
+      gsap.to(heroRest, { opacity: 1, x: 0, duration: 0.75, ease: "power2.out", stagger: 0.09, delay: 0.6, clearProps: "all" });
+      gsap.fromTo(
+        heroIni,
+        { color: "#ffffff", textShadow: "0 0 0 rgba(218,41,28,0)" },
+        { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.85, ease: "power1.inOut", stagger: 0.09, delay: 0.5, clearProps: "color,textShadow" },
+      );
       gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.9, ease: "power1.inOut" });
       gsap.set(overlay, { pointerEvents: "none" });
     }, 1.9);

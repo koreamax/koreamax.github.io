@@ -302,3 +302,59 @@ export const corridorTitles = [
   "Cloud Island",
   "WalkingCity",
 ];
+
+/* ───────────────────────── 분야별 프로젝트 ───────────────────────── */
+
+export interface CategoryItem {
+  title: string;
+  desc: string;
+  repo: string;
+  status: string;
+}
+
+export interface Category {
+  num: string;
+  name: string;
+  color: string;
+  stack: string[];
+  items: CategoryItem[];
+}
+
+const ALL: CategoryItem[] = [
+  ...projects.map((p) => ({ title: p.title, desc: p.desc, repo: p.repo, status: p.status })),
+  ...moreProjects.map((m) => ({ title: m.title, desc: m.desc, repo: m.repo, status: m.status })),
+];
+
+const pick = (...titles: string[]): CategoryItem[] =>
+  titles.map((t) => ALL.find((p) => p.title === t)).filter((p): p is CategoryItem => Boolean(p));
+
+export const categories: Category[] = [
+  {
+    num: "01",
+    name: "Backend",
+    color: "#60a5fa",
+    stack: ["Spring Boot", "FastAPI", "Node.js", "MySQL", "PostgreSQL", "Redis"],
+    items: pick("beautytalk", "Mission Pawss!ble", "Wilson", "Seagnal"),
+  },
+  {
+    num: "02",
+    name: "AI",
+    color: "#a78bfa",
+    stack: ["PyTorch", "OpenCV", "OCR", "LLM", "VLM", "LangChain", "RAG"],
+    items: pick("GSV Paper", "beautytalk", "VIAssist", "LLM ROUTER"),
+  },
+  {
+    num: "03",
+    name: "Cloud",
+    color: "#fbbf24",
+    stack: ["AWS", "Azure", "GCP", "Docker", "Kubernetes", "Terraform"],
+    items: pick("Mission Pawss!ble", "Wilson", "Cloud Island", "WalkingCity"),
+  },
+  {
+    num: "04",
+    name: "Embedded",
+    color: "#34d399",
+    stack: ["C/C++", "Raspberry Pi", "NVIDIA Jetson", "ROS2", "LiDAR"],
+    items: pick("Goliath Crane", "JeokjaeJeokso", "VIAssist"),
+  },
+];

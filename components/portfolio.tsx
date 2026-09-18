@@ -5,6 +5,7 @@ import ScrollShrinkHero from "@/components/ui/scroll-shrink-hero";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import TechBadge from "@/components/tech-badge";
 import IntroBace from "@/components/intro-bace";
+import ProjectScenes from "@/components/project-scenes";
 import {
   awards,
   corridorTitles,
@@ -223,13 +224,16 @@ function Corridor() {
 const TOTAL_PROJECTS = projects.length + moreProjects.length;
 
 /** 화면에 들어오면 0 → to 까지 빨갛게 올라간다 */
-function CountUp({ to, duration = 1400 }: { to: number; duration?: number }) {
+function CountUp({ to, suffix = "", duration = 1400 }: { to: number; suffix?: string; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const paint = (v: number) => {
+      el.textContent = String(v) + suffix;
+    };
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      el.textContent = String(to);
+      paint(to);
       return;
     }
     let raf = 0;
@@ -238,7 +242,7 @@ function CountUp({ to, duration = 1400 }: { to: number; duration?: number }) {
       if (!start) start = now;
       const t = Math.min(1, (now - start) / duration);
       const eased = 1 - Math.pow(1 - t, 3);
-      el.textContent = String(Math.round(eased * to));
+      paint(Math.round(eased * to));
       if (t < 1) raf = requestAnimationFrame(run);
     };
     const io = new IntersectionObserver(
@@ -255,10 +259,10 @@ function CountUp({ to, duration = 1400 }: { to: number; duration?: number }) {
       io.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, [to, duration]);
+  }, [to, suffix, duration]);
   return (
     <span ref={ref} className="proj-count-num">
-      0
+      0{suffix}
     </span>
   );
 }
@@ -762,7 +766,7 @@ export default function Portfolio() {
             <span style={{ fontFamily: BHS, fontSize: "min(8vw,96px)", letterSpacing: "0.02em", color: "#ffffff", textShadow: "0 4px 40px rgba(0,0,0,0.7)", lineHeight: 1 }}>PROJECTS</span>
           </div>
           <div className="proj-count">
-            <CountUp to={TOTAL_PROJECTS} />
+            <CountUp to={TOTAL_PROJECTS} suffix="+" />
             <span className="proj-count-label">Projects shipped</span>
           </div>
         </div>
@@ -780,41 +784,9 @@ export default function Portfolio() {
             GitHub에서 보기 →
           </a>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 24 }}>
-          {projects.map((p) => (
-            <a key={p.title} href={p.repo} target="_blank" rel="noopener noreferrer" className="card-lift" style={{ display: "block", color: "#ffffff" }}>
-              <div style={{ height: 360, overflow: "hidden", borderRadius: 4, background: "#1f1f1f" }}>
-                <ImageSlot src={p.image} placeholder={p.ph} />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "18px 0 6px" }}>
-                <TagChips tag={p.tag} />
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: statusColor(p.status), border: `1px solid ${statusColor(p.status)}`, borderRadius: 9999, padding: "4px 10px" }}>
-                  {p.status}
-                </span>
-              </div>
-              <h3 style={{ margin: 0, fontSize: 22, fontWeight: 700, lineHeight: 1.3 }}>{p.title}</h3>
-              <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "rgba(255,255,255,0.55)" }}>{p.desc}</p>
-            </a>
-          ))}
-        </div>
-        <div style={{ marginTop: 56 }}>
-          {moreProjects.map((m) => (
-            <a
-              key={m.title}
-              href={m.repo}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="row-hover"
-              style={{ display: "grid", gridTemplateColumns: "minmax(140px,200px) minmax(0,1fr) auto auto", gap: 24, alignItems: "baseline", padding: "20px 12px", borderTop: "1px solid rgba(255,255,255,0.12)", color: "#ffffff" }}
-            >
-              <span style={{ fontSize: 17, fontWeight: 700 }}>{m.title}</span>
-              <span style={{ fontSize: 14, lineHeight: 1.5, color: "rgba(255,255,255,0.55)" }}>{m.desc}</span>
-              <TagChips tag={m.tag} size="xs" />
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: statusColor(m.status) }}>{m.status}</span>
-            </a>
-          ))}
-        </div>
       </section>
+
+      <ProjectScenes />
 
       {/* ── TIMELINE ── */}
       <section id="timeline" style={{ maxWidth: 1280, margin: "0 auto", padding: "64px 24px" }}>

@@ -297,3 +297,40 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 .proj-count-num { font-family: 'Black Han Sans', sans-serif; font-size: min(7vw, 84px); line-height: 1; color: #da291c; text-shadow: 0 0 36px rgba(218, 41, 28, 0.55); font-variant-numeric: tabular-nums; }
 .proj-count-label { font-size: 11px; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
 @media (max-width: 767px) { .proj-count-num { font-size: 52px; } .proj-count-label { font-size: 9px; } }
+
+/* ───────────── 온 더 스크린 · 고정 무대 ───────────── */
+.pstage { position: relative; height: 100vh; overflow: hidden; background: #111111; border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); }
+.pscene { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; will-change: transform, opacity, filter; }
+.pscene-inner { position: relative; width: min(1180px, 92vw); display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 56px; align-items: center; }
+
+.pscene-mark { position: absolute; left: -2vw; top: 50%; transform: translateY(-50%); font-family: 'Black Han Sans', sans-serif; font-size: min(34vw, 420px); line-height: 0.8; color: rgba(255,255,255,0.035); pointer-events: none; user-select: none; }
+
+.pscene-num { display: inline-block; font-family: 'Nanum Gothic Coding', monospace; font-size: 13px; font-weight: 700; letter-spacing: 3px; color: var(--cat); }
+.pscene-name { margin: 8px 0 22px; font-family: 'Black Han Sans', sans-serif; font-size: clamp(48px, 6.4vw, 92px); line-height: 1; letter-spacing: -0.01em; color: #ffffff; }
+.pscene-name::after { content: ""; display: block; width: 64px; height: 4px; margin-top: 18px; border-radius: 4px; background: var(--cat); box-shadow: 0 0 22px color-mix(in srgb, var(--cat) 60%, transparent); }
+.pscene-stack { display: flex; flex-wrap: wrap; gap: 7px; max-width: 420px; }
+
+.pscene-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.pscene-list a { display: grid; grid-template-columns: 10px minmax(120px, auto) minmax(0, 1fr) 16px; gap: 14px; align-items: center; padding: 16px 18px; border-radius: 16px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); color: #ffffff; }
+.pscene-list a:hover { background: color-mix(in srgb, var(--cat) 14%, transparent); border-color: color-mix(in srgb, var(--cat) 55%, transparent); color: #ffffff; transform: translateX(4px); }
+.pl-dot { width: 8px; height: 8px; border-radius: 9999px; }
+.pl-title { font-size: 17px; font-weight: 700; white-space: nowrap; }
+.pl-desc { font-size: 13.5px; line-height: 1.45; color: rgba(255,255,255,0.5); }
+.pl-go { font-size: 14px; color: rgba(255,255,255,0.35); }
+
+.pstage-dots { position: absolute; right: 26px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 5; }
+.pstage-dot { width: 8px; height: 8px; border-radius: 9999px; background: rgba(255,255,255,0.22); }
+
+/* 폴백: 평범한 세로 흐름 */
+.pstage.pstage-flow { height: auto; overflow: visible; }
+.pstage.pstage-flow .pscene { position: relative; inset: auto; padding: 72px 0; }
+.pstage.pstage-flow .pstage-dots { display: none; }
+
+@media (max-width: 900px) {
+  .pscene-inner { grid-template-columns: 1fr; gap: 26px; }
+  .pscene-mark { display: none; }
+  .pscene-name { font-size: 44px; margin-bottom: 16px; }
+  .pscene-list a { grid-template-columns: 8px 1fr; gap: 10px; padding: 13px 14px; }
+  .pl-desc { display: none; }
+  .pl-go { display: none; }
+}
