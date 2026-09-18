@@ -55,6 +55,8 @@ export default function IntroBace() {
     try {
       played = sessionStorage.getItem(KEY) === "1";
     } catch {}
+    // 주소 끝에 ?intro 를 붙이면 세션에 상관없이 다시 볼 수 있다
+    if (new URLSearchParams(window.location.search).has("intro")) played = false;
 
     if (reduced || played) {
       setShow(false);
@@ -67,7 +69,7 @@ export default function IntroBace() {
     const words = gsap.utils.toArray<HTMLElement>(".intro-word", overlay);
     const chars = gsap.utils.toArray<HTMLElement>(".intro-ch", overlay);
     const heroItems = gsap.utils.toArray<HTMLElement>("[data-hero-item]");
-    const heroKw = gsap.utils.toArray<HTMLElement>("[data-flip-id].kw");
+    const heroKw = gsap.utils.toArray<HTMLElement>("[data-flip-id].bace-row");
 
     document.documentElement.classList.add("intro-lock");
     // 히어로 요소는 인트로가 걷힐 때 등장하도록 미리 숨겨 둔다 (오버레이 뒤라 보이지 않음)
@@ -125,7 +127,15 @@ export default function IntroBace() {
         scale: true,
         stagger: 0.05,
         props: "color",
-        onComplete: () => gsap.set(heroKw, { clearProps: "all" }),
+        onComplete: () => {
+          gsap.set(heroKw, { clearProps: "all" });
+          // 착지하면서 첫 글자 B·A·C·E 가 빨갛게 켜진다
+          gsap.fromTo(
+            heroKw.map((el) => el.querySelector(".bace-ini")),
+            { color: "#ffffff", textShadow: "0 0 0 rgba(218,41,28,0)" },
+            { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.5, ease: "power2.out", stagger: 0.07, clearProps: "color,textShadow" },
+          );
+        },
       });
       gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.7, ease: "power2.inOut" });
       gsap.set(overlay, { pointerEvents: "none" });

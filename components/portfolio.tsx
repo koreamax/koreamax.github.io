@@ -289,6 +289,13 @@ const CFG = [
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
 const MARQUEE_ITEMS = ["BACKEND", "AI", "CLOUD", "EMBEDDED"];
+/** 히어로 왼쪽 BACE 스택 — 인트로의 네 단어가 이 자리로 날아와 그대로 남는다 */
+const BACE = [
+  { ini: "B", rest: "ackend" },
+  { ini: "A", rest: "I" },
+  { ini: "C", rest: "loud" },
+  { ini: "E", rest: "mbedded" },
+];
 
 /* ───────────────────────── 컴포넌트 ───────────────────────── */
 
@@ -511,14 +518,14 @@ export default function Portfolio() {
             className="giant-word"
             style={{
               position: "absolute",
-              left: "50%",
-              top: 340,
+              left: "58%",
+              top: 330,
               transform: "translate(-50%,-50%)",
               fontFamily: BHS,
-              fontSize: "min(17vw,250px)",
+              fontSize: "min(15vw,220px)",
               lineHeight: 1,
               letterSpacing: "0.02em",
-              color: "#242424",
+              color: "#1f1f1f",
               whiteSpace: "nowrap",
               pointerEvents: "none",
               userSelect: "none",
@@ -537,48 +544,57 @@ export default function Portfolio() {
               willChange: "transform",
             }}
           >
-          {/* 인트로에서 풀어진 Backend / AI / Cloud / Embedded 가 얼굴 옆 이 자리로 날아와 그대로 남는다 */}
-          <div className="hero-words" aria-hidden>
-            <span className="kw hero-word hw-b" data-flip-id="kw-B">Backend</span>
-            <span className="kw hero-word hw-a" data-flip-id="kw-A">AI</span>
-            <span className="kw hero-word hw-c" data-flip-id="kw-C">Cloud</span>
-            <span className="kw hero-word hw-e" data-flip-id="kw-E">Embedded</span>
-          </div>
-          <div className="face-wrap" style={{ position: "absolute", left: "50%", top: 30, transform: "translateX(-50%)", height: 560, animation: "heroFloat 5s ease-in-out infinite" }}>
-            {/* gsap 입장 애니메이션은 이 안쪽 래퍼에만 걸어 바깥의 translateX(-50%) 를 건드리지 않는다 */}
-            <div data-hero-item data-hero-portrait style={{ height: "100%" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              ref={faceRef}
-              data-hero-face
-              src="/uploads/pasted-1789519232538-0.png"
-              alt="이민형"
-              style={{
-                height: "100%",
-                width: "auto",
-                maxWidth: "none",
-                objectFit: "contain",
-                filter: "drop-shadow(0 24px 48px rgba(0,0,0,0.5))",
-                willChange: "transform",
-              }}
-            />
+          {/* 왼쪽: 인트로에서 풀어진 BACE 가 날아와 그대로 남는 키워드 스택 / 오른쪽: 얼굴 */}
+          <div className="hero-grid">
+            <div className="hero-left">
+              <div className="bace-stack">
+                {BACE.map((k) => (
+                  <span key={k.ini} className={`bace-row br-${k.ini.toLowerCase()}`} data-flip-id={`kw-${k.ini}`}>
+                    <span className="bace-ini">{k.ini}</span>
+                    <span className="bace-rest">{k.rest}</span>
+                  </span>
+                ))}
+              </div>
+              <div data-hero-item>
+                <h1 className="hero-name" style={{ margin: 0, fontFamily: BHS, lineHeight: 1.05, letterSpacing: "0.01em" }}>
+                  이민형
+                </h1>
+                <p className="hero-sub" style={{ margin: "18px 0 0", maxWidth: 520, fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.65)" }}>
+                  Backend부터 AI, Cloud, Embedded까지 모두를 아우를 수 있는
+                  <br />이 시대의 멀티플레이어 개발자
+                </p>
+              </div>
+              <div data-hero-item className="hero-ctas" style={{ display: "flex", gap: 12, marginTop: 30, flexWrap: "wrap" }}>
+                <a href="#work" className="btn-red" style={{ ...pillBtn, background: RED }}>
+                  프로젝트 보기
+                </a>
+                <a href="#contact" className="btn-ghost" style={{ ...pillBtn, border: "1px solid rgba(255,255,255,0.35)" }}>
+                  이력서 받기
+                </a>
+              </div>
             </div>
-          </div>
-          <div className="hero-text" style={{ position: "relative", textAlign: "center", paddingTop: 630, pointerEvents: "none" }}>
-            <div data-hero-item>
-              <h1 style={{ margin: 0, fontFamily: BHS, fontSize: 88, lineHeight: 1.05, letterSpacing: "0.01em" }}>이민형</h1>
-              <p style={{ margin: "20px auto 0", maxWidth: 560, fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.65)" }}>
-                Backend부터 AI, Cloud, Embedded까지 모두를 아우를 수 있는
-                <br />이 시대의 멀티플레이어 개발자
-              </p>
-            </div>
-            <div data-hero-item style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 32, pointerEvents: "auto" }}>
-              <a href="#work" className="btn-red" style={{ ...pillBtn, background: RED }}>
-                프로젝트 보기
-              </a>
-              <a href="#contact" className="btn-ghost" style={{ ...pillBtn, border: "1px solid rgba(255,255,255,0.35)" }}>
-                이력서 받기
-              </a>
+
+            <div className="hero-right">
+              <div className="face-wrap" style={{ animation: "heroFloat 5s ease-in-out infinite" }}>
+                {/* gsap 입장 애니메이션은 안쪽 래퍼에만 걸어 레이아웃을 건드리지 않는다 */}
+                <div data-hero-item data-hero-portrait style={{ height: "100%" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    ref={faceRef}
+                    data-hero-face
+                    src="/uploads/pasted-1789519232538-0.png"
+                    alt="이민형"
+                    style={{
+                      height: "100%",
+                      width: "auto",
+                      maxWidth: "none",
+                      objectFit: "contain",
+                      filter: "drop-shadow(0 24px 48px rgba(0,0,0,0.5))",
+                      willChange: "transform",
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
           </div>
