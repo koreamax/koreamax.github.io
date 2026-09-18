@@ -305,15 +305,16 @@ function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
 
 /* ───────────────────────── 스크롤 연출 설정 ───────────────────────── */
 
+/* 최종 위치는 화면 안(±50vw / ±50vh)에 머물면서 가운데(수상 목록) 를 비운다 */
 const CFG = [
-  { sx: -8, sy: -10, sr: -18, x: -27, y: -41 },
-  { sx: 14, sy: -10, sr: 20, x: 34, y: -33 },
-  { sx: -16, sy: 0, sr: -4, x: -36, y: -2 },
-  { sx: 1, sy: -10, sr: -2, x: 19, y: -43 },
-  { sx: 18, sy: 1, sr: 6, x: 37, y: 6 },
-  { sx: -6, sy: 10, sr: 6, x: -34, y: 37 },
-  { sx: 8, sy: 7, sr: 3, x: -6, y: 45 },
-  { sx: 20, sy: 12, sr: -7, x: 33, y: 37 },
+  { sx: -8, sy: -10, sr: -18, x: -30, y: -30 },
+  { sx: 14, sy: -10, sr: 20, x: 30, y: -30 },
+  { sx: -16, sy: 0, sr: -4, x: -37, y: 2 },
+  { sx: 1, sy: -10, sr: -2, x: 0, y: 37 },
+  { sx: 18, sy: 1, sr: 6, x: 37, y: 2 },
+  { sx: -6, sy: 10, sr: 6, x: -30, y: 31 },
+  { sx: 8, sy: 7, sr: 3, x: 0, y: -35 },
+  { sx: 20, sy: 12, sr: -7, x: 30, y: 31 },
 ];
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -527,12 +528,6 @@ export default function Portfolio() {
         const sinkPx = p * 120;
         return (
       <header id="top" ref={headerRef} style={{ position: "relative", overflow: "hidden", padding: "80px 24px 0" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 600, letterSpacing: 2, color: "rgba(255,255,255,0.4)" }}>
-          <span>01 &nbsp;BACKEND</span>
-          <span>02 &nbsp;AI</span>
-          <span>03 &nbsp;CLOUD</span>
-          <span>04 &nbsp;EMBEDDED</span>
-        </div>
         <div style={{ position: "relative", display: "flow-root", maxWidth: 1280, margin: "0 auto", minHeight: `max(440px, calc((100vh - 330px) * ${(1 - p * 0.5).toFixed(3)}))` }}>
           <div
             ref={wordRef}
@@ -607,7 +602,7 @@ export default function Portfolio() {
               <h1 className="hero-name" style={{ margin: 0, fontFamily: BHS, lineHeight: 1.05, letterSpacing: "0.01em" }}>
                 이민형
               </h1>
-              <p className="hero-sub" style={{ margin: "16px 0 0", fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.65)" }}>
+              <p className="hero-sub" style={{ margin: "18px 0 0" }}>
                 Backend부터 AI, Cloud, Embedded까지
                 <br />
                 모두를 아우를 수 있는
@@ -668,8 +663,8 @@ export default function Portfolio() {
                     <img src={a.logo} alt="" />
                   </span>
                   <span className="sp-t">
-                    {a.title}
-                    <span className="sp-p">({a.prize})</span>
+                    {a.prize}
+                    <span className="sp-p">{a.title}</span>
                   </span>
                   <span className="sp-d">{a.date}</span>
                 </a>
