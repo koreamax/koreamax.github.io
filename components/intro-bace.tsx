@@ -127,7 +127,7 @@ export default function IntroBace() {
         props: "color",
         onComplete: () => gsap.set(heroKw, { clearProps: "all" }),
       });
-      gsap.to(overlay, { backgroundColor: "rgba(20,20,19,0)", duration: 0.7, ease: "power2.inOut" });
+      gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.7, ease: "power2.inOut" });
       gsap.set(overlay, { pointerEvents: "none" });
     }, 2.85);
 
