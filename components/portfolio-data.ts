@@ -303,11 +303,18 @@ export const corridorTitles = [
   "WalkingCity",
 ];
 
-/* ───────────────────────── 분야별 프로젝트 ───────────────────────── */
+/* ───────────────────────── 분야별 프로젝트 ─────────────────────────
+   같은 프로젝트라도 분야에 따라 맡은 역할과 풀어낸 문제가 다르므로
+   설명 · 문제 · 해결을 분야별로 따로 적는다. */
 
 export interface CategoryItem {
   title: string;
-  desc: string;
+  /** 어떤 프로젝트인지 한 줄 */
+  summary: string;
+  /** 어떤 문제가 있었는지 */
+  problem: string;
+  /** 어떻게 풀었는지 */
+  solution: string;
   repo: string;
   status: string;
 }
@@ -320,41 +327,187 @@ export interface Category {
   items: CategoryItem[];
 }
 
-const ALL: CategoryItem[] = [
-  ...projects.map((p) => ({ title: p.title, desc: p.desc, repo: p.repo, status: p.status })),
-  ...moreProjects.map((m) => ({ title: m.title, desc: m.desc, repo: m.repo, status: m.status })),
-];
-
-const pick = (...titles: string[]): CategoryItem[] =>
-  titles.map((t) => ALL.find((p) => p.title === t)).filter((p): p is CategoryItem => Boolean(p));
-
 export const categories: Category[] = [
   {
     num: "01",
     name: "Backend",
     color: "#60a5fa",
     stack: ["Spring Boot", "FastAPI", "Node.js", "MySQL", "PostgreSQL", "Redis"],
-    items: pick("beautytalk", "Mission Pawss!ble", "Wilson", "Seagnal"),
+    items: [
+      {
+        title: "beautytalk",
+        summary: "시각장애인·저시력 사용자를 위한 메이크업 도우미 API",
+        problem:
+          "얼굴 이미지 업로드와 분석, 추천 생성이 한 요청 안에서 동기로 처리돼 사용자가 몰리면 요청이 줄줄이 밀리고 타임아웃이 났다.",
+        solution:
+          "업로드와 분석을 분리해 분석은 작업 큐로 넘기고 결과만 따로 받아가도록 바꿨다. 이미지 전처리는 백그라운드 워커로 옮겨 API 스레드를 비웠고, 같은 사진에 대한 재분석은 캐시로 건너뛰게 했다.",
+        repo: "https://github.com/koreamax/beautytalk-app",
+        status: "종료",
+      },
+      {
+        title: "Mission Pawss!ble",
+        summary: "반려견 산책으로 도시 위험을 제보하고 지자체와 연결하는 플랫폼",
+        problem:
+          "같은 위험 지점을 여러 사람이 제보해 중복 데이터가 쌓였고, 처리 상태를 동시에 바꾸면 값이 덮어써지는 충돌이 생겼다.",
+        solution:
+          "위경도 근접 제보를 하나의 그룹 키로 묶어 중복을 합치고, 상태 변경에는 버전을 둔 낙관적 잠금을 적용했다. 사진 원본은 오브젝트 스토리지에 두고 데이터베이스에는 참조만 남겨 테이블을 가볍게 유지했다.",
+        repo: "https://github.com/koreamax/TECH4GOOD_OH",
+        status: "종료",
+      },
+      {
+        title: "Wilson",
+        summary: "치매 노인을 위한 말벗 챗봇의 서비스 간 통신 설계",
+        problem:
+          "음성 처리와 대화 생성을 별도 서비스로 나눈 뒤 매 대화 턴마다 REST 호출이 오갔다. 요청마다 연결을 새로 맺고 JSON을 직렬화하느라 지연이 쌓였고, 동시 세션이 늘자 CPU와 메모리도 함께 튀었다.",
+        solution:
+          "서비스 간 통신을 gRPC로 바꿔 HTTP/2 연결을 재사용하고 프로토콜 버퍼로 페이로드를 줄였다. 음성은 스트리밍 RPC로 조각을 흘려보내 첫 응답까지의 시간을 앞당겼고, 워커 수와 컨테이너 메모리 한계를 동시 세션 기준으로 다시 잡아 사용량이 튀지 않게 했다.",
+        repo: "https://github.com/koreamax/wilson_chatbot",
+        status: "종료",
+      },
+      {
+        title: "Seagnal",
+        summary: "해양 환경 정화 활동을 모으는 통합 ICT 플랫폼",
+        problem:
+          "수거 기록과 위치, 참여자 정보가 서로 다른 출처에서 제각각인 형태로 들어와 통계를 낼 때마다 전체를 훑어야 했고 조회가 느려졌다.",
+        solution:
+          "수집 계층에서 공통 스키마로 정규화한 뒤 저장하고, 자주 쓰는 집계는 요약 테이블로 미리 계산해 두었다. 목록 조회는 복합 인덱스와 커서 페이지네이션으로 바꿔 데이터가 늘어도 비용이 일정하게 유지되도록 했다.",
+        repo: "https://github.com/koreamax/piudaback",
+        status: "종료",
+      },
+    ],
   },
   {
     num: "02",
     name: "AI",
     color: "#a78bfa",
     stack: ["PyTorch", "OpenCV", "OCR", "LLM", "VLM", "LangChain", "RAG"],
-    items: pick("GSV Paper", "beautytalk", "VIAssist", "LLM ROUTER"),
+    items: [
+      {
+        title: "GSV Paper",
+        summary: "구글 스트리트뷰 간판을 검출하고 텍스트를 뽑아내는 파이프라인",
+        problem:
+          "거리 사진 속 간판은 기울고 작고 일부가 가려져 있어 OCR만으로는 글자를 놓쳤고, 한 장에 간판이 여러 개라 엉뚱한 영역까지 읽어 들였다.",
+        solution:
+          "YOLO로 간판 영역을 먼저 검출해 잘라낸 뒤 해상도를 키워 OCR에 넘기는 2단 구조로 바꿨다. OCR 신뢰도가 기준 아래일 때만 VLM에게 이미지를 넘겨 문자열을 보정하게 해서, 비용이 큰 모델은 어려운 간판에만 쓰이도록 했다.",
+        repo: "https://github.com/koreamax/GSV_SIGNBOARD",
+        status: "진행 중",
+      },
+      {
+        title: "beautytalk",
+        summary: "메이크업 설명을 말로 풀어주는 생성 모델 튜닝",
+        problem:
+          "설명의 말투와 단계 순서를 맞추려고 QLoRA로 파인튜닝했지만, 확보한 학습 데이터가 적어 금세 과적합됐다. 학습에 없던 요청에는 지시를 놓치고 엉뚱한 형식으로 답했다.",
+        solution:
+          "파인튜닝을 접고 few-shot 프롬프트로 방향을 바꿨다. 대표 예시 몇 개를 고정 블록으로 넣어 말투와 단계 구조를 잡고, 출력 형식을 강제해 응답이 흔들리지 않게 했다. 데이터가 적을 때는 학습보다 프롬프트 설계가 더 빨리 안정된다는 걸 확인했다.",
+        repo: "https://github.com/koreamax/beautytalk-app",
+        status: "종료",
+      },
+      {
+        title: "VIAssist",
+        summary: "시각장애인 보행 보조 웨어러블의 온디바이스 추론",
+        problem:
+          "YOLO 검출, Optical Flow, VLM, TTS를 한 기기에서 동시에 돌리자 프레임이 밀렸다. 보행 안내는 늦으면 쓸모가 없는데 지연이 체감될 만큼 커졌다.",
+        solution:
+          "모델을 양자화해 메모리와 연산량을 줄이고 추론 엔진에 맞게 변환해 지연을 낮췄다. 무거운 VLM은 매 프레임이 아니라 장면이 바뀌었을 때만 호출하도록 트리거를 나눠, 실시간으로 돌아야 하는 검출과 흐름 추정에 자원을 몰아줬다.",
+        repo: "https://github.com/koreamax/VIAssist_Total",
+        status: "종료",
+      },
+      {
+        title: "LLM ROUTER",
+        summary: "질문에 맞는 모델로 보내 비용과 품질을 함께 잡는 라우터",
+        problem:
+          "쉬운 질문까지 큰 모델로 보내면 비용이 불어나고, 반대로 작은 모델로 몰면 어려운 질문에서 정답률이 떨어졌다. 둘 중 하나를 고르는 문제가 아니었다.",
+        solution:
+          "질문 임베딩과 길이·형식 같은 난이도 특징으로 라우팅 분류기를 학습시켜 모델을 고르게 했다. 분류기의 확신도에 임계값을 두고 애매한 질문만 큰 모델로 올려보내, 비용과 정확도가 만나는 지점을 찾아 조정했다.",
+        repo: "https://github.com/koreamax/SKTLLMROUTER0.710",
+        status: "종료",
+      },
+    ],
   },
   {
     num: "03",
     name: "Cloud",
     color: "#fbbf24",
     stack: ["AWS", "Azure", "GCP", "Docker", "Kubernetes", "Terraform"],
-    items: pick("Mission Pawss!ble", "Wilson", "Cloud Island", "WalkingCity"),
+    items: [
+      {
+        title: "Mission Pawss!ble",
+        summary: "제보 이미지가 몰리는 시민참여 서비스의 인프라",
+        problem:
+          "제보 사진이 애플리케이션 서버를 거쳐 업로드되다 보니 트래픽이 몰릴 때 서버가 함께 흔들렸고, 배포할 때마다 서비스가 잠깐씩 끊겼다.",
+        solution:
+          "프리사인드 URL을 발급해 사진을 오브젝트 스토리지로 직접 올리게 하여 서버에서 업로드 부하를 걷어냈다. 애플리케이션은 컨테이너로 올리고 새 버전이 준비된 뒤 전환하는 방식으로 배포해 중단을 없앴다.",
+        repo: "https://github.com/koreamax/TECH4GOOD_OH",
+        status: "종료",
+      },
+      {
+        title: "Wilson",
+        summary: "무거운 추론 서비스를 감당하기 위한 쿠버네티스 운영",
+        problem:
+          "대화 생성 서비스가 요청마다 자원을 크게 먹어 한 대로는 동시 사용자를 감당하지 못했다. 같은 인스턴스에 있던 가벼운 API까지 덩달아 느려졌다.",
+        solution:
+          "추론 서비스와 일반 API를 별도 디플로이먼트로 나눠 쿠버네티스에 올리고, 추론 쪽만 리소스 요청과 상한을 크게 잡아 따로 오토스케일되게 했다. 노드 선택으로 추론 파드를 전용 노드에 배치해 두 워크로드가 서로를 밀어내지 않도록 격리했다.",
+        repo: "https://github.com/koreamax/wilson_chatbot",
+        status: "종료",
+      },
+      {
+        title: "Cloud Island",
+        summary: "AWS CloudTrail 로그를 탐험하듯 읽는 시각화",
+        problem:
+          "CloudTrail 이벤트는 JSON으로 끝없이 쌓이는데, 누가 어떤 자원에 무엇을 했는지 사람이 읽어 내려가서는 흐름이 잡히지 않았다.",
+        solution:
+          "로그를 수집해 주체·행동·자원 축으로 정규화한 뒤, 계정과 서비스를 행성과 궤도로 매핑해 3D 공간에 배치했다. 시간축을 따라 이동하며 이벤트가 어디서 발생했는지 한눈에 따라갈 수 있게 만들었다.",
+        repo: "https://github.com/koreamax/cloud-island",
+        status: "종료",
+      },
+      {
+        title: "WalkingCity",
+        summary: "취향에 맞는 산책 경로를 추천하고 이유까지 설명하는 서비스",
+        problem:
+          "추천 이유를 자연어로 만들어 주려면 생성 모델이 필요했는데, 모델을 직접 띄워 운영하기에는 관리 부담과 비용이 컸다.",
+        solution:
+          "Amazon Bedrock의 관리형 모델을 호출해 추천 문구를 생성하도록 했다. 취향 태그와 경로 데이터를 프롬프트에 넣어 개인화하고, 호출 부분을 한 겹 감싸 모델을 바꿔도 서비스 코드는 그대로 두도록 했다.",
+        repo: "https://github.com/koreamax/walk_web",
+        status: "종료",
+      },
+    ],
   },
   {
     num: "04",
     name: "Embedded",
     color: "#34d399",
     stack: ["C/C++", "Raspberry Pi", "NVIDIA Jetson", "ROS2", "LiDAR"],
-    items: pick("Goliath Crane", "JeokjaeJeokso", "VIAssist"),
+    items: [
+      {
+        title: "Goliath Crane",
+        summary: "한화오션 골리앗 크레인용 LiDAR 상황 인식 시스템",
+        problem:
+          "크레인 아래 작업자와 장애물을 카메라만으로 보면 거리와 높이를 정확히 잡지 못했고, 역광이나 야간에는 인식 자체가 흔들렸다.",
+        solution:
+          "LiDAR 포인트 클라우드를 받아 거리 기반으로 인식하도록 바꾸고, 지면을 걷어낸 뒤 남은 점들을 묶어 작업자와 장애물을 분리했다. 센서 수집, 인지, 경보를 ROS2 노드로 나눠 한 단계가 밀려도 다른 단계가 멈추지 않게 했다.",
+        repo: "https://github.com/koreamax/Hanhwa-Ocean-Goliath-Crane",
+        status: "진행 중",
+      },
+      {
+        title: "JeokjaeJeokso",
+        summary: "트럭 적재물을 측정해 디지털 트윈으로 보여주는 장치",
+        problem:
+          "센서 수집과 적재물 계산, 시각화 전송을 보드 한 대에서 모두 처리하자 처리량이 부족해 측정 주기가 들쭉날쭉해졌다.",
+        solution:
+          "라즈베리파이 5 두 대로 역할을 나눠 한 대는 센서 수집과 적재물 계산만, 다른 한 대는 통신과 디지털 트윈 전송을 맡게 했다. 두 보드는 네트워크로 메시지를 주고받게 해서 시각화가 밀려도 측정 주기는 일정하게 유지되도록 했다.",
+        repo: "https://github.com/koreamax/2026ESWContest_mobility_JeokjaeJeokso",
+        status: "진행 중",
+      },
+      {
+        title: "VIAssist",
+        summary: "Jetson Orin Nano Super 한 대로 돌아가는 보행 보조 웨어러블",
+        problem:
+          "몸에 걸치는 장치라 전력과 발열에 여유가 없는데, 검출과 흐름 추정, 언어 모델, 음성 합성을 한 보드에 모두 올려야 했다.",
+        solution:
+          "Jetson Orin Nano Super를 기준으로 전력 모드와 클럭을 맞추고, 카메라 입력부터 음성 출력까지를 보드 한 대 안에서 끝내는 파이프라인으로 구성했다. 처리 주기를 상황에 따라 조절해 발열이 올라가도 안내가 끊기지 않게 했다.",
+        repo: "https://github.com/koreamax/VIAssist_Total",
+        status: "종료",
+      },
+    ],
   },
 ];

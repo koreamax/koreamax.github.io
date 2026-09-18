@@ -138,11 +138,21 @@ export default function ProjectScenes() {
               {c.items.map((it) => (
                 <li key={it.title} data-item>
                   <a href={it.repo} target="_blank" rel="noopener noreferrer">
-                    <span className="pl-dot" style={{ background: statusColor(it.status) }} />
-                    <span className="pl-title">{it.title}</span>
-                    <span className="pl-desc">{it.desc}</span>
-                    <span className="pl-go" aria-hidden>
-                      ↗
+                    <span className="pl-head">
+                      <span className="pl-dot" style={{ background: statusColor(it.status) }} />
+                      <span className="pl-title">{it.title}</span>
+                      <span className="pl-summary">{it.summary}</span>
+                      <span className="pl-go" aria-hidden>
+                        ↗
+                      </span>
+                    </span>
+                    <span className="pl-line">
+                      <b>문제</b>
+                      {it.problem}
+                    </span>
+                    <span className="pl-line pl-fix">
+                      <b>해결</b>
+                      {it.solution}
                     </span>
                   </a>
                 </li>
