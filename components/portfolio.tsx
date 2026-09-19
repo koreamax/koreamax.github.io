@@ -373,12 +373,13 @@ const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
 const MARQUEE_ITEMS = ["AI", "BACKEND", "CLOUD", "DEVELOPER", "EMBEDDED"];
 /** 히어로 왼쪽 ABCDE 스택 — 인트로의 다섯 글자가 이 자리로 날아와 그대로 남는다 */
+/* 인트로에서는 ABCDE 로 모였다가, 다 풀리면 Developer 가 맨 아래로 간다 */
 const ABCDE = [
   { ini: "A", rest: "I" },
   { ini: "B", rest: "ackend" },
   { ini: "C", rest: "loud" },
-  { ini: "D", rest: "eveloper" },
   { ini: "E", rest: "mbedded" },
+  { ini: "D", rest: "eveloper" },
 ];
 
 /* ───────────────────────── 컴포넌트 ───────────────────────── */
@@ -534,7 +535,7 @@ export default function Portfolio() {
             };
             requestAnimationFrame(tick);
           },
-          { threshold: 0.35 },
+          { threshold: 0.7 },
         );
         io3.observe(target);
         cleanup.push(() => io3.disconnect());

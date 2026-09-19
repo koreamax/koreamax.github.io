@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: "A부터 E까지 모두 가능한 멀티플레이어 개발자",
     url: "https://koreamax.github.io",
     siteName: "ABCDE.",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "ABCDE." }],
+    images: [{ url: "/og-abcde.png", width: 1200, height: 630, alt: "ABCDE." }],
     locale: "ko_KR",
     type: "website",
   },
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ABCDE.",
     description: "A부터 E까지 모두 가능한 멀티플레이어 개발자",
-    images: ["/og.png"],
+    images: ["/og-abcde.png"],
   },
 };
 

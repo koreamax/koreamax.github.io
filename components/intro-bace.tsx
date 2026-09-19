@@ -112,13 +112,17 @@ export default function IntroBace() {
     // STEP 2 — 가운데 BACE 가 그대로 홈 화면의 제자리로 날아가고 배경이 걷힌다.
     // 글자마다 자기 타임라인을 갖고, 도착하기 전에 자기 단어가 이어 붙기 시작한다.
     tl.add(() => {
-      const from = words.map((w) => w.getBoundingClientRect());
-      const to = heroIni.map((e) => e.getBoundingClientRect());
+      /* 화면에 놓인 순서가 달라도 같은 글자끼리 이어지도록 data-flip-id 로 짝짓는다 */
+      const pairs = words
+        .map((w) => ({ w, h: heroIni.find((e) => e.dataset.flipId === w.dataset.flipId) || null }))
+        .filter((p): p is { w: HTMLElement; h: HTMLElement } => Boolean(p.h));
+      const from = pairs.map((p) => p.w.getBoundingClientRect());
+      const to = pairs.map((p) => p.h.getBoundingClientRect());
       gsap.set(words, { display: "none" });
       // 막대는 글자가 이동하는 동안 계속 자라다가 풀네임이 다 나오면 멈춘다
       if (rule) gsap.to(rule, { scaleY: 1, duration: 2.0, ease: "none" });
 
-      heroIni.forEach((el, i) => {
+      pairs.forEach(({ h: el }, i) => {
         const a = from[i];
         const b = to[i];
         if (!a || !b || !b.height) return;
