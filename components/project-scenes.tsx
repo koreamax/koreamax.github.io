@@ -1,24 +1,24 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { categories } from "@/components/portfolio-data";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
-import type { CSSProperties } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
  * "온 더 스크린" 전용 무대.
  *
- * 이 구간에서는 페이지가 내려가는 대신 화면이 제자리에 고정되고, 스크롤 진행도가 장면 전환에
- * 쓰인다. 01 Backend → 02 AI → 03 Cloud → 04 Embedded 네 장면이 같은 자리에 겹쳐 있고,
- * 나가는 장면과 들어오는 장면이 잠깐 함께 존재하며 교차한다.
+ * 화면은 제자리에 고정되고, 스크롤 진행도가 장면을 바꾼다. 다만 장면이 통째로 사라졌다
+ * 나타나는 것이 아니라 현재 장면이 해체되어 흩어지고 그 자리에서 다음 장면이 조립된다.
  *
- * 화면 크기에 따라 구성이 달라지지 않도록 1440 × 860 고정 캔버스에 그린 뒤 통째로 배율만
- * 맞춘다. 그래서 노트북이든 큰 모니터든 같은 그림이 보인다.
+ * 요소는 세 겹으로 나뉜다. 배경, 본문 카드, 앞쪽 제목이 서로 다른 속도와 방향으로 움직여
+ * 깊이가 생긴다. 전환마다 해체·조립 방식이 달라 같은 동작이 반복되지 않고, 스크롤 속도를
+ * 읽어 빠르게 굴릴수록 무대가 조금 더 크게 반응한다.
  *
+ * 화면 크기에 따라 구성이 달라지지 않도록 1440 × 860 고정 캔버스에 그린 뒤 배율만 맞춘다.
  * 모바일과 prefers-reduced-motion 에서는 고정하지 않고 평범한 세로 흐름으로 되돌린다.
  */
 
@@ -55,6 +55,8 @@ function CardStatus({ status }: { status: string }) {
     </div>
   );
 }
+
+const SHOW = "inset(0% 0% 0% 0%)";
 
 export default function ProjectScenes() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -108,22 +110,40 @@ export default function ProjectScenes() {
 
     const ctx = gsap.context(() => {
       const n = scenes.length;
-      const layers = (s: HTMLElement) => gsap.utils.toArray<HTMLElement>("[data-layer]", s);
-      const depth = (el: Element) => Number((el as HTMLElement).dataset.layer || 1);
+      const q = (s: HTMLElement, sel: string) => gsap.utils.toArray<HTMLElement>(sel, s);
 
+      /* 첫 장면만 보이고, 나머지는 조립되기 전 상태로 숨겨 둔다 */
+      gsap.set(scenes[0], { autoAlpha: 1 });
       gsap.set(scenes.slice(1), { autoAlpha: 0 });
+      scenes.forEach((s, i) => {
+        if (i === 0) return;
+        gsap.set(q(s, "[data-name],[data-num]"), { yPercent: 115 });
+        gsap.set(q(s, "[data-rule]"), { scaleX: 0, transformOrigin: "0% 50%" });
+        gsap.set(q(s, "[data-count]"), { opacity: 0, y: 18 });
+        gsap.set(q(s, "[data-item]"), { clipPath: "inset(0% 0% 100% 0%)", y: 60 });
+        gsap.set(q(s, "[data-bg]"), { scale: 0.6, opacity: 0 });
+      });
+
+      /* 스크롤 속도에 따른 아주 약한 반응 (범위를 clamp 해서 과하지 않게) */
+      const setSkew = gsap.quickTo(".pscene-inner", "skewY", { duration: 0.55, ease: "power3.out" });
+      const setSquash = gsap.quickTo(".pscene-inner", "scaleY", { duration: 0.55, ease: "power3.out" });
 
       const tl = gsap.timeline({
-        defaults: { ease: "power2.inOut", duration: 1 },
+        defaults: { ease: "power2.inOut" },
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: `+=${(n - 1) * 115}%`,
+          end: `+=${(n - 1) * 145}%`,
           pin: true,
           pinSpacing: true,
-          scrub: 0.9,
+          scrub: 0.75,
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const v = gsap.utils.clamp(-1, 1, self.getVelocity() / 2600);
+            setSkew(v * 1.1);
+            setSquash(1 - Math.abs(v) * 0.014);
+          },
         },
       });
 
@@ -131,28 +151,84 @@ export default function ProjectScenes() {
         const cur = scenes[i];
         const nxt = scenes[i + 1];
         const at = i;
+        const P = (t: number) => at + t; // 구간 안에서의 상대 위치
 
-        /* 나가는 장면 — 흐림 없이 또렷한 채로 물러난다 */
-        tl.to(cur, { autoAlpha: 0, scale: 0.94, y: -60 }, at);
-        tl.to(layers(cur), { y: (_i, el) => -52 * depth(el), ease: "power2.in" }, at);
+        const pick = (s: HTMLElement) => ({
+          name: q(s, "[data-name]"),
+          num: q(s, "[data-num]"),
+          count: q(s, "[data-count]"),
+          rule: q(s, "[data-rule]"),
+          cards: q(s, "[data-item]"),
+          bg: q(s, "[data-bg]"),
+        });
+        const a = pick(cur);
+        const b = pick(nxt);
 
-        /* 들어오는 장면 */
-        tl.fromTo(nxt, { autoAlpha: 0, scale: 1.04, y: 80 }, { autoAlpha: 1, scale: 1, y: 0 }, at);
-        tl.fromTo(layers(nxt), { y: (_i, el) => 64 * depth(el) }, { y: 0, ease: "power2.out" }, at);
+        /* ── 해체 ── 앞쪽 제목은 크고 빠르게, 배경은 느리고 반대 방향으로 ── */
+        tl.to(a.num, { xPercent: -140, opacity: 0, duration: 0.42, ease: "power2.in" }, P(0));
+        tl.to(a.name, { x: -170, y: -34, opacity: 0, duration: 0.48, ease: "power2.in" }, P(0.04));
+        tl.to(a.count, { y: 46, opacity: 0, duration: 0.34, ease: "power2.in" }, P(0.02));
+        tl.to(a.rule, { scaleX: 0, transformOrigin: "100% 50%", duration: 0.34, ease: "power2.in" }, P(0.06));
+        tl.to(a.bg, { x: 190, scale: 1.25, opacity: 0, duration: 0.72, ease: "power1.inOut" }, P(0));
 
-        /* 장면마다 성격을 조금씩 다르게 */
         if (i === 0) {
-          tl.fromTo(nxt.querySelectorAll("[data-item]"), { x: 70, autoAlpha: 0 }, { x: 0, autoAlpha: 1, stagger: 0.05, ease: "power3.out" }, at + 0.28);
+          /* 좌우로 갈라지며 뒤로 물러난다 */
+          tl.to(
+            a.cards,
+            {
+              x: (idx: number) => (idx % 2 ? 230 : -230),
+              y: (idx: number) => (idx % 2 ? 54 : -46),
+              rotate: (idx: number) => (idx % 2 ? 5 : -5),
+              scale: 0.82,
+              opacity: 0,
+              duration: 0.55,
+              stagger: 0.05,
+              ease: "power2.in",
+            },
+            P(0.1),
+          );
         } else if (i === 1) {
-          tl.to(cur.querySelectorAll("[data-item]"), { y: 40, autoAlpha: 0, stagger: 0.03, ease: "power2.in" }, at);
-          tl.fromTo(nxt.querySelectorAll("[data-item]"), { y: 56, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.06, ease: "power3.out" }, at + 0.28);
+          /* 아래로 쏟아지듯 떨어진다 */
+          tl.to(
+            a.cards,
+            { y: 250, rotate: (idx: number) => -4 + idx * 3, scale: 0.9, opacity: 0, duration: 0.5, stagger: { each: 0.055, from: "end" }, ease: "power2.in" },
+            P(0.1),
+          );
         } else {
-          tl.to(cur.querySelectorAll("[data-item]"), { x: -90, autoAlpha: 0, stagger: 0.04, ease: "power2.in" }, at);
-          tl.fromTo(nxt.querySelectorAll("[data-item]"), { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.06, ease: "power3.out" }, at + 0.3);
+          /* 보는 사람 쪽으로 확대되며 지나간다 */
+          tl.to(a.cards, { scale: 1.22, y: -70, opacity: 0, duration: 0.52, stagger: 0.05, ease: "power2.in" }, P(0.1));
+        }
+
+        /* 장면 자체는 요소가 다 흩어진 뒤에 꺼지고, 다음 장면은 조립 직전에 켜진다 */
+        tl.to(cur, { autoAlpha: 0, duration: 0.2 }, P(0.62));
+        tl.to(nxt, { autoAlpha: 1, duration: 0.2 }, P(0.3));
+
+        /* ── 조립 ── 배경이 먼저 열리고 번호, 이름, 선, 카드 순으로 ── */
+        tl.fromTo(b.bg, { scale: 0.6, x: -150, opacity: 0 }, { scale: 1, x: 0, opacity: 1, duration: 0.75, ease: "power2.out" }, P(0.34));
+        tl.fromTo(b.num, { yPercent: 115 }, { yPercent: 0, duration: 0.52, ease: "power3.out" }, P(0.46));
+        tl.fromTo(b.name, { yPercent: 115 }, { yPercent: 0, duration: 0.56, ease: "back.out(1.5)" }, P(0.52));
+        tl.fromTo(b.rule, { scaleX: 0 }, { scaleX: 1, transformOrigin: "0% 50%", duration: 0.5, ease: "power3.out" }, P(0.6));
+        tl.fromTo(b.count, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, P(0.66));
+
+        if (i === 0) {
+          /* 아래에서 마스크가 걷히며 올라온다 */
+          tl.fromTo(b.cards, { clipPath: "inset(0% 0% 100% 0%)", y: 70 }, { clipPath: SHOW, y: 0, duration: 0.62, stagger: 0.07, ease: "power3.out" }, P(0.66));
+        } else if (i === 1) {
+          /* 왼쪽에서 오른쪽으로 닦여 나온다 */
+          tl.fromTo(b.cards, { clipPath: "inset(0% 100% 0% 0%)", x: -40 }, { clipPath: SHOW, x: 0, duration: 0.6, stagger: 0.08, ease: "power3.out" }, P(0.66));
+        } else {
+          /* 가운데부터 펼쳐지며 아주 약한 overshoot */
+          tl.fromTo(
+            b.cards,
+            { clipPath: "inset(12% 6% 12% 6%)", scale: 0.94, y: 40, opacity: 0 },
+            { clipPath: SHOW, scale: 1, y: 0, opacity: 1, duration: 0.66, stagger: { each: 0.07, from: "center" }, ease: "back.out(1.3)" },
+            P(0.64),
+          );
         }
 
         /* 진행 표시 */
-        tl.to(root.querySelectorAll(".pstage-dot")[i + 1], { backgroundColor: RED, scale: 1.25 }, at + 0.5);
+        tl.to(root.querySelectorAll(".pstage-dot")[i + 1], { backgroundColor: RED, scale: 1.25, duration: 0.3 }, P(0.55));
+        tl.to(root.querySelectorAll(".pstage-dot")[i], { backgroundColor: "rgba(255,255,255,0.22)", scale: 1, duration: 0.3 }, P(0.55));
       }
     }, root);
 
@@ -164,16 +240,27 @@ export default function ProjectScenes() {
       <div ref={canvasRef} className="pstage-canvas">
         {categories.map((c) => (
           <section key={c.num} className="pscene" style={{ ["--cat" as string]: c.color }}>
+            <span className="pscene-bg" data-bg aria-hidden />
+
             <div className="pscene-inner">
-              <div className="pscene-head" data-layer="1.1">
-                <span className="pscene-num">{c.num}</span>
-                <h3 className="pscene-name">{c.name}</h3>
-                <span className="pscene-count">
+              <div className="pscene-head">
+                <span className="pscene-mask">
+                  <span className="pscene-num" data-num>
+                    {c.num}
+                  </span>
+                </span>
+                <span className="pscene-mask">
+                  <h3 className="pscene-name" data-name>
+                    {c.name}
+                  </h3>
+                </span>
+                <span className="pscene-count" data-count>
                   {c.items.length} projects
                 </span>
+                <span className="pscene-rule" data-rule aria-hidden />
               </div>
 
-              <div className="pscene-row" data-layer="1.5" style={{ ["--n" as string]: c.items.length }}>
+              <div className="pscene-row" style={{ ["--n" as string]: c.items.length }}>
                 {c.items.map((it) => (
                   <a key={it.title} data-item href={it.repo} target="_blank" rel="noopener noreferrer" className="pcard">
                     <span className="pcard-top">

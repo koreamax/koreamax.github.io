@@ -167,7 +167,7 @@ body { font-family: 'Nanum Gothic', sans-serif; color: #ffffff; }
 
 /* 연락처 버튼: 호버 시 각 서비스 브랜드 색 */
 .dc .btn-email:hover { background: #ea4335 !important; color: #ffffff; border-color: #ea4335; }
-.dc .btn-github:hover { background: #000000 !important; color: #ffffff; border-color: #ffffff; }
+.dc .btn-github:hover { background: #ffffff !important; color: #111111; border-color: #ffffff; }
 .dc .btn-velog:hover { background: #20c997 !important; color: #0b1f19; border-color: #20c997; }
 .dc .btn-linkedin:hover { background: #0a66c2 !important; color: #ffffff; border-color: #0a66c2; }
 
@@ -266,7 +266,7 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 .sp-logo { flex: none; width: 34px; height: 34px; border-radius: 999px; background: #ffffff; display: flex; align-items: center; justify-content: center; padding: 5px; }
 .sp-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .sp-t { font-size: 15.5px; font-weight: 800; line-height: 1.3; white-space: nowrap; color: #ffffff; }
-.sp-p { margin-left: 8px; font-size: 12px; font-weight: 600; color: #f37338; }
+.sp-p { margin-left: 8px; font-size: 12px; font-weight: 600; color: #e8b64c; }
 .sp-d { font-size: 12px; font-weight: 800; color: #ff2f22; white-space: nowrap; }
 @media (max-width: 767px) {
   .spread-awards { gap: 5px; }
@@ -313,8 +313,8 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 .pscene-head { display: flex; align-items: baseline; gap: 20px; }
 .pscene-num { font-family: 'Black Han Sans', sans-serif; font-size: 64px; line-height: 1; letter-spacing: 0; color: var(--cat); }
 .pscene-name { margin: 0; font-family: 'Black Han Sans', sans-serif; font-size: 64px; line-height: 1; letter-spacing: -0.01em; color: #ffffff; }
-.pscene-count { font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #f37338; }
-.pscene-head::after { content: ""; flex: 1; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--cat), transparent); }
+.pscene-count { font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #e8b64c; }
+
 
 /* 프로젝트는 가로로 크게 */
 .pscene-row { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 20px; align-items: stretch; }
@@ -346,3 +346,10 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 .pcard-status { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.8px; white-space: nowrap; }
 .pcard-status-dot { width: 6px; height: 6px; border-radius: 9999px; }
 .pcard-bar { flex: 1; min-width: 0; }
+
+/* 장면 배경 레이어 · 마스크 · 구분선 */
+.pscene-bg { position: absolute; left: 50%; top: 50%; width: 920px; height: 920px; margin: -460px 0 0 -460px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--cat) 22%, transparent) 0%, transparent 64%); pointer-events: none; will-change: transform, opacity; }
+.pscene-mask { display: inline-block; overflow: hidden; vertical-align: bottom; }
+.pscene-rule { flex: 1; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--cat), transparent); }
+.pscene-inner { will-change: transform; }
+.pcard { will-change: transform, opacity, clip-path; }
