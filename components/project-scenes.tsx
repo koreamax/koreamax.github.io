@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { categories } from "@/components/portfolio-data";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
+import { GlowCard } from "@/components/ui/spotlight-card";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -57,6 +58,14 @@ function CardStatus({ status }: { status: string }) {
 }
 
 const SHOW = "inset(0% 0% 0% 0%)";
+
+/** 분야마다 카드에 감도는 빛의 색 — 그 분야의 강조색과 가장 가까운 쪽으로 */
+const GLOW: Record<string, "blue" | "purple" | "green" | "orange"> = {
+  "01": "blue",
+  "02": "purple",
+  "03": "orange",
+  "04": "green",
+};
 
 export default function ProjectScenes() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -260,7 +269,8 @@ export default function ProjectScenes() {
 
               <div className="pscene-row" style={{ ["--n" as string]: c.items.length }}>
                 {c.items.map((it) => (
-                  <a key={it.title} data-item href={it.repo} target="_blank" rel="noopener noreferrer" className="pcard">
+                  <a key={it.title} data-item href={it.repo} target="_blank" rel="noopener noreferrer" className="pcard-link">
+                    <GlowCard customSize pointerSpace="element" glowColor={GLOW[c.num] ?? "blue"} className="pcard">
                     <span className="pcard-top">
                       <span className="pl-title">{it.title}</span>
                       <span className="pl-go" aria-hidden>
@@ -277,6 +287,7 @@ export default function ProjectScenes() {
                       {it.solution}
                     </span>
                     <CardStatus status={it.status} />
+                    </GlowCard>
                   </a>
                 ))}
               </div>

@@ -510,26 +510,42 @@ export default function Portfolio() {
           txt.style.transform = "none";
         }
       } else {
-        let played = false;
+        /* 올 때마다 다시 펼쳐지도록, 화면에서 완전히 벗어나면 조용히 도로 모아 둔다 */
+        let opened = false;
+        let spreadRaf = 0;
+        const open = () => {
+          if (opened) return;
+          opened = true;
+          const start = performance.now();
+          const DUR = 2600;
+          const tick = (now: number) => {
+            const t = Math.min(1, (now - start) / DUR);
+            // 부드럽게 붙었다 펼쳐지도록 뒤로 갈수록 느려지는 곡선
+            applySpread(1 - Math.pow(1 - t, 3));
+            if (t < 1) spreadRaf = requestAnimationFrame(tick);
+          };
+          spreadRaf = requestAnimationFrame(tick);
+        };
+        const reset = () => {
+          if (!opened) return;
+          opened = false;
+          cancelAnimationFrame(spreadRaf);
+          applySpread(0);
+        };
         const io3 = new IntersectionObserver(
           (es) => {
-            if (!es[0].isIntersecting || played) return;
-            played = true;
-            io3.disconnect();
-            const start = performance.now();
-            const DUR = 2600;
-            const tick = (now: number) => {
-              const t = Math.min(1, (now - start) / DUR);
-              // 부드럽게 붙었다 펼쳐지도록 뒤로 갈수록 느려지는 곡선
-              applySpread(1 - Math.pow(1 - t, 3));
-              if (t < 1) requestAnimationFrame(tick);
-            };
-            requestAnimationFrame(tick);
+            const r = es[es.length - 1].intersectionRatio;
+            if (r >= 0.7) open();
+            // 보이는 동안 접히면 이상하니, 화면 밖으로 완전히 나간 뒤에만 되돌린다
+            else if (r <= 0.02) reset();
           },
-          { threshold: 0.7 },
+          { threshold: [0, 0.02, 0.7] },
         );
         io3.observe(target);
-        cleanup.push(() => io3.disconnect());
+        cleanup.push(() => {
+          io3.disconnect();
+          cancelAnimationFrame(spreadRaf);
+        });
       }
     }
 
