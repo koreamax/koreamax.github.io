@@ -224,7 +224,7 @@ function Corridor() {
 const TOTAL_PROJECTS = projects.length + moreProjects.length;
 
 /** 화면에 들어오면 0 → to 까지 빨갛게 올라간다 */
-function CountUp({ to, suffix = "", duration = 1400 }: { to: number; suffix?: string; duration?: number }) {
+function CountUp({ to, suffix = "", duration = 2800 }: { to: number; suffix?: string; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -544,7 +544,7 @@ export default function Portfolio() {
             padding: "8px 14px 8px 24px",
           }}
         >
-          <a href="#top" style={{ fontFamily: MONO, fontWeight: 700, fontSize: 17, letterSpacing: 0.5, marginRight: 16 }}>
+          <a href="#top" className="nav-logo" style={{ fontFamily: MONO, fontWeight: 700, fontSize: 17, letterSpacing: 0.5, marginRight: 10, padding: "8px 14px", borderRadius: 9999 }}>
             이민형<span style={{ color: RED }}>.</span>
           </a>
           {[
@@ -756,10 +756,10 @@ export default function Portfolio() {
       </section>
 
       {/* ── PROJECTS ── */}
-      <section id="work" style={{ maxWidth: 1280, margin: "0 auto", padding: "112px 24px 64px" }}>
+      <section id="work" style={{ maxWidth: 1280, margin: "0 auto", padding: "112px 24px 40px" }}>
         <div
           data-corridor
-          style={{ position: "relative", height: "56vh", minHeight: 360, overflow: "hidden", marginBottom: 72, containerType: "inline-size", borderRadius: 8, background: "#0d0d0d" }}
+          style={{ position: "relative", height: "56vh", minHeight: 360, overflow: "hidden", marginBottom: 0, containerType: "inline-size", borderRadius: 8, background: "#0d0d0d" }}
         >
           <Corridor />
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, pointerEvents: "none" }}>
@@ -767,22 +767,7 @@ export default function Portfolio() {
           </div>
           <div className="proj-count">
             <CountUp to={TOTAL_PROJECTS} suffix="+" />
-            <span className="proj-count-label">Projects shipped</span>
           </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 40 }}>
-          <div>
-            <p style={eyebrow}>Projects</p>
-            <h2 style={{ margin: 0, fontFamily: BHS, fontSize: 48, lineHeight: 1.1 }}>온 더 스크린</h2>
-          </div>
-          <a
-            href="https://github.com/koreamax"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.4, textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.3)", paddingBottom: 4 }}
-          >
-            GitHub에서 보기 →
-          </a>
         </div>
       </section>
 

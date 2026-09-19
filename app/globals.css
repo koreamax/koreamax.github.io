@@ -243,10 +243,9 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 }
 
 /* ───────────── 헤더 링크: get in touch 같은 빨간 호버 ───────────── */
-.dc .nav-link, .dc .navpill .logo { transition: background .18s ease, color .18s ease; }
-.dc .navpill .logo { padding: 8px 14px; border-radius: 9999px; background: transparent; border: 0; cursor: pointer; }
-.dc .navpill .logo:hover { background: #da291c; color: #ffffff; }
-.dc .navpill .logo:hover span { color: #ffffff !important; }
+.dc .nav-link, .dc .nav-logo { transition: background .18s ease, color .18s ease; }
+.dc .nav-logo:hover { background: #da291c; color: #ffffff; }
+.dc .nav-logo:hover span { color: #ffffff !important; }
 .dc .nav-link:hover { background: #da291c; color: #ffffff; }
 .dc .nav-link:active { transform: scale(0.96); }
 html { scroll-behavior: smooth; }
@@ -267,7 +266,7 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 .sp-logo { flex: none; width: 34px; height: 34px; border-radius: 999px; background: #ffffff; display: flex; align-items: center; justify-content: center; padding: 5px; }
 .sp-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .sp-t { font-size: 15.5px; font-weight: 800; line-height: 1.3; white-space: nowrap; color: #ffffff; }
-.sp-p { margin-left: 8px; font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.55); }
+.sp-p { margin-left: 8px; font-size: 12px; font-weight: 600; color: #f37338; }
 .sp-d { font-size: 12px; font-weight: 800; color: #ff2f22; white-space: nowrap; }
 @media (max-width: 767px) {
   .spread-awards { gap: 5px; }
@@ -296,7 +295,7 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 }
 
 /* ───────────── 프로젝트 수 카운터 ───────────── */
-.proj-count { position: absolute; left: 0; right: 0; bottom: 8%; display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; z-index: 6; }
+.proj-count { position: absolute; left: 0; right: 0; bottom: 9%; display: flex; justify-content: center; pointer-events: none; z-index: 6; }
 .proj-count-num { font-family: 'Black Han Sans', sans-serif; font-size: min(7vw, 84px); line-height: 1; color: #da291c; text-shadow: 0 0 36px rgba(218, 41, 28, 0.55); font-variant-numeric: tabular-nums; }
 .proj-count-label { font-size: 11px; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
 @media (max-width: 767px) { .proj-count-num { font-size: 52px; } .proj-count-label { font-size: 9px; } }
@@ -312,8 +311,8 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 .pscene-mark { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-family: 'Black Han Sans', sans-serif; font-size: 380px; line-height: 0.8; color: rgba(255,255,255,0.035); pointer-events: none; user-select: none; }
 
 /* 직무는 왼쪽 위에 */
-.pscene-head { display: flex; align-items: baseline; gap: 18px; }
-.pscene-num { font-family: 'Nanum Gothic Coding', monospace; font-size: 14px; font-weight: 700; letter-spacing: 4px; color: var(--cat); }
+.pscene-head { display: flex; align-items: baseline; gap: 20px; }
+.pscene-num { font-family: 'Black Han Sans', sans-serif; font-size: 64px; line-height: 1; letter-spacing: 0; color: var(--cat); }
 .pscene-name { margin: 0; font-family: 'Black Han Sans', sans-serif; font-size: 64px; line-height: 1; letter-spacing: -0.01em; color: #ffffff; }
 .pscene-count { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.35); }
 .pscene-head::after { content: ""; flex: 1; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--cat), transparent); }
