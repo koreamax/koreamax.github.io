@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import ScrollShrinkHero from "@/components/ui/scroll-shrink-hero";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import TechBadge from "@/components/tech-badge";
 import IntroBace from "@/components/intro-bace";
@@ -225,6 +224,8 @@ function Corridor() {
 const TOTAL_PROJECTS = projects.length + moreProjects.length;
 /** 함께 만든 팀원 수 — 실제 숫자에 맞게 고치면 된다 */
 const TOTAL_TEAMMATES = 30;
+/** 프로젝트를 만들어 온 기간(개월) */
+const TOTAL_MONTHS = 18;
 
 /** 화면에 들어오면 0 → to 까지 빨갛게 올라간다 */
 function CountUp({ to, suffix = "", duration = 2800 }: { to: number; suffix?: string; duration?: number }) {
@@ -365,9 +366,9 @@ const CFG = [
   { sx: -16, sy: 0, sr: -4, x: -31, y: 0 },
   { sx: 1, sy: -10, sr: -2, x: 26, y: -23 },
   { sx: 18, sy: 1, sr: 6, x: 31, y: 0 },
-  { sx: -6, sy: 10, sr: 6, x: -26, y: 24 },
-  { sx: 8, sy: 7, sr: 3, x: 0, y: 33 },
-  { sx: 20, sy: 12, sr: -7, x: 26, y: 24 },
+  { sx: -6, sy: 10, sr: 6, x: -26, y: 23 },
+  { sx: 8, sy: 7, sr: 3, x: 0, y: 30 },
+  { sx: 20, sy: 12, sr: -7, x: 26, y: 23 },
 ];
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -457,16 +458,6 @@ export default function Portfolio() {
 
       if (word) word.style.transform = "translate(-50%,-50%) translateY(" + rel * 0.18 + "px)";
 
-      // Deadpool 스타일 bounded scrub: 히어로 경계를 지나는 동안만 반응 — 아래/오른쪽으로 가라앉음
-      if (face && heroEl && faceEntranceDone) {
-        const hh = heroEl.offsetHeight;
-        const pp = clamp((rel - hh * 0.2) / (hh * 0.55));
-        face.style.transform =
-          pp > 0
-            ? "translateY(" + (pp * 110).toFixed(1) + "px) translateX(" + (pp * 42).toFixed(1) + "px) scale(" + (1 - pp * 0.11).toFixed(3) + ") rotate(" + (pp * 3).toFixed(2) + "deg)"
-            : "none";
-      }
-
       /* 지금 보고 있는 구간을 헤더 링크에 표시한다 */
       {
         const mid = window.innerHeight * 0.45;
@@ -526,7 +517,7 @@ export default function Portfolio() {
             played = true;
             io3.disconnect();
             const start = performance.now();
-            const DUR = 1500;
+            const DUR = 2600;
             const tick = (now: number) => {
               const t = Math.min(1, (now - start) / DUR);
               // 부드럽게 붙었다 펼쳐지도록 뒤로 갈수록 느려지는 곡선
@@ -616,13 +607,8 @@ export default function Portfolio() {
       </nav>
 
       {/* ── HERO (스크롤하면 이 화면 전체가 작아지며 아래로 내려온다) ── */}
-      <ScrollShrinkHero>
-      {(p) => {
-        const scale = 1 - p * 0.58;
-        const sinkPx = p * 120;
-        return (
       <header id="top" ref={headerRef} style={{ position: "relative", overflow: "hidden", padding: "80px 24px 0" }}>
-        <div style={{ position: "relative", display: "flow-root", maxWidth: 1280, margin: "0 auto", minHeight: `max(440px, calc((100vh - 330px) * ${(1 - p * 0.5).toFixed(3)}))` }}>
+        <div style={{ position: "relative", display: "flow-root", maxWidth: 1280, margin: "0 auto", minHeight: "max(440px, calc(100vh - 330px))" }}>
           <div
             ref={wordRef}
             className="giant-word"
@@ -644,16 +630,7 @@ export default function Portfolio() {
             멀티플레이어
           </div>
           {/* 스크롤하면 이 블록(얼굴 + 이름 + 소개)만 작아지며 아래로 내려온다 */}
-          <div
-            ref={shrinkRef}
-            style={{
-              position: "relative",
-              transformOrigin: "50% 0%",
-              transform: `translateY(${sinkPx}px) scale(${scale})`,
-              marginBottom: shrinkNatural ? -(shrinkNatural * (1 - scale)) + sinkPx : 0,
-              willChange: "transform",
-            }}
-          >
+          <div ref={shrinkRef} style={{ position: "relative" }}>
           {/* 왼쪽: 인트로에서 풀어진 ABCDE 가 날아와 그대로 남는 키워드 스택 / 오른쪽: 얼굴 */}
           <div className="hero-grid">
             <div className="hero-left">
@@ -678,7 +655,7 @@ export default function Portfolio() {
                   <img
                     ref={faceRef}
                     data-hero-face
-                    src="/uploads/pasted-1789519232538-0.png"
+                    src="/uploads/face-2026.png"
                     alt="이민형"
                     style={{
                       height: "100%",
@@ -698,9 +675,7 @@ export default function Portfolio() {
                 이민형
               </h1>
               <p className="hero-sub" style={{ margin: "18px 0 0" }}>
-                A부터 E까지
-                <br />
-                모두 가능한
+                A부터 E까지 모두 가능한
                 <br />이 시대의 멀티플레이어 개발자
               </p>
             </div>
@@ -713,9 +688,6 @@ export default function Portfolio() {
           </div>
         </div>
       </header>
-        );
-      }}
-      </ScrollShrinkHero>
 
       {/* ── MARQUEE ── */}
       <div className="band" style={{ overflow: "hidden", background: RED, padding: "14px 0", display: "flex" }}>
@@ -828,6 +800,11 @@ export default function Portfolio() {
             <span className="proj-stat">
               <CountUp to={TOTAL_TEAMMATES} suffix="+" />
               <span className="proj-stat-label">People</span>
+            </span>
+            <span className="proj-stat-div" aria-hidden />
+            <span className="proj-stat">
+              <CountUp to={TOTAL_MONTHS} suffix="+" />
+              <span className="proj-stat-label">Months</span>
             </span>
           </div>
         </div>
