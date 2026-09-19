@@ -455,7 +455,7 @@ export default function Portfolio() {
             : "none";
       }
 
-      if (spreadSec) {
+      if (spreadSec && window.innerWidth > 900) {
         const r = spreadSec.getBoundingClientRect();
         const total = r.height - window.innerHeight;
         const raw = total > 0 ? clamp(-r.top / total) : 1;
@@ -710,9 +710,11 @@ export default function Portfolio() {
               ))}
             </div>
           </div>
+          <div className="spread-cards">
           {spreadCards.map((c, i) => (
             <div
               key={i}
+              className="spread-card"
               ref={(el) => {
                 cardRefs.current[i] = el;
               }}
@@ -746,6 +748,7 @@ export default function Portfolio() {
               )}
             </div>
           ))}
+          </div>
           <div
             ref={spreadHintRef}
             style={{ position: "absolute", left: 0, right: 0, bottom: 24, zIndex: 11, textAlign: "center", fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}
@@ -781,8 +784,8 @@ export default function Portfolio() {
           {events.map((e) => (
             <div
               key={e.date + e.title}
-              className="row-hover"
-              style={{ display: "grid", gridTemplateColumns: "150px minmax(0,1fr) 200px", gap: 32, alignItems: "baseline", padding: "28px 12px", borderTop: "1px solid rgba(255,255,255,0.12)" }}
+              className="row-hover row-time"
+              style={{ alignItems: "baseline", padding: "28px 12px", borderTop: "1px solid rgba(255,255,255,0.12)" }}
             >
               <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, color: RED }}>{e.date}</span>
               <div>
