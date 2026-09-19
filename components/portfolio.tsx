@@ -150,7 +150,7 @@ function Contacts() {
 
 /* ───────────────────────── 3D 프로젝트 복도 ───────────────────────── */
 
-const P = { persp: 30, cardH: 25, birth: 2.6, exit: 46, rb: -11, re: 44, fan: 3.3, tb: 6, te: 28, stops: 24 };
+const P = { persp: 30, cardH: 25, birth: 2.2, exit: 52, rb: -13, re: 56, fan: 3.3, tb: 6, te: 28, stops: 24 };
 
 function keyframes(dir: 1 | -1, name: string): string {
   let s = "";
@@ -174,8 +174,8 @@ function keyframes(dir: 1 | -1, name: string): string {
 }
 
 const CORRIDOR_CSS = keyframes(1, "ishr") + keyframes(-1, "ishl");
-const CORRIDOR_SPEED = 18;
-const CORRIDOR_N = 9;
+const CORRIDOR_SPEED = 38;
+const CORRIDOR_N = 6;
 
 function Corridor() {
   return (
@@ -762,7 +762,8 @@ export default function Portfolio() {
       <section id="work" style={{ maxWidth: 1280, margin: "0 auto", padding: "112px 24px 40px" }}>
         <div
           data-corridor
-          style={{ position: "relative", height: "56vh", minHeight: 360, overflow: "hidden", marginBottom: 0, containerType: "inline-size", borderRadius: 8, background: "#0d0d0d" }}
+          className="corridor"
+          style={{ position: "relative", height: "58vh", minHeight: 380, overflow: "hidden", marginBottom: 0, containerType: "inline-size" }}
         >
           <Corridor />
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, pointerEvents: "none" }}>

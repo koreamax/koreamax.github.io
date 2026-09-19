@@ -124,9 +124,8 @@ export default function ProjectScenes() {
         gsap.set(q(s, "[data-bg]"), { scale: 0.6, opacity: 0 });
       });
 
-      /* 스크롤 속도에 따른 아주 약한 반응 (범위를 clamp 해서 과하지 않게) */
-      const setSkew = gsap.quickTo(".pscene-inner", "skewY", { duration: 0.55, ease: "power3.out" });
-      const setSquash = gsap.quickTo(".pscene-inner", "scaleY", { duration: 0.55, ease: "power3.out" });
+      /* 스크롤 속도에 따른 반응은 기울이지 않고 아주 약한 확대로만 준다 */
+      const setPush = gsap.quickTo(".pscene-inner", "scale", { duration: 0.6, ease: "power3.out" });
 
       const tl = gsap.timeline({
         defaults: { ease: "power2.inOut" },
@@ -140,9 +139,8 @@ export default function ProjectScenes() {
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            const v = gsap.utils.clamp(-1, 1, self.getVelocity() / 2600);
-            setSkew(v * 1.1);
-            setSquash(1 - Math.abs(v) * 0.014);
+            const v = gsap.utils.clamp(0, 1, Math.abs(self.getVelocity()) / 2600);
+            setPush(1 + v * 0.012);
           },
         },
       });
