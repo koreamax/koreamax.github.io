@@ -16,13 +16,14 @@ import gsap from "gsap";
  */
 
 const WORDS = [
-  { l: "B", cls: "w-b" },
   { l: "A", cls: "w-a" },
+  { l: "B", cls: "w-b" },
   { l: "C", cls: "w-c" },
+  { l: "D", cls: "w-d" },
   { l: "E", cls: "w-e" },
 ] as const;
 
-const KEY = "bace-intro-played";
+const KEY = "abcde-intro-played";
 
 /** 히어로 요소들을 순차 등장시킨다 (인트로 유무와 상관없이 공통) */
 function revealHero(fast: boolean) {

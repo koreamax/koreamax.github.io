@@ -178,7 +178,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 .intro-stage { position: absolute; inset: 0; }
 .intro-word { position: absolute; display: inline-flex; align-items: baseline; font-family: 'Black Han Sans', sans-serif; font-weight: 400; letter-spacing: 0.01em; line-height: 1; white-space: nowrap; will-change: transform; opacity: 0; }
 .intro[data-state="word"] .intro-stage { display: flex; align-items: center; justify-content: center; }
-.intro[data-state="word"] .intro-word { position: static; font-size: clamp(96px, 24vw, 360px); letter-spacing: 0.02em; }
+.intro[data-state="word"] .intro-word { position: static; font-size: clamp(64px, 17vw, 250px); letter-spacing: 0.02em; }
 .intro[data-state="scatter"] .intro-word { position: absolute; }
 .intro .w-b { left: 8vw; top: 18vh; font-size: clamp(64px, 13vw, 200px); }
 .intro .w-a { left: 12vw; top: 61vh; font-size: clamp(56px, 10.5vw, 160px); }
@@ -211,8 +211,8 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 .bace-stack { position: relative; padding-left: 24px; }
 .bace-rule { position: absolute; left: 0; top: 6px; bottom: 6px; width: 4px; border-radius: 4px; background: linear-gradient(#da291c, #ff6a3d); box-shadow: 0 0 22px rgba(218, 41, 28, 0.55); }
 .bace-row { display: flex; align-items: baseline; font-family: 'Black Han Sans', sans-serif; line-height: 1.04; white-space: nowrap; letter-spacing: 0.01em; }
-.bace-ini { display: inline-block; min-width: 0.78em; font-size: clamp(46px, 5.4vw, 82px); color: #da291c; text-shadow: 0 0 34px rgba(218, 41, 28, 0.5); }
-.bace-rest { font-size: clamp(25px, 3vw, 45px); color: #ffffff; }
+.bace-ini { display: inline-block; min-width: 0.78em; font-size: clamp(38px, 4.4vw, 66px); color: #da291c; text-shadow: 0 0 34px rgba(218, 41, 28, 0.5); }
+.bace-rest { font-size: clamp(21px, 2.5vw, 37px); color: #ffffff; }
 
 .hero-name { font-size: clamp(44px, 5vw, 74px); }
 .hero-right { position: relative; display: flex; justify-content: center; }
@@ -373,8 +373,8 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 @media (max-width: 600px) {
   .face-wrap { height: 310px !important; }
   .bace-stack { margin-top: 6px; }
-  .bace-ini { font-size: 46px !important; }
-  .bace-rest { font-size: 25px !important; }
+  .bace-ini { font-size: 36px !important; }
+  .bace-rest { font-size: 20px !important; }
   .hero-name { font-size: 54px !important; }
   .hero-sub { font-size: 15px !important; }
   .hero-center { padding: 34px 0 16px !important; }

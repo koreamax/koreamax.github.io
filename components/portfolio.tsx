@@ -371,12 +371,13 @@ const CFG = [
 ];
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
-const MARQUEE_ITEMS = ["BACKEND", "AI", "CLOUD", "EMBEDDED"];
-/** 히어로 왼쪽 BACE 스택 — 인트로의 네 단어가 이 자리로 날아와 그대로 남는다 */
-const BACE = [
-  { ini: "B", rest: "ackend" },
+const MARQUEE_ITEMS = ["AI", "BACKEND", "CLOUD", "DEVELOPER", "EMBEDDED"];
+/** 히어로 왼쪽 ABCDE 스택 — 인트로의 다섯 글자가 이 자리로 날아와 그대로 남는다 */
+const ABCDE = [
   { ini: "A", rest: "I" },
+  { ini: "B", rest: "ackend" },
   { ini: "C", rest: "loud" },
+  { ini: "D", rest: "eveloper" },
   { ini: "E", rest: "mbedded" },
 ];
 
@@ -389,7 +390,6 @@ export default function Portfolio() {
   const faceRef = useRef<HTMLImageElement>(null);
   const spreadRef = useRef<HTMLElement>(null);
   const spreadTextRef = useRef<HTMLDivElement>(null);
-  const spreadHintRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shrinkRef = useRef<HTMLDivElement>(null);
   const [shrinkNatural, setShrinkNatural] = useState(0);
@@ -451,7 +451,6 @@ export default function Portfolio() {
       const heroEl = headerRef.current;
       const spreadSec = spreadRef.current;
       const txt = spreadTextRef.current;
-      const hint = spreadHintRef.current;
       const heroTop = heroEl ? heroEl.getBoundingClientRect().top + window.scrollY : 0;
       const rel = Math.max(0, window.scrollY - heroTop); // 히어로 상단 기준 스크롤량
 
@@ -485,27 +484,63 @@ export default function Portfolio() {
         }
       }
 
-      if (spreadSec && window.innerWidth > 900) {
-        const r = spreadSec.getBoundingClientRect();
-        const total = r.height - window.innerHeight;
-        const raw = total > 0 ? clamp(-r.top / total) : 1;
-        const p = clamp((raw - 0.1) / 0.75);
-        cardRefs.current.forEach((el, i) => {
-          if (!el) return;
-          const c = CFG[i % CFG.length];
-          const tx = c.sx + (c.x - c.sx) * p;
-          const ty = c.sy + (c.y - c.sy) * p;
-          el.style.transform = "translate(calc(-50% + " + tx + "vw), calc(-50% + " + ty + "vh)) rotate(" + c.sr * (1 - p) + "deg) scale(" + (0.82 + 0.18 * p) + ")";
-        });
-        if (txt) {
-          txt.style.opacity = String(clamp((p - 0.35) / 0.4));
-          txt.style.transform = "scale(" + (0.88 + 0.12 * clamp((p - 0.3) / 0.6)) + ")";
-        }
-        if (hint) hint.style.opacity = String(1 - clamp(p / 0.15));
-      }
     };
 
     // 매 프레임 scrollY 폴링 (원본과 동일한 rAF 루프)
+    /* 펼침: 화면에 들어오면 스크롤과 무관하게 한 번 자연스럽게 펼쳐진다 */
+    const applySpread = (p: number) => {
+      cardRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const c = CFG[i % CFG.length];
+        const tx = c.sx + (c.x - c.sx) * p;
+        const ty = c.sy + (c.y - c.sy) * p;
+        el.style.transform =
+          "translate(calc(-50% + " + tx + "vw), calc(-50% + " + ty + "vh)) rotate(" + c.sr * (1 - p) + "deg) scale(" + (0.82 + 0.18 * p) + ")";
+      });
+      const txt = spreadTextRef.current;
+      if (txt) {
+        txt.style.opacity = String(clamp((p - 0.25) / 0.45));
+        txt.style.transform = "scale(" + (0.9 + 0.1 * clamp((p - 0.2) / 0.7)) + ")";
+      }
+    };
+    applySpread(0);
+
+    if (spreadRef.current) {
+      const target = spreadRef.current;
+      const reducedSpread = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const narrow = window.innerWidth <= 900;
+      if (reducedSpread || narrow) {
+        // 모바일과 동작 최소화에서는 평범하게 쌓아 보여주므로 인라인 변형을 지운다
+        cardRefs.current.forEach((el) => el && (el.style.transform = ""));
+        const txt = spreadTextRef.current;
+        if (txt) {
+          txt.style.opacity = "1";
+          txt.style.transform = "none";
+        }
+      } else {
+        let played = false;
+        const io3 = new IntersectionObserver(
+          (es) => {
+            if (!es[0].isIntersecting || played) return;
+            played = true;
+            io3.disconnect();
+            const start = performance.now();
+            const DUR = 1500;
+            const tick = (now: number) => {
+              const t = Math.min(1, (now - start) / DUR);
+              // 부드럽게 붙었다 펼쳐지도록 뒤로 갈수록 느려지는 곡선
+              applySpread(1 - Math.pow(1 - t, 3));
+              if (t < 1) requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+          },
+          { threshold: 0.35 },
+        );
+        io3.observe(target);
+        cleanup.push(() => io3.disconnect());
+      }
+    }
+
     let lastY = -1;
     let lastW = -1;
     let raf = 0;
@@ -618,12 +653,12 @@ export default function Portfolio() {
               willChange: "transform",
             }}
           >
-          {/* 왼쪽: 인트로에서 풀어진 BACE 가 날아와 그대로 남는 키워드 스택 / 오른쪽: 얼굴 */}
+          {/* 왼쪽: 인트로에서 풀어진 ABCDE 가 날아와 그대로 남는 키워드 스택 / 오른쪽: 얼굴 */}
           <div className="hero-grid">
             <div className="hero-left">
               <div className="bace-stack">
                 <span className="bace-rule" aria-hidden />
-                {BACE.map((k) => (
+                {ABCDE.map((k) => (
                   <span key={k.ini} className={`bace-row br-${k.ini.toLowerCase()}`}>
                     <span className="bace-ini" data-flip-id={`kw-${k.ini}`}>
                       {k.ini}
@@ -662,9 +697,9 @@ export default function Portfolio() {
                 이민형
               </h1>
               <p className="hero-sub" style={{ margin: "18px 0 0" }}>
-                Backend부터 AI, Cloud, Embedded까지
+                A부터 E까지
                 <br />
-                모두를 아우를 수 있는
+                모두 가능한
                 <br />이 시대의 멀티플레이어 개발자
               </p>
             </div>
@@ -703,11 +738,11 @@ export default function Portfolio() {
       <section
         ref={spreadRef}
         data-spread
-        style={{ position: "relative", height: "260vh", background: "#111111", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        style={{ position: "relative", height: "100vh", background: "#111111", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
       >
         {/* 헤더의 Awards 는 카드가 다 펼쳐진 지점으로 보낸다 */}
-        <span id="awards" style={{ position: "absolute", top: "52%", left: 0, width: 1, height: 1 }} />
-        <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}>
+        <span id="awards" style={{ position: "absolute", top: 0, left: 0, width: 1, height: 1 }} />
+        <div style={{ position: "relative", height: "100%", overflow: "hidden" }}>
           <div ref={spreadTextRef} className="spread-text">
             <h2 className="spread-h2" style={{ margin: 0, fontFamily: BHS, lineHeight: 1.15 }}>
               하나의 스택에
@@ -768,12 +803,6 @@ export default function Portfolio() {
               )}
             </div>
           ))}
-          </div>
-          <div
-            ref={spreadHintRef}
-            style={{ position: "absolute", left: 0, right: 0, bottom: 24, zIndex: 11, textAlign: "center", fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}
-          >
-            Scroll ↓
           </div>
         </div>
       </section>

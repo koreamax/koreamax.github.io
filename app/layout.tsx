@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BACE.",
-  description: "멀티플레이어 이민형 포트폴리오",
+  title: "ABCDE.",
+  description: "A부터 E까지 모두 가능한 멀티플레이어 개발자",
   metadataBase: new URL("https://koreamax.github.io"),
   openGraph: {
-    title: "BACE.",
-    description: "멀티플레이어 이민형 포트폴리오",
+    title: "ABCDE.",
+    description: "A부터 E까지 모두 가능한 멀티플레이어 개발자",
     url: "https://koreamax.github.io",
-    siteName: "BACE.",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "BACE." }],
+    siteName: "ABCDE.",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "ABCDE." }],
     locale: "ko_KR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "BACE.",
-    description: "멀티플레이어 이민형 포트폴리오",
+    title: "ABCDE.",
+    description: "A부터 E까지 모두 가능한 멀티플레이어 개발자",
     images: ["/og.png"],
   },
 };
