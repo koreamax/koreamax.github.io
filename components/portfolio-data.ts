@@ -7,14 +7,14 @@ export type SpreadCard =
 
 export const spreadCards: SpreadCard[] = [
   // 활동 사진: public/uploads/ 에 아래 파일명으로 저장하면 표시된다. (파일이 없으면 플레이스홀더)
-  { kind: "image", src: "/uploads/activity-khtml-aws.jpg", ph: "K-HTML 해커톤 · AWS", w: 17, h: 22, z: 2 },
-  { kind: "label", label: "Backend", num: "01", items: ["Spring Boot", "FastAPI", "Node.js", "MySQL", "PostgreSQL", "Redis"], w: 16, h: 21, z: 3 },
-  { kind: "image", src: "/uploads/activity-skt-best.jpg", ph: "SKT FLY AI 최우수상", w: 15, h: 26, z: 4 },
-  { kind: "label", label: "AI", num: "02", items: ["PyTorch", "OpenCV", "OCR", "LLM", "VLM", "LangChain", "RAG"], w: 17, h: 22, z: 5 },
-  { kind: "image", src: "/uploads/activity-skt-project.jpg", ph: "SKT FLY AI 프로젝트 우수상", w: 16, h: 24, z: 6 },
-  { kind: "label", label: "Cloud", num: "03", items: ["AWS", "Azure", "GCP", "Docker", "Kubernetes", "Terraform"], w: 16, h: 21, z: 7 },
-  { kind: "image", src: "/uploads/activity-piuda.jpg", ph: "피우다 프로젝트 장려상", w: 17, h: 22, z: 8 },
-  { kind: "label", label: "Embedded", num: "04", items: ["C/C++", "Raspberry Pi", "NVIDIA Jetson", "ROS2", "LiDAR"], w: 16, h: 21, z: 9 },
+  { kind: "image", src: "/uploads/activity-khtml-aws.jpg", ph: "K-HTML 해커톤 · AWS", w: 14, h: 18, z: 2 },
+  { kind: "label", label: "Backend", num: "01", items: ["Spring Boot", "FastAPI", "Node.js", "MySQL", "PostgreSQL", "Redis"], w: 15, h: 21, z: 3 },
+  { kind: "image", src: "/uploads/activity-skt-best.jpg", ph: "SKT FLY AI 최우수상", w: 13, h: 20, z: 4 },
+  { kind: "label", label: "AI", num: "02", items: ["PyTorch", "OpenCV", "OCR", "LLM", "VLM", "LangChain", "RAG"], w: 15, h: 21, z: 5 },
+  { kind: "image", src: "/uploads/activity-skt-project.jpg", ph: "SKT FLY AI 프로젝트 우수상", w: 14, h: 19, z: 6 },
+  { kind: "label", label: "Cloud", num: "03", items: ["AWS", "Azure", "GCP", "Docker", "Kubernetes", "Terraform"], w: 15, h: 21, z: 7 },
+  { kind: "image", src: "/uploads/activity-piuda.jpg", ph: "피우다 프로젝트 장려상", w: 14, h: 18, z: 8 },
+  { kind: "label", label: "Embedded", num: "04", items: ["C/C++", "Raspberry Pi", "NVIDIA Jetson", "ROS2", "LiDAR"], w: 15, h: 21, z: 9 },
 ];
 
 export interface Project {

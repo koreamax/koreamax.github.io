@@ -117,7 +117,7 @@ export default function ProjectScenes() {
       gsap.set(scenes.slice(1), { autoAlpha: 0 });
       scenes.forEach((s, i) => {
         if (i === 0) return;
-        gsap.set(q(s, "[data-name],[data-num]"), { yPercent: 115 });
+        gsap.set(q(s, "[data-name],[data-num]"), { clipPath: "inset(0% 0% 100% 0%)", yPercent: 38 });
         gsap.set(q(s, "[data-rule]"), { scaleX: 0, transformOrigin: "0% 50%" });
         gsap.set(q(s, "[data-count]"), { opacity: 0, y: 18 });
         gsap.set(q(s, "[data-item]"), { clipPath: "inset(0% 0% 100% 0%)", y: 60 });
@@ -132,7 +132,7 @@ export default function ProjectScenes() {
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: `+=${(n - 1) * 145}%`,
+          end: `+=${(n - 1) * 210}%`,
           pin: true,
           pinSpacing: true,
           scrub: 0.75,
@@ -162,71 +162,71 @@ export default function ProjectScenes() {
         const a = pick(cur);
         const b = pick(nxt);
 
-        /* ── 해체 ── 앞쪽 제목은 크고 빠르게, 배경은 느리고 반대 방향으로 ── */
-        tl.to(a.num, { xPercent: -140, opacity: 0, duration: 0.42, ease: "power2.in" }, P(0));
-        tl.to(a.name, { x: -170, y: -34, opacity: 0, duration: 0.48, ease: "power2.in" }, P(0.04));
-        tl.to(a.count, { y: 46, opacity: 0, duration: 0.34, ease: "power2.in" }, P(0.02));
-        tl.to(a.rule, { scaleX: 0, transformOrigin: "100% 50%", duration: 0.34, ease: "power2.in" }, P(0.06));
-        tl.to(a.bg, { x: 190, scale: 1.25, opacity: 0, duration: 0.72, ease: "power1.inOut" }, P(0));
+        /* ── 해체 ── 구간 앞부분(0 ~ 0.34)은 그대로 멈춰 있어 카드를 끝까지 읽을 수 있다 ── */
+        tl.to(a.num, { xPercent: -140, opacity: 0, duration: 0.2, ease: "power2.in" }, P(0.34));
+        tl.to(a.name, { x: -170, y: -28, opacity: 0, duration: 0.22, ease: "power2.in" }, P(0.36));
+        tl.to(a.count, { y: 40, opacity: 0, duration: 0.18, ease: "power2.in" }, P(0.35));
+        tl.to(a.rule, { scaleX: 0, transformOrigin: "100% 50%", duration: 0.16, ease: "power2.in" }, P(0.37));
+        tl.to(a.bg, { x: 190, scale: 1.25, opacity: 0, duration: 0.3, ease: "power1.inOut" }, P(0.34));
 
         if (i === 0) {
           /* 좌우로 갈라지며 뒤로 물러난다 */
           tl.to(
             a.cards,
             {
-              x: (idx: number) => (idx % 2 ? 230 : -230),
-              y: (idx: number) => (idx % 2 ? 54 : -46),
-              rotate: (idx: number) => (idx % 2 ? 5 : -5),
+              x: (idx) => (idx % 2 ? 230 : -230),
+              y: (idx) => (idx % 2 ? 54 : -46),
+              rotate: (idx) => (idx % 2 ? 5 : -5),
               scale: 0.82,
               opacity: 0,
-              duration: 0.55,
-              stagger: 0.05,
+              duration: 0.24,
+              stagger: 0.025,
               ease: "power2.in",
             },
-            P(0.1),
+            P(0.38),
           );
         } else if (i === 1) {
           /* 아래로 쏟아지듯 떨어진다 */
           tl.to(
             a.cards,
-            { y: 250, rotate: (idx: number) => -4 + idx * 3, scale: 0.9, opacity: 0, duration: 0.5, stagger: { each: 0.055, from: "end" }, ease: "power2.in" },
-            P(0.1),
+            { y: 250, rotate: (idx) => -4 + idx * 3, scale: 0.9, opacity: 0, duration: 0.24, stagger: { each: 0.025, from: "end" }, ease: "power2.in" },
+            P(0.38),
           );
         } else {
           /* 보는 사람 쪽으로 확대되며 지나간다 */
-          tl.to(a.cards, { scale: 1.22, y: -70, opacity: 0, duration: 0.52, stagger: 0.05, ease: "power2.in" }, P(0.1));
+          tl.to(a.cards, { scale: 1.22, y: -70, opacity: 0, duration: 0.24, stagger: 0.025, ease: "power2.in" }, P(0.38));
         }
 
         /* 장면 자체는 요소가 다 흩어진 뒤에 꺼지고, 다음 장면은 조립 직전에 켜진다 */
-        tl.to(cur, { autoAlpha: 0, duration: 0.2 }, P(0.62));
-        tl.to(nxt, { autoAlpha: 1, duration: 0.2 }, P(0.3));
+        tl.to(cur, { autoAlpha: 0, duration: 0.08 }, P(0.6));
+        tl.to(nxt, { autoAlpha: 1, duration: 0.08 }, P(0.56));
 
         /* ── 조립 ── 배경이 먼저 열리고 번호, 이름, 선, 카드 순으로 ── */
-        tl.fromTo(b.bg, { scale: 0.6, x: -150, opacity: 0 }, { scale: 1, x: 0, opacity: 1, duration: 0.75, ease: "power2.out" }, P(0.34));
-        tl.fromTo(b.num, { yPercent: 115 }, { yPercent: 0, duration: 0.52, ease: "power3.out" }, P(0.46));
-        tl.fromTo(b.name, { yPercent: 115 }, { yPercent: 0, duration: 0.56, ease: "back.out(1.5)" }, P(0.52));
-        tl.fromTo(b.rule, { scaleX: 0 }, { scaleX: 1, transformOrigin: "0% 50%", duration: 0.5, ease: "power3.out" }, P(0.6));
-        tl.fromTo(b.count, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, P(0.66));
+        tl.fromTo(b.bg, { scale: 0.6, x: -150, opacity: 0 }, { scale: 1, x: 0, opacity: 1, duration: 0.32, ease: "power2.out" }, P(0.58));
+        tl.fromTo(b.num, { clipPath: "inset(0% 0% 100% 0%)", yPercent: 38 }, { clipPath: SHOW, yPercent: 0, duration: 0.22, ease: "power3.out" }, P(0.64));
+        tl.fromTo(b.name, { clipPath: "inset(0% 0% 100% 0%)", yPercent: 38 }, { clipPath: SHOW, yPercent: 0, duration: 0.24, ease: "power3.out" }, P(0.66));
+        tl.fromTo(b.rule, { scaleX: 0 }, { scaleX: 1, transformOrigin: "0% 50%", duration: 0.2, ease: "power3.out" }, P(0.7));
+        tl.fromTo(b.count, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.16, ease: "power2.out" }, P(0.74));
 
         if (i === 0) {
           /* 아래에서 마스크가 걷히며 올라온다 */
-          tl.fromTo(b.cards, { clipPath: "inset(0% 0% 100% 0%)", y: 70 }, { clipPath: SHOW, y: 0, duration: 0.62, stagger: 0.07, ease: "power3.out" }, P(0.66));
+          tl.fromTo(b.cards, { clipPath: "inset(0% 0% 100% 0%)", y: 70 }, { clipPath: SHOW, y: 0, duration: 0.22, stagger: 0.025, ease: "power3.out" }, P(0.7));
         } else if (i === 1) {
           /* 왼쪽에서 오른쪽으로 닦여 나온다 */
-          tl.fromTo(b.cards, { clipPath: "inset(0% 100% 0% 0%)", x: -40 }, { clipPath: SHOW, x: 0, duration: 0.6, stagger: 0.08, ease: "power3.out" }, P(0.66));
+          tl.fromTo(b.cards, { clipPath: "inset(0% 100% 0% 0%)", x: -40 }, { clipPath: SHOW, x: 0, duration: 0.22, stagger: 0.025, ease: "power3.out" }, P(0.7));
         } else {
           /* 가운데부터 펼쳐지며 아주 약한 overshoot */
           tl.fromTo(
             b.cards,
             { clipPath: "inset(12% 6% 12% 6%)", scale: 0.94, y: 40, opacity: 0 },
-            { clipPath: SHOW, scale: 1, y: 0, opacity: 1, duration: 0.66, stagger: { each: 0.07, from: "center" }, ease: "back.out(1.3)" },
-            P(0.64),
+            { clipPath: SHOW, scale: 1, y: 0, opacity: 1, duration: 0.24, stagger: { each: 0.025, from: "center" }, ease: "back.out(1.3)" },
+            P(0.7),
           );
         }
 
         /* 진행 표시 */
-        tl.to(root.querySelectorAll(".pstage-dot")[i + 1], { backgroundColor: RED, scale: 1.25, duration: 0.3 }, P(0.55));
-        tl.to(root.querySelectorAll(".pstage-dot")[i], { backgroundColor: "rgba(255,255,255,0.22)", scale: 1, duration: 0.3 }, P(0.55));
+        tl.to(root.querySelectorAll(".pstage-dot")[i + 1], { backgroundColor: RED, scale: 1.25, duration: 0.14 }, P(0.62));
+        tl.to(root.querySelectorAll(".pstage-dot")[i], { backgroundColor: "rgba(255,255,255,0.22)", scale: 1, duration: 0.14 }, P(0.62));
       }
     }, root);
 

@@ -150,7 +150,7 @@ function Contacts() {
 
 /* ───────────────────────── 3D 프로젝트 복도 ───────────────────────── */
 
-const P = { persp: 30, cardH: 25, birth: 2.2, exit: 52, rb: -13, re: 56, fan: 3.3, tb: 6, te: 28, stops: 24 };
+const P = { persp: 30, cardH: 25, birth: 2.2, exit: 50, rb: -12, re: 48, fan: 3.3, tb: 6, te: 28, stops: 24 };
 
 function keyframes(dir: 1 | -1, name: string): string {
   let s = "";
@@ -175,7 +175,7 @@ function keyframes(dir: 1 | -1, name: string): string {
 
 const CORRIDOR_CSS = keyframes(1, "ishr") + keyframes(-1, "ishl");
 const CORRIDOR_SPEED = 38;
-const CORRIDOR_N = 6;
+const CORRIDOR_N = 8;
 
 function Corridor() {
   return (
@@ -357,14 +357,14 @@ function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
 /* 최종 위치는 화면 안(±50vw / ±50vh)에 머물면서 가운데(수상 목록) 를 비운다.
    번호가 붙은 카드는 01 02 / 03 04 로 읽히도록 네 모서리에 놓는다. */
 const CFG = [
-  { sx: -8, sy: -10, sr: -18, x: 0, y: -36 },
-  { sx: 14, sy: -10, sr: 20, x: -31, y: -32 },
-  { sx: -16, sy: 0, sr: -4, x: -37, y: 2 },
-  { sx: 1, sy: -10, sr: -2, x: 31, y: -32 },
-  { sx: 18, sy: 1, sr: 6, x: 37, y: 2 },
-  { sx: -6, sy: 10, sr: 6, x: -31, y: 32 },
-  { sx: 8, sy: 7, sr: 3, x: 0, y: 38 },
-  { sx: 20, sy: 12, sr: -7, x: 31, y: 32 },
+  { sx: -8, sy: -10, sr: -18, x: 0, y: -30 },
+  { sx: 14, sy: -10, sr: 20, x: -26, y: -23 },
+  { sx: -16, sy: 0, sr: -4, x: -31, y: 0 },
+  { sx: 1, sy: -10, sr: -2, x: 26, y: -23 },
+  { sx: 18, sy: 1, sr: 6, x: 31, y: 0 },
+  { sx: -6, sy: 10, sr: 6, x: -26, y: 24 },
+  { sx: 8, sy: 7, sr: 3, x: 0, y: 33 },
+  { sx: 20, sy: 12, sr: -7, x: 26, y: 24 },
 ];
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -434,6 +434,15 @@ export default function Portfolio() {
     const face = faceRef.current;
     const faceEntranceDone = true;
 
+    /* 헤더 표시용: 구간과 링크를 짝지어 둔다 */
+    const NAV_MAP: [string, string][] = [
+      ["[data-spread]", "#awards"],
+      ["#work", "#work"],
+      [".pstage", "#work"],
+      ["#timeline", "#timeline"],
+    ];
+    let lastActive = "";
+
     const onScroll = () => {
       const word = wordRef.current;
       const heroEl = headerRef.current;
@@ -453,6 +462,24 @@ export default function Portfolio() {
           pp > 0
             ? "translateY(" + (pp * 110).toFixed(1) + "px) translateX(" + (pp * 42).toFixed(1) + "px) scale(" + (1 - pp * 0.11).toFixed(3) + ") rotate(" + (pp * 3).toFixed(2) + "deg)"
             : "none";
+      }
+
+      /* 지금 보고 있는 구간을 헤더 링크에 표시한다 */
+      {
+        const mid = window.innerHeight * 0.45;
+        let active = "";
+        for (const [sel, href] of NAV_MAP) {
+          const el = document.querySelector(sel);
+          if (!el) continue;
+          const r = el.getBoundingClientRect();
+          if (r.top <= mid && r.bottom >= mid) active = href;
+        }
+        if (active !== lastActive) {
+          lastActive = active;
+          document.querySelectorAll<HTMLElement>(".nav-link").forEach((el) => {
+            el.classList.toggle("is-active", el.dataset.nav === active);
+          });
+        }
       }
 
       if (spreadSec && window.innerWidth > 900) {
@@ -552,7 +579,7 @@ export default function Portfolio() {
             ["#work", "Projects"],
             ["#timeline", "Timeline"],
           ].map(([href, label]) => (
-            <a key={href} href={href} className="nav-link" style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", padding: "10px 16px", borderRadius: 9999 }}>
+            <a key={href} href={href} className="nav-link" data-nav={href} style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", padding: "10px 16px", borderRadius: 9999 }}>
               {label}
             </a>
           ))}
@@ -572,7 +599,7 @@ export default function Portfolio() {
             className="giant-word"
             style={{
               position: "absolute",
-              left: "58%",
+              left: "50%",
               top: 330,
               transform: "translate(-50%,-50%)",
               fontFamily: BHS,
