@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { categories } from "@/components/portfolio-data";
+import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
+import type { CSSProperties } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,6 +28,33 @@ const CANVAS_H = 860;
 const GREEN = "#22c55e";
 const RED = "#da291c";
 const statusColor = (status: string) => (status.includes("진행") ? GREEN : RED);
+
+const FLUX_ONGOING = { "--flux-from": "#16a34a", "--flux-to": "#4ade80" } as CSSProperties;
+const FLUX_DONE = { "--flux-from": "#da291c", "--flux-to": "#ff8a7a" } as CSSProperties;
+
+/** 카드 아래에 붙는 진행 상태 — 진행 중이면 초록 바가 계속 흐르고, 끝났으면 빨간 바가 꽉 찬다 */
+function CardStatus({ status }: { status: string }) {
+  const ongoing = status.includes("진행");
+  const c = statusColor(status);
+  return (
+    <div className="pcard-foot" style={ongoing ? FLUX_ONGOING : FLUX_DONE}>
+      <span className="pcard-status" style={{ color: c }}>
+        <span
+          className="pcard-status-dot"
+          style={{ background: c, boxShadow: ongoing ? `0 0 8px ${c}` : "none", animation: ongoing ? "statusPulse 1.4s ease-in-out infinite" : "none" }}
+        />
+        {ongoing ? "진행 중" : "종료"}
+      </span>
+      <div className="pcard-bar">
+        {ongoing ? (
+          <ProgressiveFluxLoader showLabel={false} duration={4} loop className="max-w-none gap-0" barClassName="h-1.5 bg-white/10 shadow-none" />
+        ) : (
+          <ProgressiveFluxLoader showLabel={false} value={100} className="max-w-none gap-0" barClassName="h-1.5 bg-white/10 shadow-none" />
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function ProjectScenes() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -113,14 +142,12 @@ export default function ProjectScenes() {
 
         /* 장면마다 성격을 조금씩 다르게 */
         if (i === 0) {
-          tl.to(cur.querySelectorAll("[data-mark]"), { x: -160, ease: "power2.in" }, at);
           tl.fromTo(nxt.querySelectorAll("[data-item]"), { x: 70, autoAlpha: 0 }, { x: 0, autoAlpha: 1, stagger: 0.05, ease: "power3.out" }, at + 0.28);
         } else if (i === 1) {
           tl.to(cur.querySelectorAll("[data-item]"), { y: 40, autoAlpha: 0, stagger: 0.03, ease: "power2.in" }, at);
           tl.fromTo(nxt.querySelectorAll("[data-item]"), { y: 56, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.06, ease: "power3.out" }, at + 0.28);
         } else {
           tl.to(cur.querySelectorAll("[data-item]"), { x: -90, autoAlpha: 0, stagger: 0.04, ease: "power2.in" }, at);
-          tl.fromTo(nxt.querySelectorAll("[data-mark]"), { scale: 1.3, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, ease: "power3.out" }, at + 0.15);
           tl.fromTo(nxt.querySelectorAll("[data-item]"), { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.06, ease: "power3.out" }, at + 0.3);
         }
 
@@ -137,10 +164,6 @@ export default function ProjectScenes() {
       <div ref={canvasRef} className="pstage-canvas">
         {categories.map((c) => (
           <section key={c.num} className="pscene" style={{ ["--cat" as string]: c.color }}>
-            <div className="pscene-mark" data-mark data-layer="0.5" aria-hidden>
-              {c.num}
-            </div>
-
             <div className="pscene-inner">
               <div className="pscene-head" data-layer="1.1">
                 <span className="pscene-num">{c.num}</span>
@@ -154,7 +177,6 @@ export default function ProjectScenes() {
                 {c.items.map((it) => (
                   <a key={it.title} data-item href={it.repo} target="_blank" rel="noopener noreferrer" className="pcard">
                     <span className="pcard-top">
-                      <span className="pl-dot" style={{ background: statusColor(it.status) }} />
                       <span className="pl-title">{it.title}</span>
                       <span className="pl-go" aria-hidden>
                         ↗
@@ -169,6 +191,7 @@ export default function ProjectScenes() {
                       <b className="pb-fix">해결</b>
                       {it.solution}
                     </span>
+                    <CardStatus status={it.status} />
                   </a>
                 ))}
               </div>
