@@ -223,9 +223,8 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .hero-copy { text-align: center; }
   .hero-copy .hero-sub { margin-left: auto; margin-right: auto; }
   .hero-face { order: -1; }
-  .bace-stack { padding-left: 0; margin: 0 auto 28px; display: inline-block; }
-  .bace-stack::before { display: none; }
-  .bace-row { justify-content: center; }
+  .bace-stack { padding-left: 20px; margin: 0 auto 28px; display: inline-block; text-align: left; }
+  .bace-row { justify-content: flex-start; }
   .hero-sub { margin-left: auto !important; margin-right: auto !important; }
   .hero-ctas { justify-content: center; }
 }
@@ -343,6 +342,7 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 .pstage.pstage-flow .pstage-dots { display: none; }
 .pstage.pstage-flow .pscene-row { grid-template-columns: 1fr; }
 .pstage.pstage-flow .pscene-name { font-size: 40px; }
+.pstage.pstage-flow .pscene-num { font-size: 40px; }
 
 /* 프로젝트 카드 하단 진행 상태 */
 .pcard-foot { margin-top: auto; padding-top: 14px; display: flex; align-items: center; gap: 10px; }
@@ -352,7 +352,7 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 
 /* 장면 배경 레이어 · 마스크 · 구분선 */
 .pscene-bg { position: absolute; left: 50%; top: 50%; width: 920px; height: 920px; margin: -460px 0 0 -460px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--cat) 22%, transparent) 0%, transparent 64%); pointer-events: none; will-change: transform, opacity; }
-.pscene-mask { display: inline-block; vertical-align: bottom; }
+.pscene-mask { display: inline-block; vertical-align: baseline; }
 .pscene-rule { flex: 1; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--cat), transparent); }
 .pscene-inner { will-change: transform; }
 .pcard { will-change: transform, opacity, clip-path; }
