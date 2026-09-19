@@ -295,10 +295,13 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 }
 
 /* ───────────── 프로젝트 수 카운터 ───────────── */
-.proj-count { position: absolute; left: 0; right: 0; bottom: 9%; display: flex; justify-content: center; pointer-events: none; z-index: 6; }
-.proj-count-num { font-family: 'Black Han Sans', sans-serif; font-size: min(7vw, 84px); line-height: 1; color: #da291c; text-shadow: 0 0 36px rgba(218, 41, 28, 0.55); font-variant-numeric: tabular-nums; }
+.proj-count { position: absolute; left: 0; right: 0; bottom: 8%; display: flex; align-items: center; justify-content: center; gap: clamp(28px, 5vw, 64px); pointer-events: none; z-index: 6; }
+.proj-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.proj-stat-label { font-size: 11px; font-weight: 800; letter-spacing: 2.6px; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); }
+.proj-stat-div { width: 1px; height: clamp(38px, 5vw, 62px); background: linear-gradient(transparent, rgba(255, 255, 255, 0.22), transparent); }
+.proj-count-num { font-family: 'Black Han Sans', sans-serif; font-size: min(5.6vw, 72px); line-height: 1; color: #da291c; text-shadow: 0 0 36px rgba(218, 41, 28, 0.55); font-variant-numeric: tabular-nums; }
 .proj-count-label { font-size: 11px; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
-@media (max-width: 767px) { .proj-count-num { font-size: 52px; } .proj-count-label { font-size: 9px; } }
+@media (max-width: 767px) { .proj-count-num { font-size: 42px; } .proj-stat-label { font-size: 9px; letter-spacing: 1.8px; } .proj-count { gap: 24px; } }
 
 /* ───────────── 온 더 스크린 · 고정 무대 ─────────────
    1440 × 860 고정 캔버스에 그린 뒤 배율만 맞춰, 화면 크기가 달라도 같은 구성으로 보이게 한다. */
@@ -400,5 +403,57 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 html { overflow-x: clip; }
 
 /* ───────────── 헤더: 지금 보고 있는 구간 표시 ───────────── */
-.dc .nav-link.is-active { color: #ffffff; background: rgba(218, 41, 28, 0.18); box-shadow: inset 0 0 0 1px rgba(218, 41, 28, 0.55); }
-.dc .nav-link.is-active::after { content: ""; display: block; height: 2px; margin: 4px auto -6px; width: 14px; border-radius: 2px; background: #da291c; }
+
+
+/* ═══════════ 헤더 ═══════════ */
+/* 읽은 만큼 차오르는 막대 */
+.scroll-bar { height: 3px !important; background: linear-gradient(90deg, #da291c, #ff6a3d) !important; box-shadow: 0 0 16px rgba(218, 41, 28, 0.55); }
+
+.dc .navbar { position: sticky; top: 18px; z-index: 50; display: flex; justify-content: center; padding: 0 20px; }
+.dc .navpill {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 52px;
+  padding: 0 8px 0 18px;
+  border-radius: 9999px;
+  background: rgba(20, 20, 20, 0.72);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
+}
+.dc .nav-logo { display: inline-flex; align-items: center; height: 36px; margin-right: 14px; padding: 0 12px; border-radius: 9999px; font-weight: 700; font-size: 16px; letter-spacing: 0.4px; }
+.dc .nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+.dc .nav-link:hover { background: #da291c; color: #ffffff; }
+.dc .nav-link.is-active { color: #ffffff; background: transparent; }
+.dc .nav-link.is-active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  background: #da291c;
+  box-shadow: 0 0 10px rgba(218, 41, 28, 0.8);
+}
+.dc .nav-link.is-active:hover::after { background: #ffffff; box-shadow: none; }
+@media (max-width: 460px) {
+  .dc .navbar { padding: 0 10px !important; top: 14px; }
+  .dc .navpill { height: 46px; padding: 0 6px 0 12px !important; }
+  .dc .nav-logo { height: 32px; margin-right: 4px !important; padding: 0 8px; font-size: 13px !important; }
+  .dc .nav-link { height: 32px; padding: 0 8px !important; font-size: 10px !important; letter-spacing: 0.6px !important; }
+}

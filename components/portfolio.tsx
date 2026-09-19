@@ -6,6 +6,7 @@ import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import TechBadge from "@/components/tech-badge";
 import IntroBace from "@/components/intro-bace";
 import ProjectScenes from "@/components/project-scenes";
+import { ScrollProgress } from "@/components/ui/scroll-progress";
 import {
   awards,
   corridorTitles,
@@ -222,6 +223,8 @@ function Corridor() {
 /* ───────────────────────── 프로젝트 수 카운터 ───────────────────────── */
 
 const TOTAL_PROJECTS = projects.length + moreProjects.length;
+/** 함께 만든 팀원 수 — 실제 숫자에 맞게 고치면 된다 */
+const TOTAL_TEAMMATES = 30;
 
 /** 화면에 들어오면 0 → to 까지 빨갛게 올라간다 */
 function CountUp({ to, suffix = "", duration = 2800 }: { to: number; suffix?: string; duration?: number }) {
@@ -557,21 +560,11 @@ export default function Portfolio() {
   return (
     <div ref={rootRef} className="dc" style={{ minHeight: "100vh", background: "#161616", color: "#ffffff" }}>
       <IntroBace />
+      <ScrollProgress progressProps={{ className: "scroll-bar" }} />
       {/* ── NAV ── */}
-      <nav data-hero-item style={{ position: "sticky", top: 16, zIndex: 50, display: "flex", justifyContent: "center", padding: "0 24px" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            background: "rgba(24,24,24,0.85)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 9999,
-            padding: "8px 14px 8px 24px",
-          }}
-        >
-          <a href="#top" className="nav-logo" style={{ fontFamily: MONO, fontWeight: 700, fontSize: 17, letterSpacing: 0.5, marginRight: 10, padding: "8px 14px", borderRadius: 9999 }}>
+      <nav data-hero-item className="navbar">
+        <div className="navpill">
+          <a href="#top" className="nav-logo" style={{ fontFamily: MONO }}>
             이민형<span style={{ color: RED }}>.</span>
           </a>
           {[
@@ -579,7 +572,7 @@ export default function Portfolio() {
             ["#work", "Projects"],
             ["#timeline", "Timeline"],
           ].map(([href, label]) => (
-            <a key={href} href={href} className="nav-link" data-nav={href} style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1.2, textTransform: "uppercase", padding: "10px 16px", borderRadius: 9999 }}>
+            <a key={href} href={href} className="nav-link" data-nav={href}>
               {label}
             </a>
           ))}
@@ -797,7 +790,15 @@ export default function Portfolio() {
             <span style={{ fontFamily: BHS, fontSize: "min(8vw,96px)", letterSpacing: "0.02em", color: "#ffffff", textShadow: "0 4px 40px rgba(0,0,0,0.7)", lineHeight: 1 }}>PROJECTS</span>
           </div>
           <div className="proj-count">
-            <CountUp to={TOTAL_PROJECTS} suffix="+" />
+            <span className="proj-stat">
+              <CountUp to={TOTAL_PROJECTS} suffix="+" />
+              <span className="proj-stat-label">Projects</span>
+            </span>
+            <span className="proj-stat-div" aria-hidden />
+            <span className="proj-stat">
+              <CountUp to={TOTAL_TEAMMATES} suffix="+" />
+              <span className="proj-stat-label">People</span>
+            </span>
           </div>
         </div>
       </section>
