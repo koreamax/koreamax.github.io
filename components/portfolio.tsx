@@ -189,8 +189,9 @@ function Corridor() {
             /* 두 레일이 같은 순서로 돌지 않도록 왼쪽은 절반 밀어 둔다 */
             const card = corridorCards[(name === "ishl" ? i + Math.floor(CORRIDOR_N / 2) : i) % corridorCards.length];
             /* 실제 화면이 있는 카드는 화면 비율에 맞춰 가로로 눕힌다 */
-            const w = card.shot ? 30 : 18;
-            const h = card.shot ? 19 : 25;
+            const shots = card.shots ?? [];
+            const w = shots.length ? 30 : 18;
+            const h = shots.length ? 19 : 25;
             return (
               <div
                 key={name + i}
@@ -209,37 +210,53 @@ function Corridor() {
                   border: "1px solid rgba(255,255,255,0.12)",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "space-between",
-                  padding: card.shot ? 0 : "1.4cqw",
+                  justifyContent: "flex-end",
+                  padding: shots.length ? 0 : "1.4cqw",
                   animation: `${name} ${CORRIDOR_SPEED}s linear infinite`,
                   animationDelay: `${-(i * CORRIDOR_SPEED) / CORRIDOR_N}s`,
                 }}
               >
-                {card.shot ? (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={card.shot}
-                      alt={`${card.title} ${card.caption ?? ""}`.trim()}
-                      loading="lazy"
-                      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
-                    />
-                    {/* 글자가 읽히도록 아래쪽만 어둡게 */}
-                    <span style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 26%, transparent 52%, rgba(0,0,0,0.82) 100%)" }} />
-                    <span style={{ position: "relative", padding: "1.1cqw 1.3cqw", fontSize: "0.9cqw", fontWeight: 700, letterSpacing: "0.2cqw", color: RED }}>PROJECT</span>
-                    <span style={{ position: "relative", padding: "0 1.3cqw 1.1cqw", fontFamily: BHS, fontSize: "2cqw", color: "#fff", lineHeight: 1.2 }}>
-                      {card.title}
-                      {card.caption && (
-                        <span style={{ display: "block", fontSize: "1.05cqw", color: "rgba(255,255,255,0.72)", marginTop: "0.15cqw" }}>{card.caption}</span>
-                      )}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span style={{ fontSize: "0.9cqw", fontWeight: 700, letterSpacing: "0.2cqw", color: RED }}>PROJECT</span>
-                    <span style={{ fontFamily: BHS, fontSize: "2cqw", color: "#fff", lineHeight: 1.2 }}>{card.title}</span>
-                  </>
+                {shots.length > 0 && (
+                  /* 한 프로젝트의 화면을 한 카드 안에 모아 깐다 */
+                  <span
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "grid",
+                      gridTemplateColumns: `repeat(${shots.length > 1 ? 2 : 1}, 1fr)`,
+                      gridAutoRows: "1fr",
+                      gap: "0.15cqw",
+                      background: "#101010",
+                    }}
+                  >
+                    {shots.map((src) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        key={src}
+                        src={src}
+                        alt={card.title}
+                        loading="lazy"
+                        style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+                      />
+                    ))}
+                  </span>
                 )}
+                {shots.length > 0 && (
+                  /* 이름이 읽히도록 아래쪽만 어둡게 */
+                  <span style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 58%, rgba(0,0,0,0.88) 100%)" }} />
+                )}
+                <span
+                  style={{
+                    position: "relative",
+                    padding: shots.length ? "0 1.3cqw 1.1cqw" : 0,
+                    fontFamily: BHS,
+                    fontSize: "2cqw",
+                    color: "#fff",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {card.title}
+                </span>
               </div>
             );
           }),

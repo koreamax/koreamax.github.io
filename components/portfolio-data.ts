@@ -291,28 +291,27 @@ export const skills: SkillGroup[] = [
   },
 ];
 
-/** 복도를 지나가는 카드 한 장 — 실제 화면이 있으면 그 화면이 크게 흘러간다 */
+/** 복도를 지나가는 카드 한 장 — 프로젝트 하나에 카드 하나다 */
 export interface CorridorCard {
   title: string;
-  /** 직접 찍은 화면 (없으면 이름만 흘러간다) */
-  shot?: string;
-  /** 무슨 화면인지 한 줄 */
-  caption?: string;
+  /** 직접 찍은 화면들. 한 카드 안에 모아 보여 준다 (없으면 이름만 흘러간다) */
+  shots?: string[];
 }
 
-/* 실제 화면이 한쪽에 몰리지 않도록 이름 카드 사이에 고르게 끼워 둔다 */
+/* 프로젝트마다 한 장씩 — 어느 하나가 더 자주 나오지 않도록 */
 export const corridorCards: CorridorCard[] = [
-  { title: "Seagnal", shot: "/uploads/seagnal-1.webp", caption: "메인" },
+  {
+    title: "Seagnal",
+    shots: ["/uploads/seagnal-1.webp", "/uploads/seagnal-2.webp", "/uploads/seagnal-3.webp", "/uploads/seagnal-4.webp"],
+  },
   { title: "VIAssist" },
   { title: "Goliath Crane" },
-  { title: "Seagnal", shot: "/uploads/seagnal-2.webp", caption: "해양 지도" },
   { title: "LLM ROUTER" },
   { title: "GSV Paper" },
-  { title: "Seagnal", shot: "/uploads/seagnal-3.webp", caption: "단체 대시보드" },
   { title: "JeokjaeJeokso" },
   { title: "beautytalk" },
-  { title: "Seagnal", shot: "/uploads/seagnal-4.webp", caption: "신고서 · 활동 후기" },
   { title: "Mission Pawss!ble" },
+  { title: "Wilson" },
   { title: "Cloud Island" },
   { title: "WalkingCity" },
 ];
