@@ -229,14 +229,22 @@ function Corridor() {
                       background: "#101010",
                     }}
                   >
-                    {shots.map((src) => (
+                    {shots.map((src, k) => (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         key={src}
                         src={src}
                         alt={card.title}
                         loading="lazy"
-                        style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          objectPosition: "top center",
+                          display: "block",
+                          /* 홀수로 넣으면 빈칸이 생기므로 첫 장을 한 줄로 눕힌다 */
+                          gridColumn: shots.length % 2 === 1 && k === 0 ? "1 / -1" : undefined,
+                        }}
                       />
                     ))}
                   </span>
