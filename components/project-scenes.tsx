@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { categories } from "@/components/portfolio-data";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import { GlowCard } from "@/components/ui/spotlight-card";
+import { designViewport } from "@/components/fixed-canvas";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -67,7 +68,11 @@ const GLOW: Record<string, "blue" | "purple" | "green" | "orange"> = {
   "04": "green",
 };
 
+/** 장면 하나를 넘기는 데 필요한 스크롤 (화면 높이 배수) */
+const SCENE_SCROLL = 2.1;
+
 export default function ProjectScenes() {
+  const trackRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -81,7 +86,9 @@ export default function ProjectScenes() {
         canvas.style.removeProperty("--ps");
         return;
       }
-      const s = Math.min(window.innerWidth / CANVAS_W, window.innerHeight / CANVAS_H, 1.35);
+      // 창이 아니라 도면 기준으로 재야 어느 화면에서든 같은 크기로 보인다
+      const v = designViewport();
+      const s = Math.min(v.w / CANVAS_W, v.h / CANVAS_H, 1.35);
       canvas.style.setProperty("--ps", String(s));
     };
     fit();
@@ -94,13 +101,14 @@ export default function ProjectScenes() {
     if (!root) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const small = window.matchMedia("(max-width: 1000px)").matches;
+    const small = designViewport().w <= 1000;
     const scenes = gsap.utils.toArray<HTMLElement>(".pscene", root);
     if (scenes.length < 2) return;
 
     /* 폴백: 평범하게 쌓아서 보여준다 */
     if (reduced || small) {
       root.classList.add("pstage-flow");
+      if (trackRef.current) trackRef.current.style.height = "auto";
       canvasRef.current?.style.removeProperty("--ps");
       if (reduced) return;
       const io = new IntersectionObserver(
@@ -136,16 +144,19 @@ export default function ProjectScenes() {
       /* 스크롤 속도에 따른 반응은 기울이지 않고 아주 약한 확대로만 준다 */
       const setPush = gsap.quickTo(".pscene-inner", "scale", { duration: 0.6, ease: "power3.out" });
 
+      const track = trackRef.current;
+      // 무대는 sticky 로 화면에 붙고, 스크롤 길이는 트랙이 갖는다.
+      // ScrollTrigger 의 pin 은 잰 크기를 다시 써 넣는데 그 값이 화면 좌표라,
+      // 화면 전체가 확대·축소된 이 사이트에서는 어긋난다.
+      if (track) track.style.height = `calc(var(--vh) * ${100 * (1 + (n - 1) * SCENE_SCROLL)})`;
+
       const tl = gsap.timeline({
         defaults: { ease: "power2.inOut" },
         scrollTrigger: {
-          trigger: root,
+          trigger: track || root,
           start: "top top",
-          end: `+=${(n - 1) * 210}%`,
-          pin: true,
-          pinSpacing: true,
+          end: "bottom bottom",
           scrub: 0.75,
-          anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             const v = gsap.utils.clamp(0, 1, Math.abs(self.getVelocity()) / 2600);
@@ -243,6 +254,7 @@ export default function ProjectScenes() {
   }, []);
 
   return (
+    <div ref={trackRef} className="pstage-track">
     <div ref={rootRef} className="pstage">
       <div ref={canvasRef} className="pstage-canvas">
         {categories.map((c) => (
@@ -301,6 +313,7 @@ export default function ProjectScenes() {
           <span key={c.num} className="pstage-dot" style={i === 0 ? { background: RED, transform: "scale(1.25)" } : undefined} />
         ))}
       </div>
+    </div>
     </div>
   );
 }

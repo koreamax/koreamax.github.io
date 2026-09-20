@@ -6,7 +6,7 @@ import gsap from "gsap";
 /**
  * 사이트 최초 진입 시 1회 재생되는 BACE 오프닝.
  *
- * 1) 검은 화면 중앙에 BACE
+ * 1) 검은 화면 중앙에 ABCDE.
  * 2) 같은 B / A / C / E 엘리먼트가 FLIP 으로 화면 곳곳으로 흩어짐 (동일 DOM, 새 글자 아님)
  * 3) 각 글자 옆에 나머지 글자가 붙어 Backend / AI / Cloud / Embedded 가 됨
  * 4) 그 네 단어가 다시 FLIP 으로 실제 히어로의 키워드 칩 자리(data-flip-id 일치)로 날아가고,
@@ -66,6 +66,8 @@ export default function IntroBace() {
     const overlay = overlayRef.current;
     if (!overlay) return;
     const words = gsap.utils.toArray<HTMLElement>(".intro-word", overlay);
+    // 로고와 같은 빨간 마침표 — 글자들이 날아갈 때 조용히 사라진다
+    const dot = overlay.querySelector<HTMLElement>(".intro-dot");
 
     const heroItems = gsap.utils.toArray<HTMLElement>("[data-hero-item]");
     const heroIni = gsap.utils.toArray<HTMLElement>("[data-flip-id].bace-ini");
@@ -95,7 +97,7 @@ export default function IntroBace() {
 
     // STEP 1 — BACE 가 부드럽게 떠오르고 잠시 머문다
     tl.fromTo(
-      words,
+      dot ? [...words, dot] : words,
       { opacity: 0, y: 34, scale: 0.94, filter: "blur(10px)" },
       {
         opacity: 1,
@@ -119,6 +121,7 @@ export default function IntroBace() {
       const from = pairs.map((p) => p.w.getBoundingClientRect());
       const to = pairs.map((p) => p.h.getBoundingClientRect());
       gsap.set(words, { display: "none" });
+      if (dot) gsap.to(dot, { opacity: 0, scale: 0.86, duration: 0.55, ease: "power2.in" });
       // 막대는 글자가 이동하는 동안 계속 자라다가 풀네임이 다 나오면 멈춘다
       if (rule) gsap.to(rule, { scaleY: 1, duration: 2.0, ease: "none" });
 
@@ -176,6 +179,9 @@ export default function IntroBace() {
             {w.l}
           </div>
         ))}
+        <div className="intro-dot" aria-hidden>
+          .
+        </div>
       </div>
     </div>
   );

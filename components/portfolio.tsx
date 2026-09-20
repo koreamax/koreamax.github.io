@@ -5,6 +5,7 @@ import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import TechBadge from "@/components/tech-badge";
 import IntroBace from "@/components/intro-bace";
 import ProjectScenes from "@/components/project-scenes";
+import { designViewport } from "@/components/fixed-canvas";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import {
   awards,
@@ -487,7 +488,7 @@ export default function Portfolio() {
         const tx = c.sx + (c.x - c.sx) * p;
         const ty = c.sy + (c.y - c.sy) * p;
         el.style.transform =
-          "translate(calc(-50% + " + tx + "vw), calc(-50% + " + ty + "vh)) rotate(" + c.sr * (1 - p) + "deg) scale(" + (0.82 + 0.18 * p) + ")";
+          "translate(calc(-50% + var(--vw) * " + tx + "), calc(-50% + var(--sh) * " + ty + ")) rotate(" + c.sr * (1 - p) + "deg) scale(" + (0.82 + 0.18 * p) + ")";
       });
       const txt = spreadTextRef.current;
       if (txt) {
@@ -500,7 +501,7 @@ export default function Portfolio() {
     if (spreadRef.current) {
       const target = spreadRef.current;
       const reducedSpread = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const narrow = window.innerWidth <= 900;
+      const narrow = designViewport().w <= 900;
       if (reducedSpread || narrow) {
         // 모바일과 동작 최소화에서는 평범하게 쌓아 보여주므로 인라인 변형을 지운다
         cardRefs.current.forEach((el) => el && (el.style.transform = ""));
@@ -601,7 +602,7 @@ export default function Portfolio() {
   }, []);
 
   return (
-    <div ref={rootRef} className="dc" style={{ minHeight: "100vh", background: "#161616", color: "#ffffff" }}>
+    <div ref={rootRef} className="dc" style={{ minHeight: "calc(var(--vh) * 100)", background: "#161616", color: "#ffffff" }}>
       <IntroBace />
       <ScrollProgress progressProps={{ className: "scroll-bar" }} />
       {/* ── NAV ── */}
@@ -624,7 +625,7 @@ export default function Portfolio() {
 
       {/* ── HERO (스크롤하면 이 화면 전체가 작아지며 아래로 내려온다) ── */}
       <header id="top" ref={headerRef} style={{ position: "relative", overflow: "hidden", padding: "80px 24px 0" }}>
-        <div style={{ position: "relative", display: "flow-root", maxWidth: 1280, margin: "0 auto", minHeight: "max(440px, calc(100vh - 330px))" }}>
+        <div style={{ position: "relative", display: "flow-root", maxWidth: 1280, margin: "0 auto", minHeight: "max(440px, calc(var(--ch) * 100 - 330px))" }}>
           <div
             ref={wordRef}
             className="giant-word"
@@ -634,7 +635,7 @@ export default function Portfolio() {
               top: 330,
               transform: "translate(-50%,-50%)",
               fontFamily: BHS,
-              fontSize: "min(15vw,220px)",
+              fontSize: "min(calc(var(--vw) * 15),220px)",
               lineHeight: 1,
               letterSpacing: "0.02em",
               color: "#1f1f1f",
@@ -727,7 +728,7 @@ export default function Portfolio() {
       <section
         ref={spreadRef}
         data-spread
-        style={{ position: "relative", height: "100vh", background: "#111111", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        style={{ position: "relative", height: "calc(var(--vh) * 100)", background: "#111111", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
       >
         {/* 헤더의 Awards 는 카드가 다 펼쳐진 지점으로 보낸다 */}
         <span id="awards" style={{ position: "absolute", top: 0, left: 0, width: 1, height: 1 }} />
@@ -766,8 +767,8 @@ export default function Portfolio() {
                 position: "absolute",
                 left: "50%",
                 top: "50%",
-                width: `${c.w}vw`,
-                height: `${c.h}vh`,
+                width: `calc(var(--vw) * ${c.w})`,
+                height: `calc(var(--ch) * ${c.h})`,
                 zIndex: c.z,
                 willChange: "transform",
                 borderRadius: 8,
@@ -801,11 +802,11 @@ export default function Portfolio() {
         <div
           data-corridor
           className="corridor"
-          style={{ position: "relative", height: "58vh", minHeight: 380, overflow: "hidden", marginBottom: 0, containerType: "inline-size" }}
+          style={{ position: "relative", height: "calc(var(--vh) * 58)", minHeight: 380, overflow: "hidden", marginBottom: 0, containerType: "inline-size" }}
         >
           <Corridor />
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, pointerEvents: "none" }}>
-            <span style={{ fontFamily: BHS, fontSize: "min(8vw,96px)", letterSpacing: "0.02em", color: "#ffffff", textShadow: "0 4px 40px rgba(0,0,0,0.7)", lineHeight: 1 }}>PROJECTS</span>
+            <span style={{ fontFamily: BHS, fontSize: "min(calc(var(--vw) * 8),96px)", letterSpacing: "0.02em", color: "#ffffff", textShadow: "0 4px 40px rgba(0,0,0,0.7)", lineHeight: 1 }}>PROJECTS</span>
           </div>
           <div className="proj-count">
             <span className="proj-stat">
