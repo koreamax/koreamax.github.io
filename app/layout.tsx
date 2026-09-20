@@ -7,8 +7,9 @@ import { DESIGN_H, DESIGN_W, FLOW_BELOW } from "@/components/fixed-canvas";
  * 창 밖으로 삐져나온 모습이 보인다. 설명은 components/fixed-canvas.ts 참고.
  */
 const FIT_SCRIPT = `(function(){var W=${DESIGN_W},H=${DESIGN_H},F=${FLOW_BELOW},d=document.documentElement;
+var ok=!!(window.CSS&&CSS.supports&&CSS.supports('zoom','2'));
 function fit(){var w=d.clientWidth||window.innerWidth;
-if(F&&w<F){d.classList.add('flow');d.classList.remove('fixed-canvas');d.style.removeProperty('--z');return;}
+if(!ok||(F&&w<F)){d.classList.add('flow');d.classList.remove('fixed-canvas');d.style.removeProperty('--z');return;}
 var z=w/W;d.classList.add('fixed-canvas');d.classList.remove('flow');
 d.style.setProperty('--z',String(z));
 d.style.setProperty('--dw',W+'px');
