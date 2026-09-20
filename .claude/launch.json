@@ -8,10 +8,10 @@
       "port": 3000
     },
     {
-      "name": "seagnal",
+      "name": "walk-web-fe",
       "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "cd /d E:\\piuda-front\\front && npm run serve"],
-      "port": 8080
+      "runtimeArgs": ["/c", "cd /d E:\\Walk_Web_FE && npm run dev"],
+      "port": 5173
     }
   ]
 }

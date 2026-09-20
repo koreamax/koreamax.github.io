@@ -319,7 +319,11 @@ export const corridorCards: CorridorCard[] = [
     shotColumns: 4,
   },
   { title: "Cloud Island" },
-  { title: "WalkingCity" },
+  {
+    title: "WalkingCity",
+    shots: ["/uploads/walk-1.webp", "/uploads/walk-2.webp", "/uploads/walk-3.webp", "/uploads/walk-4.webp"],
+    shotColumns: 4,
+  },
 ];
 
 /* ───────────────────────── 분야별 프로젝트 ─────────────────────────
@@ -517,10 +521,22 @@ export const categories: Category[] = [
       {
         title: "WalkingCity",
         summary: "취향에 맞는 산책 경로를 추천하고 이유까지 설명하는 서비스",
-        problem:
-          "추천 이유를 자연어로 만들어 주려면 생성 모델이 필요했는데, 모델을 직접 띄워 운영하기에는 관리 부담과 비용이 컸다.",
-        solution:
-          "Amazon Bedrock의 관리형 모델을 호출해 추천 문구를 생성하도록 했다. 취향 태그와 경로 데이터를 프롬프트에 넣어 개인화하고, 호출 부분을 한 겹 감싸 모델을 바꿔도 서비스 코드는 그대로 두도록 했다.",
+        issues: [
+          {
+            tag: "추천 한 건이 서버 전체를 붙잡음",
+            problem:
+              "추천 한 번에 생성 모델 응답을 수십 초 기다려야 하는데 이를 EC2 위 애플리케이션이 직접 호출해, 기다리는 동안 스레드를 붙잡아 지도·로그인 같은 일반 요청까지 밀림",
+            solution:
+              "AI 추천만 Lambda로 떼어 내 요청마다 따로 뜨고 끝나면 사라지게 하고 EC2는 일반 트래픽만 맡게 해, 추천이 몰려도 나머지 화면이 느려지지 않게 됨",
+          },
+          {
+            tag: "공공데이터만큼 불어나던 토큰",
+            problem:
+              "산책로·공원 공공데이터를 프롬프트에 통째로 실어, 호출 한 번에 드는 토큰이 데이터 양을 그대로 따라가 자료를 더할수록 비용과 응답 시간이 같이 늘어남",
+            solution:
+              "S3에 올린 공공데이터를 임베딩해 OpenSearch에 담고 질문과 가까운 조각만 꺼내 넣도록 바꿔, 자료가 늘어도 호출당 토큰이 일정하게 유지됨",
+          },
+        ],
         repo: "https://github.com/koreamax/walk_web",
         status: "종료",
       },

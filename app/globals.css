@@ -328,7 +328,7 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 
 .pscene { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; will-change: transform, opacity; }
 /* 가장 긴 장면(01 Backend)에 맞춘 높이. 모든 장면의 제목 줄을 같은 자리에 두려고 고정한다 */
-.pscene-inner { position: relative; z-index: 1; width: 1300px; height: 689px; display: flex; flex-direction: column; justify-content: flex-start; gap: 34px; }
+.pscene-inner { position: relative; z-index: 1; width: 1300px; height: 708px; display: flex; flex-direction: column; justify-content: flex-start; gap: 34px; }
 
 
 /* 직무는 왼쪽 위에 */
