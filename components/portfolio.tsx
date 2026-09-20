@@ -423,15 +423,17 @@ function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
 
 /* 최종 위치는 화면 안(±50vw / ±50vh)에 머물면서 가운데(수상 목록) 를 비운다.
    번호가 붙은 카드는 01 02 / 03 04 로 읽히도록 네 모서리에 놓는다. */
+/* x 는 도면 가로의 %, y 는 짧은 쪽 화면의 %. 위쪽은 나브와 부딪히므로
+   가로로 더 벌리고 세로는 조금만 늘린다. */
 const CFG = [
-  { sx: -8, sy: -10, sr: -18, x: 0, y: -30 },
-  { sx: 14, sy: -10, sr: 20, x: -26, y: -23 },
-  { sx: -16, sy: 0, sr: -4, x: -31, y: 0 },
-  { sx: 1, sy: -10, sr: -2, x: 26, y: -23 },
-  { sx: 18, sy: 1, sr: 6, x: 31, y: 0 },
-  { sx: -6, sy: 10, sr: 6, x: -26, y: 23 },
-  { sx: 8, sy: 7, sr: 3, x: 0, y: 30 },
-  { sx: 20, sy: 12, sr: -7, x: 26, y: 23 },
+  { sx: -8, sy: -10, sr: -18, x: 0, y: -31.5 },
+  { sx: 14, sy: -10, sr: 20, x: -34, y: -24 },
+  { sx: -16, sy: 0, sr: -4, x: -40, y: 0 },
+  { sx: 1, sy: -10, sr: -2, x: 34, y: -24 },
+  { sx: 18, sy: 1, sr: 6, x: 40, y: 0 },
+  { sx: -6, sy: 10, sr: 6, x: -34, y: 24 },
+  { sx: 8, sy: 7, sr: 3, x: 0, y: 31.5 },
+  { sx: 20, sy: 12, sr: -7, x: 34, y: 24 },
 ];
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -503,6 +505,7 @@ export default function Portfolio() {
     const faceEntranceDone = true;
 
     /* 헤더 표시용: 구간과 링크를 짝지어 둔다 */
+    /* 어느 구간에도 안 걸리면 맨 위(소개)로 본다 — 처음 들어왔을 때 이름이 켜져야 한다 */
     const NAV_MAP: [string, string][] = [
       ["[data-spread]", "#awards"],
       ["#work", "#work"],
@@ -524,7 +527,7 @@ export default function Portfolio() {
       /* 지금 보고 있는 구간을 헤더 링크에 표시한다 */
       {
         const mid = window.innerHeight * 0.45;
-        let active = "";
+        let active = "#top";
         for (const [sel, href] of NAV_MAP) {
           const el = document.querySelector(sel);
           if (!el) continue;
@@ -533,7 +536,7 @@ export default function Portfolio() {
         }
         if (active !== lastActive) {
           lastActive = active;
-          document.querySelectorAll<HTMLElement>(".nav-link").forEach((el) => {
+          document.querySelectorAll<HTMLElement>(".nav-link, .nav-logo").forEach((el) => {
             el.classList.toggle("is-active", el.dataset.nav === active);
           });
         }
@@ -573,7 +576,8 @@ export default function Portfolio() {
           txt.style.transform = "none";
         }
       } else {
-        /* 올 때마다 다시 펼쳐지도록, 화면에서 완전히 벗어나면 조용히 도로 모아 둔다 */
+        /* 내려가며 지나친 뒤 다시 올라오면 이미 펼쳐진 채로 둔다.
+           위로 올라가 구간이 화면 아래로 빠졌을 때만 조용히 도로 모은다. */
         let opened = false;
         let spreadRaf = 0;
         const open = () => {
@@ -597,10 +601,10 @@ export default function Portfolio() {
         };
         const io3 = new IntersectionObserver(
           (es) => {
-            const r = es[es.length - 1].intersectionRatio;
-            if (r >= 0.7) open();
-            // 보이는 동안 접히면 이상하니, 화면 밖으로 완전히 나간 뒤에만 되돌린다
-            else if (r <= 0.02) reset();
+            const e = es[es.length - 1];
+            if (e.intersectionRatio >= 0.7) open();
+            // 구간이 화면 '아래'에 있다 = 내가 그 위에 있다 → 다음에 내려올 때 다시 펼친다
+            else if (e.intersectionRatio <= 0.02 && e.boundingClientRect.top >= window.innerHeight) reset();
           },
           { threshold: [0, 0.02, 0.7] },
         );
@@ -670,7 +674,7 @@ export default function Portfolio() {
       {/* ── NAV ── */}
       <nav data-hero-item className="navbar">
         <div className="navpill">
-          <a href="#top" className="nav-logo" style={{ fontFamily: MONO }}>
+          <a href="#top" className="nav-logo" data-nav="#top" style={{ fontFamily: MONO }}>
             이민형<span style={{ color: RED }}>.</span>
           </a>
           {[
