@@ -306,7 +306,10 @@ export const corridorCards: CorridorCard[] = [
     title: "Seagnal",
     shots: ["/uploads/seagnal-1.webp", "/uploads/seagnal-2.webp", "/uploads/seagnal-3.webp", "/uploads/seagnal-4.webp"],
   },
-  { title: "VIAssist" },
+  {
+    title: "VIAssist",
+    shots: ["/uploads/viassist-1.webp", "/uploads/viassist-2.webp", "/uploads/viassist-3.webp", "/uploads/viassist-4.webp"],
+  },
   { title: "Goliath Crane" },
   { title: "LLM ROUTER" },
   { title: "GSV Paper" },
