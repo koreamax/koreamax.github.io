@@ -20,12 +20,13 @@ gsap.registerPlugin(ScrollTrigger);
  * 깊이가 생긴다. 전환마다 해체·조립 방식이 달라 같은 동작이 반복되지 않고, 스크롤 속도를
  * 읽어 빠르게 굴릴수록 무대가 조금 더 크게 반응한다.
  *
- * 화면 크기에 따라 구성이 달라지지 않도록 1440 × 860 고정 캔버스에 그린 뒤 배율만 맞춘다.
+ * 화면 크기에 따라 구성이 달라지지 않도록 1440 × 1090 고정 캔버스에 그린 뒤 배율만 맞춘다.
  * 모바일과 prefers-reduced-motion 에서는 고정하지 않고 평범한 세로 흐름으로 되돌린다.
  */
 
 const CANVAS_W = 1440;
-const CANVAS_H = 860;
+/* 가장 긴 장면(문제를 셋으로 나눠 적은 01 Backend)이 위아래 여백까지 담기는 높이 */
+const CANVAS_H = 1090;
 
 const GREEN = "#22c55e";
 const RED = "#da291c";
@@ -290,14 +291,36 @@ export default function ProjectScenes() {
                       </span>
                     </span>
                     <span className="pcard-summary">{it.summary}</span>
-                    <span className="pcard-block">
-                      <b className="pb-problem">문제</b>
-                      {it.problem}
-                    </span>
-                    <span className="pcard-block">
-                      <b className="pb-fix">해결</b>
-                      {it.solution}
-                    </span>
+                    {/* 짚은 문제가 여럿이면 번호를 붙여 따로 적는다 — 한 덩어리로 뭉치면 읽히지 않는다 */}
+                    {it.issues
+                      ? it.issues.map((iss, k) => (
+                          <span className="pcard-issue" key={iss.tag}>
+                            <span className="pcard-issue-head">
+                              <b className="pcard-issue-num">{String(k + 1).padStart(2, "0")}</b>
+                              <b className="pcard-issue-tag">{iss.tag}</b>
+                            </span>
+                            <span className="pcard-block">
+                              <b className="pb-problem">문제</b>
+                              {iss.problem}
+                            </span>
+                            <span className="pcard-block">
+                              <b className="pb-fix">해결</b>
+                              {iss.solution}
+                            </span>
+                          </span>
+                        ))
+                      : (
+                          <>
+                            <span className="pcard-block">
+                              <b className="pb-problem">문제</b>
+                              {it.problem}
+                            </span>
+                            <span className="pcard-block">
+                              <b className="pb-fix">해결</b>
+                              {it.solution}
+                            </span>
+                          </>
+                        )}
                     <CardStatus status={it.status} />
                     </GlowCard>
                   </a>
