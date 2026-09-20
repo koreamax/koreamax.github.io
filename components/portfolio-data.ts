@@ -315,7 +315,11 @@ export const corridorCards: CorridorCard[] = [
   { title: "GSV Paper" },
   { title: "JeokjaeJeokso" },
   { title: "beautytalk" },
-  { title: "Mission Pawss!ble" },
+  {
+    title: "Mission Pawss!ble",
+    shots: ["/uploads/paws-1.webp", "/uploads/paws-2.webp", "/uploads/paws-3.webp", "/uploads/paws-4.webp"],
+    shotColumns: 4,
+  },
   {
     title: "Wilson",
     shots: ["/uploads/wilson-1.webp", "/uploads/wilson-2.webp", "/uploads/wilson-3.webp", "/uploads/wilson-4.webp"],

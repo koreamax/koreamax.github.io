@@ -8,9 +8,9 @@
       "port": 3000
     },
     {
-      "name": "walk-web-fe",
+      "name": "pawpatrol-web",
       "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "cd /d E:\\Walk_Web_FE && npm run dev"],
+      "runtimeArgs": ["/c", "cd /d E:\\TECH4GOOD_OH\\web && npm run dev"],
       "port": 5173
     }
   ]
