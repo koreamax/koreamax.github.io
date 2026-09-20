@@ -298,6 +298,9 @@ export interface CorridorCard {
   shots?: string[];
   /** 화면을 몇 칸으로 깔지. 가로 화면은 2칸(기본), 세로 폰 화면은 4칸으로 눕힌다 */
   shotColumns?: number;
+  /** 카드 자체 크기(cqw). 화면 비율이 유별날 때만 손으로 잡는다 */
+  cardW?: number;
+  cardH?: number;
 }
 
 /* 프로젝트마다 한 장씩 — 어느 하나가 더 자주 나오지 않도록.
@@ -311,7 +314,12 @@ export const corridorCards: CorridorCard[] = [
     title: "VIAssist",
     shots: ["/uploads/viassist-1.webp", "/uploads/viassist-2.webp", "/uploads/viassist-3.webp", "/uploads/viassist-4.webp"],
   },
-  { title: "GSV Paper" },
+  {
+    title: "GSV Paper",
+    shots: ["/uploads/gsv-1.webp", "/uploads/gsv-2.webp", "/uploads/gsv-3.webp"],
+    shotColumns: 1,
+    cardH: 28,
+  },
   { title: "beautytalk" },
   {
     title: "Mission Pawss!ble",

@@ -197,8 +197,8 @@ function Corridor() {
           CORRIDOR_RAILS[name].map((card, i, rail) => {
             /* 실제 화면이 있는 카드는 화면 비율에 맞춰 가로로 눕힌다 */
             const shots = card.shots ?? [];
-            const w = shots.length ? 30 : 18;
-            const h = shots.length ? 19 : 25;
+            const w = card.cardW ?? (shots.length ? 30 : 18);
+            const h = card.cardH ?? (shots.length ? 19 : 25);
             return (
               <div
                 key={name + i}
