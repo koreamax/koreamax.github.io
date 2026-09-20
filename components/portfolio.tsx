@@ -283,7 +283,8 @@ function Corridor() {
 
 /* ───────────────────────── 프로젝트 수 카운터 ───────────────────────── */
 
-const TOTAL_PROJECTS = projects.length + moreProjects.length;
+/** 화면에 내세우는 프로젝트 수 — 목록 길이와 따로 둔다 */
+const TOTAL_PROJECTS = 10;
 /** 함께 만든 팀원 수 — 실제 숫자에 맞게 고치면 된다 */
 const TOTAL_TEAMMATES = 30;
 /** 프로젝트를 만들어 온 기간(개월) */
@@ -789,7 +790,8 @@ export default function Portfolio() {
       <section
         ref={spreadRef}
         data-spread
-        style={{ position: "relative", height: "calc(var(--vh) * 100)", background: "#111111", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        /* 배경과 테두리를 두면 카드가 펼쳐지는 자리가 상자로 잘려 보인다 — 경계 없이 흐르게 둔다 */
+        style={{ position: "relative", height: "calc(var(--vh) * 100)" }}
       >
         {/* 헤더의 Awards 는 카드가 다 펼쳐진 지점으로 보낸다 */}
         <span id="awards" style={{ position: "absolute", top: 0, left: 0, width: 1, height: 1 }} />
@@ -859,7 +861,7 @@ export default function Portfolio() {
       </section>
 
       {/* ── PROJECTS ── */}
-      <section id="work" style={{ maxWidth: 1280, margin: "0 auto", padding: "112px 24px 40px" }}>
+      <section id="work" style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 40px" }}>
         <div
           data-corridor
           className="corridor"

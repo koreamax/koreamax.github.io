@@ -300,7 +300,8 @@ export interface CorridorCard {
   shotColumns?: number;
 }
 
-/* 프로젝트마다 한 장씩 — 어느 하나가 더 자주 나오지 않도록 */
+/* 프로젝트마다 한 장씩 — 어느 하나가 더 자주 나오지 않도록.
+   보여 줄 화면이 아직 없는 프로젝트(Goliath Crane · LLM ROUTER · JeokjaeJeokso)는 빼 두었다. */
 export const corridorCards: CorridorCard[] = [
   {
     title: "Seagnal",
@@ -310,10 +311,7 @@ export const corridorCards: CorridorCard[] = [
     title: "VIAssist",
     shots: ["/uploads/viassist-1.webp", "/uploads/viassist-2.webp", "/uploads/viassist-3.webp", "/uploads/viassist-4.webp"],
   },
-  { title: "Goliath Crane" },
-  { title: "LLM ROUTER" },
   { title: "GSV Paper" },
-  { title: "JeokjaeJeokso" },
   { title: "beautytalk" },
   {
     title: "Mission Pawss!ble",
@@ -325,7 +323,10 @@ export const corridorCards: CorridorCard[] = [
     shots: ["/uploads/wilson-1.webp", "/uploads/wilson-2.webp", "/uploads/wilson-3.webp", "/uploads/wilson-4.webp"],
     shotColumns: 4,
   },
-  { title: "Cloud Island" },
+  {
+    title: "Cloud Island",
+    shots: ["/uploads/island-1.webp", "/uploads/island-2.webp", "/uploads/island-3.webp", "/uploads/island-4.webp"],
+  },
   {
     title: "WalkingCity",
     shots: ["/uploads/walk-1.webp", "/uploads/walk-2.webp", "/uploads/walk-3.webp", "/uploads/walk-4.webp"],
