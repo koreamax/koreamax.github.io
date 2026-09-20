@@ -175,7 +175,8 @@ function keyframes(dir: 1 | -1, name: string): string {
 }
 
 const CORRIDOR_CSS = keyframes(1, "ishr") + keyframes(-1, "ishl");
-const CORRIDOR_SPEED = 38;
+/* 한 바퀴 도는 데 걸리는 시간(초). 작을수록 빠르게 지나간다 */
+const CORRIDOR_SPEED = 38 / 1.5;
 
 /**
  * 같은 카드를 양쪽에 다 태우면 레일마다 열한 장이 줄줄이 붙어 앞뒤가 서로 가린다.
