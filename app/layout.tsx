@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { DESIGN_H, DESIGN_W, FLOW_BELOW } from "@/components/fixed-canvas";
 
@@ -51,7 +50,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic+Coding:400,700" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css?family=Nanum+Myeongjo:400" rel="stylesheet" />
-        <Script id="fit-canvas" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: FIT_SCRIPT }} />
+        {/* next/script 는 프레임워크가 뜬 뒤에 실행돼 첫 화면이 한 번 어긋난다.
+            HTML 에 그대로 박아 파싱 중에 돌게 한다. */}
+        <script dangerouslySetInnerHTML={{ __html: FIT_SCRIPT }} />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
