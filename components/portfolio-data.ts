@@ -296,6 +296,8 @@ export interface CorridorCard {
   title: string;
   /** 직접 찍은 화면들. 한 카드 안에 모아 보여 준다 (없으면 이름만 흘러간다) */
   shots?: string[];
+  /** 화면을 몇 칸으로 깔지. 가로 화면은 2칸(기본), 세로 폰 화면은 4칸으로 눕힌다 */
+  shotColumns?: number;
 }
 
 /* 프로젝트마다 한 장씩 — 어느 하나가 더 자주 나오지 않도록 */
@@ -311,7 +313,11 @@ export const corridorCards: CorridorCard[] = [
   { title: "JeokjaeJeokso" },
   { title: "beautytalk" },
   { title: "Mission Pawss!ble" },
-  { title: "Wilson" },
+  {
+    title: "Wilson",
+    shots: ["/uploads/wilson-1.webp", "/uploads/wilson-2.webp", "/uploads/wilson-3.webp", "/uploads/wilson-4.webp"],
+    shotColumns: 4,
+  },
   { title: "Cloud Island" },
   { title: "WalkingCity" },
 ];
@@ -381,10 +387,22 @@ export const categories: Category[] = [
       {
         title: "Wilson",
         summary: "치매 노인을 위한 말벗 챗봇의 서비스 간 통신 설계",
-        problem:
-          "음성 처리와 대화 생성을 별도 서비스로 나눈 뒤 매 대화 턴마다 REST 호출이 오갔다. 요청마다 연결을 새로 맺고 JSON을 직렬화하느라 지연이 쌓였고, 동시 세션이 늘자 CPU와 메모리도 함께 튀었다.",
-        solution:
-          "서비스 간 통신을 gRPC로 바꿔 HTTP/2 연결을 재사용하고 프로토콜 버퍼로 페이로드를 줄였다. 음성은 스트리밍 RPC로 조각을 흘려보내 첫 응답까지의 시간을 앞당겼고, 워커 수와 컨테이너 메모리 한계를 동시 세션 기준으로 다시 잡아 사용량이 튀지 않게 했다.",
+        issues: [
+          {
+            tag: "말을 걸면 첫 턴이 실패",
+            problem:
+              "백엔드와 AI 서버를 gRPC 장기 연결로 묶었는데 대화가 뜸한 사이 중간 장비가 유휴 연결을 말없이 끊어, 다음 발화에서야 끊긴 것을 알고 첫 턴이 실패함",
+            solution:
+              "유휴 구간에도 연결 상태를 확인하도록 gRPC keep-alive ping을 켜고 끊긴 채널은 즉시 다시 맺게 해, 말을 걸었을 때 첫 턴이 실패하는 일이 사라짐",
+          },
+          {
+            tag: "아침 첫 요청만 터지던 DB",
+            problem:
+              "새벽에는 요청이 없어 커넥션 풀의 연결이 오래 놀았는데 DB가 먼저 그 연결을 닫아, 아침 첫 요청이 이미 죽은 연결을 집어 들고 실패함",
+            solution:
+              "풀이 유휴 연결을 주기적으로 확인하게 하고 연결 수명을 DB가 끊는 시간보다 짧게 잡아 미리 교체되도록 해, 아침 첫 요청이 끊기는 일이 없어짐",
+          },
+        ],
         repo: "https://github.com/koreamax/wilson_chatbot",
         status: "종료",
       },

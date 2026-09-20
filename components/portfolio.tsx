@@ -230,7 +230,7 @@ function Corridor() {
                       position: "absolute",
                       inset: 0,
                       display: "grid",
-                      gridTemplateColumns: `repeat(${shots.length > 1 ? 2 : 1}, 1fr)`,
+                      gridTemplateColumns: `repeat(${card.shotColumns ?? (shots.length > 1 ? 2 : 1)}, 1fr)`,
                       gridAutoRows: "1fr",
                       gap: "0.15cqw",
                       background: "#101010",
@@ -250,7 +250,7 @@ function Corridor() {
                           objectPosition: "top center",
                           display: "block",
                           /* 홀수로 넣으면 빈칸이 생기므로 첫 장을 한 줄로 눕힌다 */
-                          gridColumn: shots.length % 2 === 1 && k === 0 ? "1 / -1" : undefined,
+                          gridColumn: !card.shotColumns && shots.length % 2 === 1 && k === 0 ? "1 / -1" : undefined,
                         }}
                       />
                     ))}
