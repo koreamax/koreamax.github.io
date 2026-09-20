@@ -31,9 +31,11 @@ export const FLOW_BELOW = 0;
  * 가로는 언제나 DESIGN_W 이고, 세로는 창의 가로세로비에 따라 달라진다.
  */
 export function designViewport(): { w: number; h: number } {
-  if (typeof window === "undefined") return { w: DESIGN_W, h: 860 };
-  const real = document.documentElement.clientWidth || window.innerWidth;
-  if (real < FLOW_BELOW) return { w: real, h: window.innerHeight };
+  if (typeof window === "undefined") return { w: DESIGN_W, h: DESIGN_H };
+  const d = document.documentElement;
+  const real = d.clientWidth || window.innerWidth;
+  // 고정 도면을 쓰지 않는 화면(좁거나, zoom 을 모르는 브라우저)에서는 창이 곧 도면이다
+  if (!d.classList.contains("fixed-canvas")) return { w: real, h: window.innerHeight };
   const z = real / DESIGN_W;
   return { w: DESIGN_W, h: window.innerHeight / z };
 }
