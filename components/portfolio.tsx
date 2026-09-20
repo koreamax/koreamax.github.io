@@ -9,7 +9,7 @@ import { designViewport } from "@/components/fixed-canvas";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import {
   awards,
-  corridorTitles,
+  corridorCards,
   events,
   moreProjects,
   projects,
@@ -176,7 +176,8 @@ function keyframes(dir: 1 | -1, name: string): string {
 
 const CORRIDOR_CSS = keyframes(1, "ishr") + keyframes(-1, "ishl");
 const CORRIDOR_SPEED = 38;
-const CORRIDOR_N = 8;
+/* 카드 수 = 목록 길이. 두 레일이 같은 순서로 돌지 않도록 오른쪽은 절반 밀어 둔다 */
+const CORRIDOR_N = corridorCards.length;
 
 function Corridor() {
   return (
@@ -184,36 +185,64 @@ function Corridor() {
       <style dangerouslySetInnerHTML={{ __html: CORRIDOR_CSS }} />
       <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
         {(["ishr", "ishl"] as const).map((name) =>
-          Array.from({ length: CORRIDOR_N }, (_, i) => (
-            <div
-              key={name + i}
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: "55%",
-                width: "18cqw",
-                height: "25cqw",
-                marginLeft: "-9cqw",
-                marginTop: "-12.5cqw",
-                borderRadius: 6,
-                overflow: "hidden",
-                backfaceVisibility: "hidden",
-                background: "#1f1f1f",
-                border: "1px solid rgba(255,255,255,0.12)",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                padding: "1.4cqw",
-                animation: `${name} ${CORRIDOR_SPEED}s linear infinite`,
-                animationDelay: `${-(i * CORRIDOR_SPEED) / CORRIDOR_N}s`,
-              }}
-            >
-              <span style={{ fontSize: "0.9cqw", fontWeight: 700, letterSpacing: "0.2cqw", color: RED }}>PROJECT</span>
-              <span style={{ fontFamily: BHS, fontSize: "2cqw", color: "#fff", lineHeight: 1.2 }}>
-                {corridorTitles[i % corridorTitles.length]}
-              </span>
-            </div>
-          )),
+          Array.from({ length: CORRIDOR_N }, (_, i) => {
+            /* 두 레일이 같은 순서로 돌지 않도록 왼쪽은 절반 밀어 둔다 */
+            const card = corridorCards[(name === "ishl" ? i + Math.floor(CORRIDOR_N / 2) : i) % corridorCards.length];
+            /* 실제 화면이 있는 카드는 화면 비율에 맞춰 가로로 눕힌다 */
+            const w = card.shot ? 30 : 18;
+            const h = card.shot ? 19 : 25;
+            return (
+              <div
+                key={name + i}
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "55%",
+                  width: `${w}cqw`,
+                  height: `${h}cqw`,
+                  marginLeft: `${-w / 2}cqw`,
+                  marginTop: `${-h / 2}cqw`,
+                  borderRadius: 6,
+                  overflow: "hidden",
+                  backfaceVisibility: "hidden",
+                  background: "#1f1f1f",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  padding: card.shot ? 0 : "1.4cqw",
+                  animation: `${name} ${CORRIDOR_SPEED}s linear infinite`,
+                  animationDelay: `${-(i * CORRIDOR_SPEED) / CORRIDOR_N}s`,
+                }}
+              >
+                {card.shot ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={card.shot}
+                      alt={`${card.title} ${card.caption ?? ""}`.trim()}
+                      loading="lazy"
+                      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+                    />
+                    {/* 글자가 읽히도록 아래쪽만 어둡게 */}
+                    <span style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 26%, transparent 52%, rgba(0,0,0,0.82) 100%)" }} />
+                    <span style={{ position: "relative", padding: "1.1cqw 1.3cqw", fontSize: "0.9cqw", fontWeight: 700, letterSpacing: "0.2cqw", color: RED }}>PROJECT</span>
+                    <span style={{ position: "relative", padding: "0 1.3cqw 1.1cqw", fontFamily: BHS, fontSize: "2cqw", color: "#fff", lineHeight: 1.2 }}>
+                      {card.title}
+                      {card.caption && (
+                        <span style={{ display: "block", fontSize: "1.05cqw", color: "rgba(255,255,255,0.72)", marginTop: "0.15cqw" }}>{card.caption}</span>
+                      )}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontSize: "0.9cqw", fontWeight: 700, letterSpacing: "0.2cqw", color: RED }}>PROJECT</span>
+                    <span style={{ fontFamily: BHS, fontSize: "2cqw", color: "#fff", lineHeight: 1.2 }}>{card.title}</span>
+                  </>
+                )}
+              </div>
+            );
+          }),
         )}
       </div>
     </div>

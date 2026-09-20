@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useRef, type CSSProperties } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { categories, type Shot } from "@/components/portfolio-data";
+import { categories } from "@/components/portfolio-data";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { designViewport } from "@/components/fixed-canvas";
@@ -61,71 +60,6 @@ function CardStatus({ status }: { status: string }) {
 
 const SHOW = "inset(0% 0% 0% 0%)";
 
-/**
- * 실제 화면을 크게 보는 뷰어.
- *
- * 무대는 확대·축소되는 캔버스 안에 있어 그 안에서 띄우면 잘린다.
- * 그래서 body 로 따로 내보내고, 크기는 도면 단위로 잡는다.
- */
-function ShotViewer({ shots, index, onIndex, onClose }: { shots: Shot[]; index: number; onIndex: (i: number) => void; onClose: () => void }) {
-  useEffect(() => {
-    const key = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      else if (e.key === "ArrowRight") onIndex((index + 1) % shots.length);
-      else if (e.key === "ArrowLeft") onIndex((index - 1 + shots.length) % shots.length);
-    };
-    window.addEventListener("keydown", key);
-    const prev = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", key);
-      document.documentElement.style.overflow = prev;
-    };
-  }, [index, shots.length, onIndex, onClose]);
-
-  const shot = shots[index];
-  return createPortal(
-    <div className="shotview" role="dialog" aria-modal="true" aria-label="실제 화면" onClick={onClose}>
-      <button type="button" className="shotview-close" onClick={onClose} aria-label="닫기">
-        ×
-      </button>
-      <div className="shotview-body" onClick={(ev) => ev.stopPropagation()}>
-        <button
-          type="button"
-          className="shotview-arrow shotview-prev"
-          onClick={() => onIndex((index - 1 + shots.length) % shots.length)}
-          aria-label="이전 화면"
-        >
-          ‹
-        </button>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="shotview-img" src={shot.src} alt={shot.caption} />
-        <button type="button" className="shotview-arrow shotview-next" onClick={() => onIndex((index + 1) % shots.length)} aria-label="다음 화면">
-          ›
-        </button>
-      </div>
-      <div className="shotview-foot" onClick={(ev) => ev.stopPropagation()}>
-        <p className="shotview-cap">{shot.caption}</p>
-        <div className="shotview-thumbs">
-          {shots.map((s, i) => (
-            <button
-              type="button"
-              key={s.src}
-              className={"shotview-thumb" + (i === index ? " is-on" : "")}
-              onClick={() => onIndex(i)}
-              aria-label={s.caption}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={s.src} alt="" />
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>,
-    document.body,
-  );
-}
-
 /** 분야마다 카드에 감도는 빛의 색 — 그 분야의 강조색과 가장 가까운 쪽으로 */
 const GLOW: Record<string, "blue" | "purple" | "green" | "orange"> = {
   "01": "blue",
@@ -138,8 +72,6 @@ const GLOW: Record<string, "blue" | "purple" | "green" | "orange"> = {
 const SCENE_SCROLL = 2.1;
 
 export default function ProjectScenes() {
-  /* 크게 열어 둔 화면 — 어느 프로젝트의 몇 번째 장인지 */
-  const [viewing, setViewing] = useState<{ shots: Shot[]; index: number } | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -366,37 +298,6 @@ export default function ProjectScenes() {
                       <b className="pb-fix">해결</b>
                       {it.solution}
                     </span>
-                    {it.shots && it.shots.length > 0 && (
-                      <span className="pcard-shots">
-                        <b className="pcard-shots-label">실제 화면</b>
-                        <span className="pcard-shots-row">
-                          {it.shots.map((s, i) => (
-                            /* a 안이라 button 을 쓸 수 없다 — 링크를 막고 뷰어를 연다 */
-                            <span
-                              key={s.src}
-                              role="button"
-                              tabIndex={0}
-                              className="pcard-shot"
-                              title={s.caption}
-                              onClick={(ev) => {
-                                ev.preventDefault();
-                                ev.stopPropagation();
-                                setViewing({ shots: it.shots!, index: i });
-                              }}
-                              onKeyDown={(ev) => {
-                                if (ev.key !== "Enter" && ev.key !== " ") return;
-                                ev.preventDefault();
-                                ev.stopPropagation();
-                                setViewing({ shots: it.shots!, index: i });
-                              }}
-                            >
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={s.src} alt={s.caption} loading="lazy" />
-                            </span>
-                          ))}
-                        </span>
-                      </span>
-                    )}
                     <CardStatus status={it.status} />
                     </GlowCard>
                   </a>
@@ -406,15 +307,6 @@ export default function ProjectScenes() {
           </section>
         ))}
       </div>
-
-      {viewing && (
-        <ShotViewer
-          shots={viewing.shots}
-          index={viewing.index}
-          onIndex={(i) => setViewing((v) => (v ? { ...v, index: i } : v))}
-          onClose={() => setViewing(null)}
-        />
-      )}
 
       <div className="pstage-dots" aria-hidden>
         {categories.map((c, i) => (
