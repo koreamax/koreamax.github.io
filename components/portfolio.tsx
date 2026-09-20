@@ -176,8 +176,16 @@ function keyframes(dir: 1 | -1, name: string): string {
 
 const CORRIDOR_CSS = keyframes(1, "ishr") + keyframes(-1, "ishl");
 const CORRIDOR_SPEED = 38;
-/* 카드 수 = 목록 길이. 두 레일이 같은 순서로 돌지 않도록 오른쪽은 절반 밀어 둔다 */
-const CORRIDOR_N = corridorCards.length;
+
+/**
+ * 같은 카드를 양쪽에 다 태우면 레일마다 열한 장이 줄줄이 붙어 앞뒤가 서로 가린다.
+ * 그래서 프로젝트를 한 줄씩 번갈아 나눠 싣는다. 레일당 대여섯 장이라
+ * 카드 사이가 두 배로 벌어지고, 프로젝트는 여전히 한 바퀴에 한 번씩만 나온다.
+ */
+const CORRIDOR_RAILS = {
+  ishr: corridorCards.filter((_, i) => i % 2 === 0),
+  ishl: corridorCards.filter((_, i) => i % 2 === 1),
+} as const;
 
 function Corridor() {
   return (
@@ -185,9 +193,7 @@ function Corridor() {
       <style dangerouslySetInnerHTML={{ __html: CORRIDOR_CSS }} />
       <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
         {(["ishr", "ishl"] as const).map((name) =>
-          Array.from({ length: CORRIDOR_N }, (_, i) => {
-            /* 두 레일이 같은 순서로 돌지 않도록 왼쪽은 절반 밀어 둔다 */
-            const card = corridorCards[(name === "ishl" ? i + Math.floor(CORRIDOR_N / 2) : i) % corridorCards.length];
+          CORRIDOR_RAILS[name].map((card, i, rail) => {
             /* 실제 화면이 있는 카드는 화면 비율에 맞춰 가로로 눕힌다 */
             const shots = card.shots ?? [];
             const w = shots.length ? 30 : 18;
@@ -213,7 +219,7 @@ function Corridor() {
                   justifyContent: "flex-end",
                   padding: shots.length ? 0 : "1.4cqw",
                   animation: `${name} ${CORRIDOR_SPEED}s linear infinite`,
-                  animationDelay: `${-(i * CORRIDOR_SPEED) / CORRIDOR_N}s`,
+                  animationDelay: `${-(i * CORRIDOR_SPEED) / rail.length}s`,
                 }}
               >
                 {shots.length > 0 && (
