@@ -307,6 +307,13 @@ export const corridorTitles = [
    같은 프로젝트라도 분야에 따라 맡은 역할과 풀어낸 문제가 다르므로
    설명 · 문제 · 해결을 분야별로 따로 적는다. */
 
+/** 실제 화면 한 장 */
+export interface Shot {
+  src: string;
+  /** 무슨 화면인지 한 줄 — 확대해서 볼 때 아래에 적힌다 */
+  caption: string;
+}
+
 export interface CategoryItem {
   title: string;
   /** 어떤 프로젝트인지 한 줄 */
@@ -317,6 +324,8 @@ export interface CategoryItem {
   solution: string;
   repo: string;
   status: string;
+  /** 직접 찍은 실제 화면 — 카드 안에 작게 깔리고 누르면 크게 열린다 */
+  shots?: Shot[];
 }
 
 export interface Category {
@@ -373,6 +382,12 @@ export const categories: Category[] = [
           "수집 계층에서 공통 스키마로 정규화한 뒤 저장하고, 자주 쓰는 집계는 요약 테이블로 미리 계산해 두었다. 목록 조회는 복합 인덱스와 커서 페이지네이션으로 바꿔 데이터가 늘어도 비용이 일정하게 유지되도록 했다.",
         repo: "https://github.com/koreamax/piudaback",
         status: "종료",
+        shots: [
+          { src: "/uploads/seagnal-1.webp", caption: "메인 — 제보·지도·후기로 들어가는 네 갈래 입구" },
+          { src: "/uploads/seagnal-2.webp", caption: "해양 지도 — 핀을 누르면 그 자리의 누적 수거량과 활동 후기" },
+          { src: "/uploads/seagnal-3.webp", caption: "단체 대시보드 — 월별 수거량, 폐기물 분류 비율, 시민 제보 처리" },
+          { src: "/uploads/seagnal-4.webp", caption: "신고서와 활동 후기 — 지도에서 위치를 찍고 정해진 양식으로 기록" },
+        ],
       },
     ],
   },

@@ -494,3 +494,26 @@ html { overflow-x: clip; }
   html.flow .dc .nav-logo { height: 32px; margin-right: 4px !important; padding: 0 8px; font-size: 13px !important; }
   html.flow .dc .nav-link { height: 32px; padding: 0 8px !important; font-size: 10px !important; letter-spacing: 0.6px !important; }
 }
+
+/* ───────────── 카드 안 실제 화면 ─────────────
+   카드에는 작게 깔리고, 누르면 도면 밖(body)에 크게 열린다. */
+.pcard-shots { display: block; margin-top: 2px; }
+.pcard-shots-label { display: block; margin-bottom: 6px; font-size: 10.5px; font-weight: 800; letter-spacing: 1.4px; color: rgba(255, 255, 255, 0.45); }
+.pcard-shots-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+.pcard-shot { display: block; position: relative; aspect-ratio: 16 / 10; border-radius: 5px; overflow: hidden; cursor: zoom-in; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); transition: border-color .2s ease, transform .2s ease; }
+.pcard-shot img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.pcard-shot:hover, .pcard-shot:focus-visible { border-color: var(--cat); transform: translateY(-2px); outline: none; }
+
+.shotview { position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--ch) * 2); padding: calc(var(--ch) * 4) calc(var(--vw) * 3); background: rgba(6, 6, 6, 0.975); backdrop-filter: blur(10px); }
+.shotview-body { display: flex; align-items: center; gap: calc(var(--vw) * 1.2); max-width: 100%; }
+.shotview-img { max-width: calc(var(--vw) * 86); max-height: calc(var(--vh) * 70); object-fit: contain; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); background: #101010; }
+.shotview-arrow { flex: none; width: 46px; height: 46px; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.06); color: #ffffff; font-size: 26px; line-height: 1; cursor: pointer; transition: background .2s ease, border-color .2s ease; }
+.shotview-arrow:hover { background: #da291c; border-color: #da291c; }
+.shotview-close { position: absolute; top: calc(var(--ch) * 3); right: calc(var(--vw) * 3); width: 42px; height: 42px; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.06); color: #ffffff; font-size: 24px; line-height: 1; cursor: pointer; }
+.shotview-close:hover { background: #da291c; border-color: #da291c; }
+.shotview-foot { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.shotview-cap { margin: 0; font-size: 14px; color: rgba(255, 255, 255, 0.78); text-align: center; }
+.shotview-thumbs { display: flex; gap: 8px; }
+.shotview-thumb { width: 94px; height: 58px; padding: 0; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.14); background: none; cursor: pointer; opacity: 0.5; transition: opacity .2s ease, border-color .2s ease; }
+.shotview-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.shotview-thumb.is-on, .shotview-thumb:hover { opacity: 1; border-color: #da291c; }
