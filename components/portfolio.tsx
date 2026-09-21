@@ -232,7 +232,8 @@ function Corridor() {
                       display: "grid",
                       gridTemplateColumns: `repeat(${card.shotColumns ?? (shots.length > 1 ? 2 : 1)}, 1fr)`,
                       gridAutoRows: "1fr",
-                      gap: "0.15cqw",
+                      /* 화면끼리 붙여 바탕이 비치지 않게 한다 */
+                      gap: 0,
                       background: "#101010",
                     }}
                   >
@@ -246,8 +247,8 @@ function Corridor() {
                         style={{
                           width: "100%",
                           height: "100%",
-                          /* 잘라내면 화면 양옆이 날아간다 — 칸 안에 통째로 담는다 */
-                          objectFit: "contain",
+                          /* 카드 높이를 화면 비율에 맞춰 잡아 두었으므로 잘려 나가는 부분이 없다 */
+                          objectFit: "cover",
                           display: "block",
                           /* 홀수로 넣으면 빈칸이 생기므로 첫 장을 한 줄로 눕힌다 */
                           gridColumn: !card.shotColumns && shots.length % 2 === 1 && k === 0 ? "1 / -1" : undefined,

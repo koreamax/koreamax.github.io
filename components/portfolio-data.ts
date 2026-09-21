@@ -309,40 +309,47 @@ export const corridorCards: CorridorCard[] = [
   {
     title: "Seagnal",
     shots: ["/uploads/seagnal-1.webp", "/uploads/seagnal-2.webp", "/uploads/seagnal-3.webp", "/uploads/seagnal-4.webp"],
+    cardH: 16.5,
   },
   {
     title: "VIAssist",
     shots: ["/uploads/viassist-1.webp", "/uploads/viassist-2.webp", "/uploads/viassist-3.webp", "/uploads/viassist-4.webp"],
+    cardH: 16.8,
   },
   {
     title: "GSV Paper",
     shots: ["/uploads/gsv-1.webp", "/uploads/gsv-2.webp", "/uploads/gsv-3.webp"],
     shotColumns: 1,
-    cardH: 28,
+    cardH: 30.3,
   },
   {
     title: "beautytalk",
     shots: ["/uploads/beauty-1.webp", "/uploads/beauty-2.webp", "/uploads/beauty-4.webp", "/uploads/beauty-3.webp"],
     shotColumns: 4,
+    cardH: 16.6,
   },
   {
     title: "Mission Pawss!ble",
     shots: ["/uploads/paws-1.webp", "/uploads/paws-2.webp", "/uploads/paws-3.webp", "/uploads/paws-4.webp"],
     shotColumns: 4,
+    cardH: 14.5,
   },
   {
     title: "Wilson",
     shots: ["/uploads/wilson-1.webp", "/uploads/wilson-2.webp", "/uploads/wilson-3.webp", "/uploads/wilson-4.webp"],
     shotColumns: 4,
+    cardH: 17.7,
   },
   {
     title: "Cloud Island",
     shots: ["/uploads/island-1.webp", "/uploads/island-2.webp", "/uploads/island-3.webp", "/uploads/island-4.webp"],
+    cardH: 16,
   },
   {
     title: "WalkingCity",
     shots: ["/uploads/walk-1.webp", "/uploads/walk-2.webp", "/uploads/walk-3.webp", "/uploads/walk-4.webp"],
     shotColumns: 4,
+    cardH: 16.2,
   },
 ];
 
