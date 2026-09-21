@@ -246,8 +246,8 @@ function Corridor() {
                         style={{
                           width: "100%",
                           height: "100%",
-                          objectFit: "cover",
-                          objectPosition: "top center",
+                          /* 잘라내면 화면 양옆이 날아간다 — 칸 안에 통째로 담는다 */
+                          objectFit: "contain",
                           display: "block",
                           /* 홀수로 넣으면 빈칸이 생기므로 첫 장을 한 줄로 눕힌다 */
                           gridColumn: !card.shotColumns && shots.length % 2 === 1 && k === 0 ? "1 / -1" : undefined,
