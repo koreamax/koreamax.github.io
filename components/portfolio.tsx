@@ -423,18 +423,20 @@ function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
 
 /* 최종 위치는 화면 안(±50vw / ±50vh)에 머물면서 가운데(수상 목록) 를 비운다.
    번호가 붙은 카드는 01 02 / 03 04 로 읽히도록 네 모서리에 놓는다. */
-/* x 는 도면 가로의 %, y 는 짧은 쪽 화면의 %. 위쪽은 나브와 부딪히므로
-   가로로 더 벌리고 세로는 조금만 늘린다. */
+/* x 는 도면 가로의 %, y 는 짧은 쪽 화면의 %.
+   네 귀퉁이는 대각으로 멀리 튀어 보여 옆 카드보다 덜 벌린다. */
 const CFG = [
-  { sx: -8, sy: -10, sr: -18, x: 0, y: -31.5 },
-  { sx: 14, sy: -10, sr: 20, x: -34, y: -24 },
-  { sx: -16, sy: 0, sr: -4, x: -40, y: 0 },
-  { sx: 1, sy: -10, sr: -2, x: 34, y: -24 },
-  { sx: 18, sy: 1, sr: 6, x: 40, y: 0 },
-  { sx: -6, sy: 10, sr: 6, x: -34, y: 24 },
-  { sx: 8, sy: 7, sr: 3, x: 0, y: 31.5 },
-  { sx: 20, sy: 12, sr: -7, x: 34, y: 24 },
+  { sx: -8, sy: -10, sr: -18, x: 0, y: -29 },
+  { sx: 14, sy: -10, sr: 20, x: -29, y: -20 },
+  { sx: -16, sy: 0, sr: -4, x: -37, y: 0 },
+  { sx: 1, sy: -10, sr: -2, x: 29, y: -20 },
+  { sx: 18, sy: 1, sr: 6, x: 37, y: 0 },
+  { sx: -6, sy: 10, sr: 6, x: -29, y: 20 },
+  { sx: 8, sy: 7, sr: 3, x: 0, y: 29 },
+  { sx: 20, sy: 12, sr: -7, x: 29, y: 20 },
 ];
+/** 펼친 덩어리를 통째로 내리는 양(--sh 단위). 위쪽 빨간 띠와 떼어 놓는다 */
+const SPREAD_DY = 5;
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
 const MARQUEE_ITEMS = ["AI", "BACKEND", "CLOUD", "DEVELOPER", "EMBEDDED"];
@@ -551,14 +553,15 @@ export default function Portfolio() {
         if (!el) return;
         const c = CFG[i % CFG.length];
         const tx = c.sx + (c.x - c.sx) * p;
-        const ty = c.sy + (c.y - c.sy) * p;
+        const ty = c.sy + (c.y - c.sy) * p + SPREAD_DY * p;
         el.style.transform =
           "translate(calc(-50% + var(--vw) * " + tx + "), calc(-50% + var(--sh) * " + ty + ")) rotate(" + c.sr * (1 - p) + "deg) scale(" + (0.82 + 0.18 * p) + ")";
       });
       const txt = spreadTextRef.current;
       if (txt) {
         txt.style.opacity = String(clamp((p - 0.25) / 0.45));
-        txt.style.transform = "scale(" + (0.9 + 0.1 * clamp((p - 0.2) / 0.7)) + ")";
+        txt.style.transform =
+          "translateY(calc(var(--sh) * " + SPREAD_DY * p + ")) scale(" + (0.9 + 0.1 * clamp((p - 0.2) / 0.7)) + ")";
       }
     };
     applySpread(0);
@@ -865,7 +868,7 @@ export default function Portfolio() {
       </section>
 
       {/* ── PROJECTS ── */}
-      <section id="work" style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 40px" }}>
+      <section id="work" style={{ maxWidth: 1280, margin: "0 auto", padding: "84px 24px 96px" }}>
         <div
           data-corridor
           className="corridor"
