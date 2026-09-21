@@ -320,7 +320,11 @@ export const corridorCards: CorridorCard[] = [
     shotColumns: 1,
     cardH: 28,
   },
-  { title: "beautytalk" },
+  {
+    title: "beautytalk",
+    shots: ["/uploads/beauty-1.webp", "/uploads/beauty-2.webp", "/uploads/beauty-3.webp"],
+    shotColumns: 3,
+  },
   {
     title: "Mission Pawss!ble",
     shots: ["/uploads/paws-1.webp", "/uploads/paws-2.webp", "/uploads/paws-3.webp", "/uploads/paws-4.webp"],
