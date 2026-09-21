@@ -179,9 +179,8 @@ export default function IntroBace() {
             {w.l}
           </div>
         ))}
-        <div className="intro-dot" aria-hidden>
-          .
-        </div>
+        {/* 링크 썸네일과 같은 네모난 마침표 — 글리프 대신 사각형을 그린다 */}
+        <div className="intro-dot" aria-hidden />
       </div>
     </div>
   );

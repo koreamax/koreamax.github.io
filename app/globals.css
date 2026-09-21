@@ -194,8 +194,11 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 .intro-word { position: absolute; display: inline-flex; align-items: baseline; font-family: 'Black Han Sans', sans-serif; font-weight: 400; letter-spacing: 0.01em; line-height: 1; white-space: nowrap; will-change: transform; opacity: 0; }
 .intro[data-state="word"] .intro-stage { display: flex; align-items: center; justify-content: center; }
 .intro[data-state="word"] .intro-word { position: static; font-size: clamp(64px, calc(var(--vw) * 17), 250px); letter-spacing: 0.02em; }
-.intro-dot { font-family: 'Black Han Sans', sans-serif; font-weight: 400; line-height: 1; color: #da291c; text-shadow: 0 0 40px rgba(218, 41, 28, 0.55); opacity: 0; will-change: transform, opacity; }
-.intro[data-state="word"] .intro-dot { font-size: clamp(64px, calc(var(--vw) * 17), 250px); letter-spacing: 0.02em; }
+/* 마침표는 글자가 아니라 사각형이다 — og 썸네일의 네모난 점과 같은 모양.
+   크기와 자리는 원래 글리프가 찍히던 값(0.188em / 밑에서 0.204em)에 맞췄다. */
+.intro-dot { position: relative; line-height: 1; opacity: 0; will-change: transform, opacity; }
+.intro-dot::after { content: ""; position: absolute; left: 0.041em; bottom: 0.204em; width: 0.188em; height: 0.188em; background: #da291c; box-shadow: 0 0 40px rgba(218, 41, 28, 0.55); }
+.intro[data-state="word"] .intro-dot { font-size: clamp(64px, calc(var(--vw) * 17), 250px); width: 0.286em; height: 1em; }
 .intro[data-state="scatter"] .intro-word { position: absolute; }
 .intro .w-b { left: calc(var(--vw) * 8); top: calc(var(--vh) * 18); font-size: clamp(64px, calc(var(--vw) * 13), 200px); }
 .intro .w-a { left: calc(var(--vw) * 12); top: calc(var(--vh) * 61); font-size: clamp(56px, calc(var(--vw) * 10.5), 160px); }
