@@ -510,4 +510,5 @@ html { overflow-x: clip; }
 
 /* 맨 위에서는 이름이 켜진다 — 소개 구간을 가리키는 표시 */
 .dc .nav-logo.is-active { position: relative; }
-.dc .nav-logo.is-active::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 6px; height: 2px; border-radius: 2px; background: #da291c; }
+/* 다른 링크와 같은 16px 짜리 짧은 밑줄 */
+.dc .nav-logo.is-active::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 16px; height: 2px; border-radius: 2px; transform: translateX(-50%); background: #da291c; box-shadow: 0 0 10px rgba(218, 41, 28, 0.8); }
