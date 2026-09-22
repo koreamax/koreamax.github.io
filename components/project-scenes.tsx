@@ -6,7 +6,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { categories, type CategoryItem, type CategoryIssue } from "@/components/portfolio-data";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import { GlowCard } from "@/components/ui/spotlight-card";
-import { SpecialText } from "@/components/ui/special-text";
 import { designViewport } from "@/components/fixed-canvas";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -62,10 +61,19 @@ function CardStatus({ status }: { status: string }) {
 /** 문제·해결이 담긴 에디터 창 — 왼쪽 구조도와 같은 창틀을 쓴다 */
 /* 들어오자마자 바뀌면 코드가 깔려 있었다는 걸 못 본다 — 잠깐 그대로 둔다 */
 const CODE_HOLD = 0.55;
+/** 글자 수에 맞춘 길이 — 짧은 제목은 짧게, 긴 문단은 길게 */
+const span = (len: number) => 160 + len * 4.6;
 
 function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
   const groups = groupByLens(issues);
-  let step = 0; // 글이 위에서 아래로 차례로 앉도록 순번을 센다
+  /* 앞 줄이 다 앉은 뒤에 다음 줄이 시작한다 — 한꺼번에 바뀌면 눈 둘 곳이 없다 */
+  let at = CODE_HOLD * 1000;
+  const slot = (len: number) => {
+    const ms = span(len);
+    const start = at;
+    at += ms;
+    return { delay: start / 1000, dur: ms };
+  };
   let ln = 0; // 빈 줄도 번호를 먹는다 — 에디터가 그렇다
   const rows: ReactNode[] = [];
   /* 한 줄은 번호 · 접두 · 본문 세 칸이다. 본문이 접혀도 접두 자리는 비어 있어 글머리가 맞는다 */
@@ -80,20 +88,13 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
 
   groups.forEach((g, gi) => {
     if (gi) push("", null, null);
-    push(
-      "is-comment",
-      null,
-      <SpecialText inView once speed={40} delay={CODE_HOLD + 0.26 * step++}>
-        {`// ${g.lens}`}
-      </SpecialText>,
-    );
+    const head = `// ${g.lens}`;
+    push("is-comment", null, <CodeReveal text={head} {...slot(head.length)} />);
     g.issues.forEach((iss, k) => {
       push(
         "is-tag",
         <em className="pw-idx">[{String(k + 1).padStart(2, "0")}]</em>,
-        <SpecialText inView once speed={34} delay={CODE_HOLD + 0.26 * step++}>
-          {iss.tag}
-        </SpecialText>,
+        <CodeReveal text={iss.tag} {...slot(iss.tag.length)} />,
       );
       /* 문제는 지워질 줄, 해결은 더해질 줄 — diff 로 읽으면 한눈에 갈린다 */
       push(
@@ -102,7 +103,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
           <em className="pw-sign">-</em>
           <em className="pw-key">문제</em>
         </>,
-        <CodeReveal text={iss.problem} code={iss.problemCode} delay={CODE_HOLD + 0.26 * step++} />,
+        <CodeReveal text={iss.problem} code={iss.problemCode} {...slot(iss.problem.length)} />,
       );
       push(
         "is-add",
@@ -110,7 +111,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
           <em className="pw-sign">+</em>
           <em className="pw-key">해결</em>
         </>,
-        <CodeReveal text={iss.solution} code={iss.solutionCode} delay={CODE_HOLD + 0.26 * step++} />,
+        <CodeReveal text={iss.solution} code={iss.solutionCode} {...slot(iss.solution.length)} />,
       );
       if (k < g.issues.length - 1) push("", null, null);
     });
@@ -214,7 +215,7 @@ function measureWide(el: HTMLElement) {
  * 앞에서부터 설명이 들어앉고, 아직 안 온 칸은 그대로 코드가 메우고 있다.
  * 완성된 글을 안 보이게 깔아 자리를 잡아 두므로 바뀌는 내내 줄바꿈이 그대로다.
  */
-function CodeReveal({ text, code, delay = 0 }: { text: string; code?: string; delay?: number }) {
+function CodeReveal({ text, code, delay = 0, dur }: { text: string; code?: string; delay?: number; dur?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -232,7 +233,7 @@ function CodeReveal({ text, code, delay = 0 }: { text: string; code?: string; de
       return;
     }
 
-    const DUR = 800 + chars.length * 9;
+    const DUR = dur ?? 800 + chars.length * 9;
     const EDGE = 5; // 앞머리 몇 칸은 아직 굳지 않은 채 깜빡인다
     let raf = 0;
     let t0 = 0;
@@ -252,14 +253,18 @@ function CodeReveal({ text, code, delay = 0 }: { text: string; code?: string; de
         out += chars[i] === " " ? " " : pick(w[i] > 1);
         used += w[i];
       }
-      out += src.slice(Math.round(used));
+      if (code) out += src.slice(Math.round(used));
+      else {
+        /* 깔아 둘 코드가 없는 줄 — 아직 안 온 칸은 흩뿌린 글자가 메운다 */
+        for (; i < chars.length; i++) out += chars[i] === " " ? " " : pick(w[i] > 1);
+      }
       el.textContent = out;
       if (p < 1) raf = requestAnimationFrame(frame);
       else el.textContent = text;
     };
 
-    /* 장면이 눈에 들어오기 전까지는 코드만 깔려 있다 */
-    el.textContent = src;
+    /* 장면이 눈에 들어오기 전까지는 코드(또는 흩뿌린 글자)만 깔려 있다 */
+    el.textContent = code ? src : chars.map((c, i) => (c === " " ? " " : pick(w[i] > 1))).join("");
     let timer = 0;
     const io = new IntersectionObserver(
       (es) => {
@@ -278,7 +283,7 @@ function CodeReveal({ text, code, delay = 0 }: { text: string; code?: string; de
       window.clearTimeout(timer);
       cancelAnimationFrame(raf);
     };
-  }, [text, code, delay]);
+  }, [text, code, delay, dur]);
 
   return (
     <span className="cr">
@@ -515,10 +520,10 @@ export default function ProjectScenes() {
               </div>
 
               <div className="pscene-row" style={{ ["--n" as string]: c.items.length }}>
-                {c.items.map((it) => (
-                  <a key={it.title} data-item={it.arch ? undefined : ""} href={it.repo} target="_blank" rel="noopener noreferrer" className={it.arch ? "pcard-link pw-link" : "pcard-link"}>
-                    {it.arch ? (
-                      /* 그림이 있는 장면 — 껍데기 없이 왼쪽 아키텍처, 오른쪽 관점별 이야기만 */
+                {c.items.map((it) =>
+                  it.arch ? (
+                    /* 그림과 글만 놓는 장면 — 껍데기도 없고, 눌러도 딴 데로 가지 않는다 */
+                    <span key={it.title} className="pcard-link pw-link">
                       <span className="pwide">
                         <span className="pw-left" data-item>
                           <ArchShot arch={it.arch} />
@@ -527,20 +532,21 @@ export default function ProjectScenes() {
                           <ProblemWindow issues={it.issues ?? []} />
                         </span>
                       </span>
-                    ) : (
-                      <GlowCard customSize pointerSpace="element" glowColor={GLOW[c.num] ?? "blue"} className="pcard">
-                        <>
-                    <span className="pcard-top">
-                      <span className="pl-title">{it.title}</span>
-                      <span className="pl-go" aria-hidden>
-                        ↗
-                      </span>
                     </span>
-                    <span className="pcard-summary">{it.summary}</span>
-                    {/* 짚은 문제가 여럿이면 번호를 붙여 따로 적는다 — 한 덩어리로 뭉치면 읽히지 않는다 */}
-                    {it.issues
-                      ? it.issues.map((iss, k) => <IssueBlock key={iss.tag} iss={iss} k={k} />)
-                      : (
+                  ) : (
+                    <a key={it.title} data-item href={it.repo} target="_blank" rel="noopener noreferrer" className="pcard-link">
+                      <GlowCard customSize pointerSpace="element" glowColor={GLOW[c.num] ?? "blue"} className="pcard">
+                        <span className="pcard-top">
+                          <span className="pl-title">{it.title}</span>
+                          <span className="pl-go" aria-hidden>
+                            ↗
+                          </span>
+                        </span>
+                        <span className="pcard-summary">{it.summary}</span>
+                        {/* 짚은 문제가 여럿이면 번호를 붙여 따로 적는다 — 한 덩어리로 뭉치면 읽히지 않는다 */}
+                        {it.issues ? (
+                          it.issues.map((iss, k) => <IssueBlock key={iss.tag} iss={iss} k={k} />)
+                        ) : (
                           <>
                             <span className="pcard-block">
                               <b className="pb-problem">문제</b>
@@ -552,12 +558,11 @@ export default function ProjectScenes() {
                             </span>
                           </>
                         )}
-                    <CardStatus status={it.status} />
-                        </>
+                        <CardStatus status={it.status} />
                       </GlowCard>
-                    )}
-                  </a>
-                ))}
+                    </a>
+                  ),
+                )}
               </div>
             </div>
           </section>

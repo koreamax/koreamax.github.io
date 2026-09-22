@@ -324,7 +324,8 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 
 /* ───────────── 온 더 스크린 · 고정 무대 ─────────────
    1440 × 860 고정 캔버스에 그린 뒤 배율만 맞춰, 화면 크기가 달라도 같은 구성으로 보이게 한다. */
-.pstage-track { position: relative; }
+/* 위 PROJECTS 구역과 맞붙어 있으면 둘이 서로를 밀어낸다 — 한 숨 띄운다 */
+.pstage-track { position: relative; margin-top: 104px; }
 .pstage { position: sticky; top: 0; height: calc(var(--vh) * 100); overflow: hidden; background: #111111; border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); }
 /* 크기는 project-scenes.tsx 의 CANVAS_W · CANVAS_H 와 같아야 한다 */
 .pstage-canvas { position: absolute; left: 50%; top: 50%; width: 1440px; height: 860px; margin-left: -720px; margin-top: -430px; transform: scale(var(--ps, 1)); transform-origin: 50% 50%; }
