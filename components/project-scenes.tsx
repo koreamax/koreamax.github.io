@@ -83,7 +83,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
     push(
       "is-comment",
       null,
-      <SpecialText inView once speed={40} delay={CODE_HOLD + 0.1 * step++}>
+      <SpecialText inView once speed={40} delay={CODE_HOLD + 0.26 * step++}>
         {`// ${g.lens}`}
       </SpecialText>,
     );
@@ -91,7 +91,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
       push(
         "is-tag",
         <em className="pw-idx">[{String(k + 1).padStart(2, "0")}]</em>,
-        <SpecialText inView once speed={34} delay={CODE_HOLD + 0.1 * step++}>
+        <SpecialText inView once speed={34} delay={CODE_HOLD + 0.26 * step++}>
           {iss.tag}
         </SpecialText>,
       );
@@ -102,7 +102,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
           <em className="pw-sign">-</em>
           <em className="pw-key">문제</em>
         </>,
-        <CodeReveal text={iss.problem} code={iss.problemCode} delay={CODE_HOLD + 0.1 * step++} />,
+        <CodeReveal text={iss.problem} code={iss.problemCode} delay={CODE_HOLD + 0.26 * step++} />,
       );
       push(
         "is-add",
@@ -110,7 +110,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
           <em className="pw-sign">+</em>
           <em className="pw-key">해결</em>
         </>,
-        <CodeReveal text={iss.solution} code={iss.solutionCode} delay={CODE_HOLD + 0.1 * step++} />,
+        <CodeReveal text={iss.solution} code={iss.solutionCode} delay={CODE_HOLD + 0.26 * step++} />,
       );
       if (k < g.issues.length - 1) push("", null, null);
     });
@@ -170,33 +170,23 @@ function groupByLens(issues: CategoryIssue[]) {
   return out;
 }
 
-/** 구조도 한 장. 창틀에 얹어야 흰 바탕이 검은 화면 위에서 겉돌지 않는다 */
+/** 구조도 한 장. 그림 자체가 한 장의 도면이라 창틀을 씌우지 않는다 */
 function ArchShot({ arch }: { arch: NonNullable<CategoryItem["arch"]> }) {
   const [failed, setFailed] = useState(false);
-  return (
-    <span className="pw-term">
-      <span className="pw-term-bar" aria-hidden>
-        <i className="pw-term-dot" />
-        <i className="pw-term-dot" />
-        <i className="pw-term-dot" />
-        <b>{arch.label}</b>
-      </span>
-      {failed ? (
-        <span className="pw-term-ph">architecture</span>
-      ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          className="pw-term-img"
-          src={arch.src}
-          alt={arch.caption}
-          /* 하이드레이션 전에 이미 실패한 그림은 onError 가 오지 않는다 */
-          ref={(el) => {
-            if (el?.complete && el.naturalWidth === 0) setFailed(true);
-          }}
-          onError={() => setFailed(true)}
-        />
-      )}
-    </span>
+  return failed ? (
+    <span className="pw-arch pw-arch-ph">architecture</span>
+  ) : (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      className="pw-arch"
+      src={arch.src}
+      alt={arch.caption}
+      /* 하이드레이션 전에 이미 실패한 그림은 onError 가 오지 않는다 */
+      ref={(el) => {
+        if (el?.complete && el.naturalWidth === 0) setFailed(true);
+      }}
+      onError={() => setFailed(true)}
+    />
   );
 }
 
@@ -242,7 +232,7 @@ function CodeReveal({ text, code, delay = 0 }: { text: string; code?: string; de
       return;
     }
 
-    const DUR = 1000 + chars.length * 12;
+    const DUR = 800 + chars.length * 9;
     const EDGE = 5; // 앞머리 몇 칸은 아직 굳지 않은 채 깜빡인다
     let raf = 0;
     let t0 = 0;
@@ -431,17 +421,19 @@ export default function ProjectScenes() {
         tl.to(a.bg, { x: 190, scale: 1.25, opacity: 0, duration: 0.3, ease: "power1.inOut" }, P(0.34));
 
         if (i === 0) {
-          /* 좌우로 갈라지며 뒤로 물러난다 */
+          /* 좌우로 갈라지며 뒤로 물러난다.
+             이 장면은 큰 판 두 장뿐이라 카드 넉 장과 같은 거리로 밀면 거의 안 움직여 보인다 */
+          const big = cur.querySelector(".pwide") ? 2.1 : 1;
           tl.to(
             a.cards,
             {
-              x: (idx) => (idx % 2 ? 230 : -230),
-              y: (idx) => (idx % 2 ? 54 : -46),
-              rotate: (idx) => (idx % 2 ? 5 : -5),
-              scale: 0.82,
+              x: (idx) => (idx % 2 ? 230 : -230) * big,
+              y: (idx) => (idx % 2 ? 54 : -46) * big,
+              rotate: (idx) => (idx % 2 ? 5 : -5) * big,
+              scale: big > 1 ? 0.64 : 0.82,
               opacity: 0,
               duration: 0.24,
-              stagger: 0.025,
+              stagger: big > 1 ? 0.07 : 0.025,
               ease: "power2.in",
             },
             P(0.38),
@@ -524,7 +516,7 @@ export default function ProjectScenes() {
 
               <div className="pscene-row" style={{ ["--n" as string]: c.items.length }}>
                 {c.items.map((it) => (
-                  <a key={it.title} data-item={it.arch ? undefined : ""} href={it.repo} target="_blank" rel="noopener noreferrer" className="pcard-link">
+                  <a key={it.title} data-item={it.arch ? undefined : ""} href={it.repo} target="_blank" rel="noopener noreferrer" className={it.arch ? "pcard-link pw-link" : "pcard-link"}>
                     {it.arch ? (
                       /* 그림이 있는 장면 — 껍데기 없이 왼쪽 아키텍처, 오른쪽 관점별 이야기만 */
                       <span className="pwide">

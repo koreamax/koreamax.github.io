@@ -518,35 +518,22 @@ html { overflow-x: clip; }
 
 /* ───────── 아키텍처 그림을 낀 장면 ─────────
    그림 한 장이 장면을 통째로 쓰므로 왼쪽에 구조, 오른쪽에 관점별 이야기로 가른다. */
-.pwide { display: grid; grid-template-columns: 600px minmax(0, 1fr); gap: 40px; align-items: center; height: 100%; }
+.pwide { display: grid; grid-template-columns: 520px minmax(0, 1fr); gap: 34px; align-items: center; height: 100%; }
+/* 이 장면은 그림과 글 두 판이 전부라 카드 여백이 필요 없다 — 그만큼 판을 키운다 */
+.pcard-link.pw-link { padding: 0; }
+.pscene-inner:has(.pwide) { gap: 16px; }
 .pw-left { display: flex; flex-direction: column; justify-content: center; }
 .pw-right { display: flex; min-width: 0; }
 
-/* 구조도는 터미널 한 장에 글자로 찍는다 — 창틀, 제목 줄, 본문 */
-.pw-term {
-  display: block; border-radius: 10px; overflow: hidden;
-  background: #0b0d10; border: 1px solid rgba(255,255,255,0.1);
+/* 구조도는 그림 한 장뿐 — 흰 바탕이라 가장자리만 둥글게 다듬는다 */
+.pw-arch {
+  display: block; width: 100%; height: auto;
+  border-radius: 10px; background: #ffffff;
   box-shadow: 0 18px 44px rgba(0,0,0,0.45);
 }
-.pw-term-bar {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 12px; background: rgba(255,255,255,0.045);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-}
-.pw-term-dot { width: 9px; height: 9px; border-radius: 9999px; background: rgba(255,255,255,0.16); }
-.pw-term-dot:first-child { background: #ff5f57; }
-.pw-term-dot:nth-child(2) { background: #febc2e; }
-.pw-term-dot:nth-child(3) { background: #28c840; }
-.pw-term-bar b {
-  margin-left: 8px; font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.3px; color: rgba(255,255,255,0.4);
-}
-/* draw.io 그림은 흰 바탕이라 밝은 판을 깔아 두고 폭을 꽉 채운다 */
-.pw-term-img { display: block; width: 100%; height: auto; background: #ffffff; }
-/* 그림이 아직 없을 때 — 들어올 자리를 그림과 똑같은 비율로 비워 둔다.
-   파일을 넣으면 이 자리에 그대로 들어차므로 배치가 흔들리지 않는다. */
-.pw-term-ph {
-  display: flex; align-items: center; justify-content: center; aspect-ratio: 1532 / 602;
+/* 그림이 없을 때만 — 자리를 같은 비율로 지킨다 */
+.pw-arch-ph {
+  display: flex; align-items: center; justify-content: center; aspect-ratio: 1521 / 602;
   background:
     repeating-linear-gradient(-45deg, rgba(255,255,255,0.022) 0 10px, transparent 10px 20px),
     rgba(255,255,255,0.015);
@@ -576,14 +563,14 @@ html { overflow-x: clip; }
 .pw-ed-tabs { display: flex; background: var(--vs-bar); }
 .pw-ed-tab {
   display: flex; align-items: center; gap: 7px;
-  padding: 7px 16px 7px 13px; font-size: 11px; letter-spacing: 0.2px;
+  padding: 8px 18px 8px 14px; font-size: 12px; letter-spacing: 0.2px;
   color: rgba(255,255,255,0.45); border-right: 1px solid rgba(0,0,0,0.4);
 }
 .pw-ed-tab.is-on { background: var(--vs-bg); color: rgba(255,255,255,0.85); box-shadow: inset 0 1px 0 var(--cat); }
 .pw-ed-dot { width: 7px; height: 7px; border-radius: 9999px; background: var(--vs-fn); }
 
 /* 코드 — 한 줄이 거터 + 본문 두 칸이다. 본문이 접혀도 번호는 맨 윗줄에 남는다 */
-.pw-ed-code { display: grid; grid-template-columns: auto auto minmax(0, 1fr); padding: 7px 0 8px; font-size: 11px; line-height: 1.56; }
+.pw-ed-code { display: grid; grid-template-columns: auto auto minmax(0, 1fr); padding: 7px 0 8px; font-size: 13px; line-height: 1.54; }
 .pw-row { display: contents; }
 .pw-gutter { padding: 0 12px 0 14px; text-align: right; font-weight: 400; color: var(--vs-gutter); font-variant-numeric: tabular-nums; }
 .pw-pre { padding-right: 9px; font-weight: 400; white-space: nowrap; }
@@ -611,7 +598,7 @@ html { overflow-x: clip; }
   display: flex; align-items: center; gap: 18px; margin-top: auto;
   padding: 7px 14px; background: var(--vs-bar); border-top: 1px solid rgba(0,0,0,0.45);
 }
-.pw-ed-panel b { font-size: 9.5px; font-weight: 600; letter-spacing: 1.3px; color: rgba(255,255,255,0.32); }
+.pw-ed-panel b { font-size: 10.5px; font-weight: 600; letter-spacing: 1.3px; color: rgba(255,255,255,0.32); }
 .pw-ed-panel b.is-on { color: rgba(255,255,255,0.72); box-shadow: 0 6px 0 -5px var(--cat); }
 
 /* 폴백(모바일·감속 모드)에서는 위아래로 흐른다 */

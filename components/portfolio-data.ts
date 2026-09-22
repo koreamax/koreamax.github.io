@@ -385,8 +385,6 @@ export interface CategoryItem {
   arch?: {
     /** 구조도 그림 */
     src: string;
-    /** 창 제목 줄 */
-    label: string;
     /** 그림을 못 보는 사람을 위한 한 줄 */
     caption: string;
   };
@@ -414,10 +412,9 @@ export const categories: Category[] = [
         summary:
           "치매 노인을 위한 말벗 챗봇. React Native 앱이 ALB를 지나 Spring Boot에 닿고, Spring Boot는 gRPC로 EKS 위의 AI 서비스(오케스트레이터 · RAG · Ollama · STT/TTS · Chroma)를 부른다. 상태를 가진 것만 RDS · Redis · Chroma에 남기고 음성은 S3, 분석 요청은 SQS로 흘린다.",
         arch: {
-          label: "wilson — architecture",
           caption:
             "React Native 앱이 ALB를 지나 EC2의 Spring Boot에 닿고, Spring Boot는 gRPC로 EKS 위의 오케스트레이터 · RAG · Ollama · STT/TTS · Chroma를 부른다. 상태는 RDS와 Redis에, 음성은 S3에, 분석 요청은 SQS에 둔다.",
-          src: "/uploads/wilson-arch.png",
+          src: "/uploads/wilson-arch.webp",
         },
         issues: [
           {
