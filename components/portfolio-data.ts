@@ -579,37 +579,68 @@ export const categories: Category[] = [
   },
   {
     num: "04",
-    name: "Embedded",
+    name: "Embedded & AI",
     color: "#34d399",
-    stack: ["C/C++", "Raspberry Pi", "NVIDIA Jetson", "ROS2", "LiDAR"],
+    stack: ["NVIDIA Jetson", "YOLO", "Optical Flow", "VLM", "TTS", "C/C++"],
     items: [
       {
-        title: "Goliath Crane",
-        summary: "한화오션 골리앗 크레인용 LiDAR 상황 인식 시스템",
-        problem:
-          "크레인 아래 작업자와 장애물을 카메라만으로 보면 거리와 높이를 정확히 잡지 못했고, 역광이나 야간에는 인식 자체가 흔들렸다.",
-        solution:
-          "LiDAR 포인트 클라우드를 받아 거리 기반으로 인식하도록 바꾸고, 지면을 걷어낸 뒤 남은 점들을 묶어 작업자와 장애물을 분리했다. 센서 수집, 인지, 경보를 ROS2 노드로 나눠 한 단계가 밀려도 다른 단계가 멈추지 않게 했다.",
-        repo: "https://github.com/koreamax/Hanhwa-Ocean-Goliath-Crane",
-        status: "진행 중",
-      },
-      {
-        title: "JeokjaeJeokso",
-        summary: "트럭 적재물을 측정해 디지털 트윈으로 보여주는 장치",
-        problem:
-          "센서 수집과 적재물 계산, 시각화 전송을 보드 한 대에서 모두 처리하자 처리량이 부족해 측정 주기가 들쭉날쭉해졌다.",
-        solution:
-          "라즈베리파이 5 두 대로 역할을 나눠 한 대는 센서 수집과 적재물 계산만, 다른 한 대는 통신과 디지털 트윈 전송을 맡게 했다. 두 보드는 네트워크로 메시지를 주고받게 해서 시각화가 밀려도 측정 주기는 일정하게 유지되도록 했다.",
-        repo: "https://github.com/koreamax/2026ESWContest_mobility_JeokjaeJeokso",
-        status: "진행 중",
-      },
-      {
         title: "VIAssist",
-        summary: "Jetson Orin Nano Super 한 대로 돌아가는 보행 보조 웨어러블",
-        problem:
-          "몸에 걸치는 장치라 전력과 발열에 여유가 없는데, 검출과 흐름 추정, 언어 모델, 음성 합성을 한 보드에 모두 올려야 했다.",
-        solution:
-          "Jetson Orin Nano Super를 기준으로 전력 모드와 클럭을 맞추고, 카메라 입력부터 음성 출력까지를 보드 한 대 안에서 끝내는 파이프라인으로 구성했다. 처리 주기를 상황에 따라 조절해 발열이 올라가도 안내가 끊기지 않게 했다.",
+        summary:
+          "시각장애인 보행 보조 웨어러블. 카메라 입력부터 음성 안내까지 Jetson Orin Nano Super 한 대 안에서 끝난다 — 검출, 흐름 추정, 장면 해석, 음성 합성이 모두 보드 위에 올라간다.",
+        arch: {
+          src: "/uploads/viassist-arch.webp",
+          caption: "착용 장치와 보행 안내 화면 — 직접 찍은 네 장",
+        },
+        issues: [
+          {
+            lens: "임베디드",
+            tag: "다 올리니 보드가 먼저 뜨거워짐",
+            problem:
+              "몸에 걸치는 장치라 전력과 발열에 여유가 없는데 검출·흐름 추정·언어 모델·음성 합성을 한 보드에 다 올려, 오래 걸으면 온도가 올라가며 클럭이 내려가 안내가 끊김",
+            problemCode:
+              "while True: detect(frame) ; flow(frame) ; describe(frame) ; speak(text)   # every stage runs at camera rate, the board throttles about ten minutes into a walk",
+            solution:
+              "전력 모드와 클럭을 보드에 맞춰 잡고 처리 주기를 상황에 따라 늦추도록 해, 온도가 올라가도 안내가 끊기지 않게 정리함",
+            solutionCode:
+              "budget = thermal_budget(read_temp()) ; run_at(detect, 15) ; run_at(describe, budget)   # the heavy stages back off first, the guidance never stops",
+          },
+          {
+            lens: "임베디드",
+            tag: "안내가 늘 한 박자 늦음",
+            problem:
+              "카메라 한 장을 받아 모든 단계를 끝낸 뒤에야 다음 장을 받아, 가장 느린 단계가 전체 주기를 정하고 그만큼 안내가 실제 상황보다 늦게 나옴",
+            problemCode:
+              "frame = cam.read() ; boxes = detect(frame) ; text = describe(frame, boxes) ; speak(text)   # one lane: the slowest stage sets the pace for everything",
+            solution:
+              "단계를 갈라 각자 자기 속도로 돌게 하고 사이를 최신 한 장만 남는 버퍼로 이어, 느린 단계가 빠른 단계를 붙잡지 않도록 바꿈",
+            solutionCode:
+              "cam >> Latest(1) >> detect >> Latest(1) >> describe >> speak   # each stage keeps its own rate, a slow describe drops stale frames instead of queueing them",
+          },
+          {
+            lens: "AI",
+            tag: "본 것을 다 읽어 주던 안내",
+            problem:
+              "검출된 물체를 보이는 대로 다 말해, 걷는 사람에게 정작 중요한 앞을 막은 것과 그냥 지나가는 것이 같은 무게로 들려 판단이 늦어짐",
+            problemCode:
+              'speak(", ".join(labels))   # "person, bicycle, pole, sign, car, tree" — everything in view, in whatever order the detector returned it',
+            solution:
+              "진행 방향과 거리로 걸림이 되는 것만 남기고 가까운 것부터 읽도록 바꿔, 한 마디로 무엇을 피해야 하는지 알 수 있게 정리함",
+            solutionCode:
+              "blocking = [o for o in objs if in_path(o, heading) and o.dist < 4.0] ; speak(nearest_first(blocking))   # only what is actually in the way, closest first",
+          },
+          {
+            lens: "AI",
+            tag: "멈춰 있는 것과 다가오는 것을 못 가름",
+            problem:
+              "한 장씩만 보고 판단해 세워 둔 자전거와 다가오는 자전거가 똑같이 들리고, 정작 비켜야 할 때와 그냥 지나가도 될 때를 구분해 주지 못함",
+            problemCode:
+              "label = detect(frame)   # a single still frame cannot tell a parked bicycle from one closing on you at walking speed",
+            solution:
+              "장면 흐름을 함께 읽어 물체가 다가오는지 멀어지는지 가려내고 다가오는 것만 먼저 알리도록 해, 비켜야 할 순간에만 말이 나오게 함",
+            solutionCode:
+              "v = flow_toward(prev, frame, box) ; if v > CLOSING: warn(label, ttc(v, dist))   # motion decides whether it is worth saying at all",
+          },
+        ],
         repo: "https://github.com/koreamax/VIAssist_Total",
         status: "종료",
       },

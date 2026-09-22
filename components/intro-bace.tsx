@@ -161,7 +161,8 @@ export default function IntroBace() {
         gsap.set(el, { x: dx, y: dy, scale, transformOrigin: "50% 50%", opacity: 1, color: "#ffffff", textShadow: "0 0 0 rgba(218,41,28,0)" });
         if (rest) gsap.set(rest, { opacity: 0, x: -12 });
 
-        const t = gsap.timeline({ delay: i * 0.075 });
+        /* 다섯 글자를 같이 보낸다 — 하나씩 늦게 떠나면 같은 순간에 크기가 제각각이라 줄이 비뚤어 보인다 */
+        const t = gsap.timeline();
         t.to(el, { x: 0, y: 0, scale: 1, duration: 1.15, ease: "power2.inOut", clearProps: "transform,transformOrigin" });
         // 아직 날아오는 중에 색이 물들고 단어가 이어진다 — 멈춤 없이 한 흐름
         t.to(el, { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.7, ease: "power1.out", clearProps: "color,textShadow" }, 0.55);
