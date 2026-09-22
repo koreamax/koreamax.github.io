@@ -43,6 +43,14 @@ function revealHero(fast: boolean) {
   if (portrait) gsap.to(portrait, { scale: 1, duration: fast ? 0.6 : 0.9, ease: "power3.out", clearProps: "transform" });
 }
 
+/** 글자가 실제로 놓인 자리 — 상자의 여백을 걷어낸다 */
+function ink(el: HTMLElement): DOMRect {
+  const r = document.createRange();
+  r.selectNodeContents(el);
+  const b = r.getBoundingClientRect();
+  return b.width && b.height ? b : el.getBoundingClientRect();
+}
+
 export default function IntroBace() {
   const [show, setShow] = useState(true);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -125,8 +133,12 @@ export default function IntroBace() {
       const pairs = words
         .map((w) => ({ w, h: heroIni.find((e) => e.dataset.flipId === w.dataset.flipId) || null }))
         .filter((p): p is { w: HTMLElement; h: HTMLElement } => Boolean(p.h));
-      const from = pairs.map((p) => p.w.getBoundingClientRect());
-      const to = pairs.map((p) => p.h.getBoundingClientRect());
+      /* 상자가 아니라 글자 자체를 재야 한 줄로 선다.
+         제자리 글자(.bace-ini)는 min-width 로 상자가 글자보다 넓고 line-height 도 달라서,
+         상자 중심끼리 맞추면 글자마다 다른 만큼 어긋나 비뚤어져 보인다. */
+      const from = pairs.map((p) => ink(p.w));
+      const to = pairs.map((p) => ink(p.h));
+      const toBox = pairs.map((p) => p.h.getBoundingClientRect());
       gsap.set(words, { display: "none" });
       if (dot) gsap.to(dot, { opacity: 0, scale: 0.86, duration: 0.55, ease: "power2.in" });
       // 막대는 글자가 이동하는 동안 계속 자라다가 풀네임이 다 나오면 멈춘다
@@ -137,9 +149,14 @@ export default function IntroBace() {
         const b = to[i];
         if (!a || !b || !b.height) return;
         const rest = el.parentElement?.querySelector<HTMLElement>(".bace-rest") || null;
-        const scale = a.height / b.height;
-        const dx = a.left + a.width / 2 - (b.left + b.width / 2);
-        const dy = a.top + a.height / 2 - (b.top + b.height / 2);
+        /* 폭은 line-height 에 흔들리지 않는다 — 글자 폭끼리 맞춘다 */
+        const scale = a.width / b.width;
+        /* 확대는 상자 중심을 축으로 도니, 글자 중심이 제자리에 오도록 그만큼 빼 준다 */
+        const box = toBox[i];
+        const cx = box.left + box.width / 2;
+        const cy = box.top + box.height / 2;
+        const dx = a.left + a.width / 2 - cx - scale * (b.left + b.width / 2 - cx);
+        const dy = a.top + a.height / 2 - cy - scale * (b.top + b.height / 2 - cy);
 
         gsap.set(el, { x: dx, y: dy, scale, transformOrigin: "50% 50%", opacity: 1, color: "#ffffff", textShadow: "0 0 0 rgba(218,41,28,0)" });
         if (rest) gsap.set(rest, { opacity: 0, x: -12 });

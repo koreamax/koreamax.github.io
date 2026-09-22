@@ -66,14 +66,8 @@ const span = (len: number) => 160 + len * 4.6;
 
 function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
   const groups = groupByLens(issues);
-  /* 앞 줄이 다 앉은 뒤에 다음 줄이 시작한다 — 한꺼번에 바뀌면 눈 둘 곳이 없다 */
-  let at = CODE_HOLD * 1000;
-  const slot = (len: number) => {
-    const ms = span(len);
-    const start = at;
-    at += ms;
-    return { delay: start / 1000, dur: ms };
-  };
+  /* 한 줄씩 차례로 넘기면 눈이 따라다니느라 정신없다 — 파일 전체가 한 번에 넘어간다 */
+  const slot = (len: number) => ({ delay: CODE_HOLD, dur: span(len) });
   let ln = 0; // 빈 줄도 번호를 먹는다 — 에디터가 그렇다
   const rows: ReactNode[] = [];
   /* 한 줄은 번호 · 접두 · 본문 세 칸이다. 본문이 접혀도 접두 자리는 비어 있어 글머리가 맞는다 */
