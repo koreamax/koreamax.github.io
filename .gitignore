@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 코리도 화면 원본(칸 비율로 여백을 다시 잡을 때만 필요)
+public/uploads/_orig/
