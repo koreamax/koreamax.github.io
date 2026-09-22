@@ -86,13 +86,6 @@ function Panel({ item, flow, cols, rows, delay }: { item: Strength; flow: Flow; 
           <h3 className="st-title">{item.title}</h3>
         </span>
         <p className="st-lead">{item.lead}</p>
-        <span className="st-tags">
-          {item.tags.map((t) => (
-            <b className="st-tag" key={t}>
-              {t}
-            </b>
-          ))}
-        </span>
       </span>
     </article>
   );
@@ -123,21 +116,11 @@ export default function Strengths() {
     return () => io.disconnect();
   }, []);
 
-  /* 머리말 아래 띠는 사진이 한 장이라도 들어왔을 때만 깐다 — 빈 칸만 흐르면 허전하다 */
+  /* 구간을 여는 띠는 사진이 한 장이라도 들어왔을 때만 깐다 — 빈 칸만 흐르면 허전하다 */
   const strip = strengths.flatMap((s) => s.shots);
 
   return (
-    <section id="how" ref={rootRef} className="st-sec">
-      <div className="st-head">
-        <span className="st-eyebrow">How I work</span>
-        <h2 className="st-h2">
-          남기고,
-          <br />
-          전합니다
-        </h2>
-        <p className="st-sub">코드는 언젠가 지워집니다. 적어 둔 문서와 전해 둔 말, 그리고 끊기지 않고 쌓인 시간은 남습니다.</p>
-      </div>
-
+    <section id="how" ref={rootRef} className={`st-sec ${strip.length > 0 ? "has-strip" : ""}`}>
       {strip.length > 0 && (
         <div className="st-strip" aria-hidden>
           <Lane tiles={strip.concat(strip).slice(0, 12)} label="" spin={48} className="st-strip-lane" />
