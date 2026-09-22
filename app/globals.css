@@ -616,3 +616,10 @@ html { overflow-x: clip; }
 
 /* 폴백(모바일·감속 모드)에서는 위아래로 흐른다 */
 .pstage.pstage-flow .pwide { grid-template-columns: 1fr; gap: 20px; height: auto; }
+
+/* 코드가 글로 바뀌는 자리 — 완성된 글을 안 보이게 깔아 칸을 먼저 잡는다.
+   그래야 코드가 깔려 있는 동안에도, 바뀌는 중에도 줄바꿈이 한 번도 안 흔들린다. */
+.cr { position: relative; display: block; overflow: hidden; }
+.cr-size { visibility: hidden; }
+/* 코드는 띄어쓰기에서 접히려 해 줄이 하나 늘어난다 — 한글처럼 아무 데서나 접게 둔다 */
+.cr-live { position: absolute; inset: 0; word-break: break-all; }

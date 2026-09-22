@@ -60,6 +60,9 @@ function CardStatus({ status }: { status: string }) {
 }
 
 /** 문제·해결이 담긴 에디터 창 — 왼쪽 구조도와 같은 창틀을 쓴다 */
+/* 들어오자마자 바뀌면 코드가 깔려 있었다는 걸 못 본다 — 잠깐 그대로 둔다 */
+const CODE_HOLD = 0.55;
+
 function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
   const groups = groupByLens(issues);
   let step = 0; // 글이 위에서 아래로 차례로 앉도록 순번을 센다
@@ -80,7 +83,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
     push(
       "is-comment",
       null,
-      <SpecialText inView once speed={22} delay={0.06 * step++}>
+      <SpecialText inView once speed={40} delay={CODE_HOLD + 0.1 * step++}>
         {`// ${g.lens}`}
       </SpecialText>,
     );
@@ -88,7 +91,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
       push(
         "is-tag",
         <em className="pw-idx">[{String(k + 1).padStart(2, "0")}]</em>,
-        <SpecialText inView once speed={18} delay={0.06 * step++}>
+        <SpecialText inView once speed={34} delay={CODE_HOLD + 0.1 * step++}>
           {iss.tag}
         </SpecialText>,
       );
@@ -99,7 +102,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
           <em className="pw-sign">-</em>
           <em className="pw-key">문제</em>
         </>,
-        <CodeReveal text={iss.problem} delay={0.06 * step++} />,
+        <CodeReveal text={iss.problem} code={iss.problemCode} delay={CODE_HOLD + 0.1 * step++} />,
       );
       push(
         "is-add",
@@ -107,7 +110,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
           <em className="pw-sign">+</em>
           <em className="pw-key">해결</em>
         </>,
-        <CodeReveal text={iss.solution} delay={0.06 * step++} />,
+        <CodeReveal text={iss.solution} code={iss.solutionCode} delay={CODE_HOLD + 0.1 * step++} />,
       );
       if (k < g.issues.length - 1) push("", null, null);
     });
@@ -202,41 +205,71 @@ const NARROW = "_!X$0-+*#";
 const WIDE = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ";
 const pick = (wide: boolean) => (wide ? WIDE : NARROW)[(Math.random() * (wide ? WIDE.length : NARROW.length)) | 0];
 
-/** 문단이 코드처럼 쏟아졌다가 글로 앉는다 — 긴 글은 React state 대신 rAF 로 굴린다 */
-function CodeReveal({ text, delay = 0, className = "" }: { text: string; delay?: number; className?: string }) {
+/* 한글 한 자가 영문 몇 자 폭인지 — 폰트마다 다르므로 실제로 재서 쓴다.
+   어림잡아 2로 두면 깔아 둔 코드가 설명보다 짧거나 길어져 칸이 안 맞는다. */
+let wideRatio = 0;
+function measureWide(el: HTMLElement) {
+  if (wideRatio) return wideRatio;
+  const cv = document.createElement("canvas").getContext("2d");
+  if (!cv) return (wideRatio = 2);
+  const cs = getComputedStyle(el);
+  cv.font = `${cs.fontSize} ${cs.fontFamily}`;
+  const narrow = cv.measureText("a".repeat(20)).width / 20;
+  const wide = cv.measureText("가".repeat(20)).width / 20;
+  return (wideRatio = narrow > 0 ? wide / narrow : 2);
+}
+
+/**
+ * 깔려 있던 코드가 설명으로 바뀐다.
+ * 앞에서부터 설명이 들어앉고, 아직 안 온 칸은 그대로 코드가 메우고 있다.
+ * 완성된 글을 안 보이게 깔아 자리를 잡아 두므로 바뀌는 내내 줄바꿈이 그대로다.
+ */
+function CodeReveal({ text, code, delay = 0 }: { text: string; code?: string; delay?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const chars = [...text];
+    const r = measureWide(el);
+    const w = chars.map((c) => (c.charCodeAt(0) > 0x1100 ? r : 1));
+    const total = Math.round(w.reduce((a, b) => a + b, 0));
+    /* 코드는 설명과 꼭 같은 폭만큼만 깔린다 */
+    const src = (code ?? "").padEnd(total, " ").slice(0, total);
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       el.textContent = text;
       return;
     }
-    const chars = [...text];
-    /* 글자 폭을 미리 재 두면 흩어진 동안에도 줄바꿈이 그대로 있다 */
-    const wide = chars.map((c) => c.charCodeAt(0) > 0x1100);
-    const DUR = 380 + chars.length * 6;
-    const EDGE = 7; // 앞머리 이만큼은 아직 굳지 않은 채 깜빡인다
+
+    const DUR = 1000 + chars.length * 12;
+    const EDGE = 5; // 앞머리 몇 칸은 아직 굳지 않은 채 깜빡인다
     let raf = 0;
     let t0 = 0;
 
     const frame = (t: number) => {
       if (!t0) t0 = t;
       const p = Math.min(1, (t - t0) / DUR);
-      const set = p * chars.length;
+      const upto = Math.floor(p * chars.length);
       let out = "";
-      for (let i = 0; i < chars.length; i++) {
-        if (chars[i] === " " || i < set - EDGE) out += chars[i];
-        else out += pick(wide[i]);
+      let used = 0;
+      let i = 0;
+      for (; i < upto; i++) {
+        out += chars[i];
+        used += w[i];
       }
+      for (let k = 0; k < EDGE && i < chars.length; k++, i++) {
+        out += chars[i] === " " ? " " : pick(w[i] > 1);
+        used += w[i];
+      }
+      out += src.slice(Math.round(used));
       el.textContent = out;
       if (p < 1) raf = requestAnimationFrame(frame);
       else el.textContent = text;
     };
 
-    /* 흩어진 채로 기다린다 — 장면이 눈에 들어와야 앉기 시작한다 */
-    el.textContent = chars.map((c, i) => (c === " " ? c : pick(wide[i]))).join("");
+    /* 장면이 눈에 들어오기 전까지는 코드만 깔려 있다 */
+    el.textContent = src;
     let timer = 0;
     const io = new IntersectionObserver(
       (es) => {
@@ -255,9 +288,15 @@ function CodeReveal({ text, delay = 0, className = "" }: { text: string; delay?:
       window.clearTimeout(timer);
       cancelAnimationFrame(raf);
     };
-  }, [text, delay]);
+  }, [text, code, delay]);
 
-  return <span ref={ref} className={className} />;
+  return (
+    <span className="cr">
+      {/* 완성된 글이 자리를 잡아 준다 — 코드가 깔려 있는 동안에도 칸이 그대로다 */}
+      <span className="cr-size">{text}</span>
+      <span className="cr-live" ref={ref} />
+    </span>
+  );
 }
 
 const SHOW = "inset(0% 0% 0% 0%)";
@@ -475,22 +514,24 @@ export default function ProjectScenes() {
                     {c.name}
                   </h3>
                 </span>
-                <span className="pscene-count" data-count>
-                  {c.items.length} project{c.items.length > 1 ? "s" : ""}
-                </span>
+                {c.items.length > 1 && (
+                  <span className="pscene-count" data-count>
+                    {c.items.length} projects
+                  </span>
+                )}
                 <span className="pscene-rule" data-rule aria-hidden />
               </div>
 
               <div className="pscene-row" style={{ ["--n" as string]: c.items.length }}>
                 {c.items.map((it) => (
-                  <a key={it.title} data-item href={it.repo} target="_blank" rel="noopener noreferrer" className="pcard-link">
+                  <a key={it.title} data-item={it.arch ? undefined : ""} href={it.repo} target="_blank" rel="noopener noreferrer" className="pcard-link">
                     {it.arch ? (
                       /* 그림이 있는 장면 — 껍데기 없이 왼쪽 아키텍처, 오른쪽 관점별 이야기만 */
                       <span className="pwide">
-                        <span className="pw-left">
+                        <span className="pw-left" data-item>
                           <ArchShot arch={it.arch} />
                         </span>
-                        <span className="pw-right">
+                        <span className="pw-right" data-item>
                           <ProblemWindow issues={it.issues ?? []} />
                         </span>
                       </span>

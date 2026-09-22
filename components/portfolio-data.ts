@@ -367,6 +367,9 @@ export interface CategoryIssue {
   problem: string;
   /** 어떻게 풀었고 그래서 무엇이 달라졌는지 */
   solution: string;
+  /** 설명이 앉기 전에 깔려 있는 실제 코드 — 이 코드가 설명으로 바뀐다 */
+  problemCode?: string;
+  solutionCode?: string;
 }
 
 export interface CategoryItem {
@@ -420,6 +423,8 @@ export const categories: Category[] = [
           {
             lens: "백엔드",
             tag: "말을 걸면 첫 턴이 실패",
+            problemCode: "ManagedChannel ch = NettyChannelBuilder.forAddress(AI_HOST, 50051).usePlaintext().build();  // keepAlive unset - an idle hop drops the socket and nobody finds out until the next turn",
+            solutionCode: "NettyChannelBuilder.forAddress(AI_HOST, 50051).keepAliveTime(30, SECONDS).keepAliveTimeout(10, SECONDS).keepAliveWithoutCalls(true).idleTimeout(5, MINUTES).usePlaintext().build();",
             problem:
               "Spring Boot와 AI 오케스트레이터를 gRPC 장기 연결로 묶었는데 대화가 뜸한 사이 중간 장비가 유휴 연결을 말없이 끊어, 다음 발화에서야 끊긴 것을 알고 첫 턴이 실패함",
             solution:
@@ -428,6 +433,8 @@ export const categories: Category[] = [
           {
             lens: "백엔드",
             tag: "아침 첫 요청만 터지던 DB",
+            problemCode: "spring.datasource.hikari.max-lifetime=1800000   # rds wait_timeout=600 - the pool keeps sockets the server closed 20 minutes ago and hands one to the first morning request",
+            solutionCode: "spring.datasource.hikari.max-lifetime=540000 ; hikari.keepalive-time=120000 ; hikari.connection-test-query=SELECT 1 ; hikari.validation-timeout=3000 ; hikari.minimum-idle=2",
             problem:
               "새벽에는 요청이 없어 커넥션 풀의 연결이 오래 놀았는데 RDS가 먼저 그 연결을 닫아, 아침 첫 요청이 이미 죽은 연결을 집어 들고 실패함",
             solution:
@@ -436,6 +443,8 @@ export const categories: Category[] = [
           {
             lens: "클라우드",
             tag: "NAT를 거쳐 나가던 음성",
+            problemCode: "s3.put_object(Bucket=AUDIO, Key=key, Body=wav)  # stt/tts sit in a private subnet, so every clip is billed out through the NAT gateway and pays for the extra hop both ways",
+            solutionCode: "resource \"aws_vpc_endpoint\" \"s3\" { service_name = \"com.amazonaws.ap-northeast-2.s3\" ; vpc_endpoint_type = \"Gateway\" ; route_table_ids = aws_route_table.private[*].id }",
             problem:
               "STT·TTS 파드가 프라이빗 서브넷에 있어 S3에 음성을 넣고 꺼낼 때마다 NAT 게이트웨이를 통과했는데, 한 마디마다 오디오가 오가는 서비스라 사용자가 늘수록 NAT 처리 요금과 구간 지연이 같이 불어남",
             solution:
@@ -444,6 +453,8 @@ export const categories: Category[] = [
           {
             lens: "클라우드",
             tag: "분석이 대답을 붙잡음",
+            problemCode: "dementia = hubert.analyze(wav) ; return Converse(reply=tts(text), risk=dementia)  # the turn cannot return until the analysis finishes, so the elder waits on a model, not on us",
+            solutionCode: "sqs.send_message(QueueUrl=HUBERT_Q, MessageBody=key) ; return Converse(reply=tts(text))  # analysis leaves the dialogue path and lands on the guardian side a moment later",
             problem:
               "치매 의심 신호를 찾는 HuBERT 음성 분석이 대화 응답과 한 요청에 묶여 있어, 분석이 끝나야 답이 나가는 탓에 정작 말벗으로 쓰기 어려운 대기가 생김",
             solution:
