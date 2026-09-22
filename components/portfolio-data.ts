@@ -697,7 +697,14 @@ export const strengths: Strength[] = [
     num: '03',
     title: '꾸준히 이어 온 스터디',
     ph: '스터디 · 근로',
-    shots: [],
+    shots: [
+      '/uploads/ovs-study-cover.webp',
+      '/uploads/os-study-readme.webp',
+      '/uploads/devops-study-weeks.webp',
+      '/uploads/k8s-study-readme.webp',
+      '/uploads/os-study-weeks.webp',
+      '/uploads/coding-test-study.webp',
+    ],
   },
   {
     num: '04',

@@ -20,19 +20,17 @@ import { strengths, type Strength } from "@/components/portfolio-data";
 type Flow = "col" | "deck" | "band";
 
 /** 한 화면에 두 개씩. 앞에서부터 둘씩 끊어 제 결을 준다.
-    lanes·tiles 는 사진이 아직 없을 때 자리만 잡아 둘 크기이자 줄 수의 상한이다. */
-const VIEWS: { flow: Flow; lanes: number; tiles: number }[] = [
-  { flow: "col", lanes: 2, tiles: 4 },
-  { flow: "deck", lanes: 3, tiles: 4 },
-  { flow: "band", lanes: 2, tiles: 5 },
+    lanes·tiles 는 사진이 없을 때 자리만 잡아 둘 크기이자 줄 수의 상한,
+    min 은 한 줄이 칸을 끊김 없이 덮는 데 필요한 최소 장수다. 칸이 클수록 적게 든다. */
+const VIEWS: { flow: Flow; lanes: number; tiles: number; min: number }[] = [
+  { flow: "col", lanes: 2, tiles: 4, min: 3 },
+  { flow: "deck", lanes: 3, tiles: 4, min: 2 },
+  { flow: "band", lanes: 2, tiles: 5, min: 3 },
 ];
 
 /** 줄 하나가 한 바퀴 도는 데 걸리는 시간(초). 읽을 수 있을 만큼 느리게 —
     줄마다 값이 달라야 나란히 움직이지 않는다 */
 const SPIN = [52, 68, 60, 76, 56];
-
-/** 한 줄이 칸을 끊김 없이 덮는 데 필요한 최소 장수 — 이보다 적으면 흐르다 빈 자리가 보인다 */
-const MIN_TILES = 3;
 
 /**
  * 사진을 줄에 나눠 담는다. 한 장은 한 줄에만, 그 줄에 한 번만 들어간다.
@@ -41,13 +39,13 @@ const MIN_TILES = 3;
  * 된다. 줄마다 속도가 달라 언젠가는 나란히 서기까지 한다. 그래서 반대로, 가진 장수에
  * 맞춰 줄 수를 줄인다 — 여섯 장이면 두 줄에 세 장씩이지, 두 줄에 여섯 장씩이 아니다.
  */
-function split(shots: string[], maxLanes: number, empty: number): (string | null)[][] {
+function split(shots: string[], maxLanes: number, empty: number, min: number): (string | null)[][] {
   if (!shots.length) return Array.from({ length: maxLanes }, () => Array.from({ length: empty }, () => null));
-  const lanes = Math.max(1, Math.min(maxLanes, Math.floor(shots.length / MIN_TILES)));
+  const lanes = Math.max(1, Math.min(maxLanes, Math.floor(shots.length / min)));
   const out: string[][] = Array.from({ length: lanes }, () => []);
   shots.forEach((s, i) => out[i % lanes].push(s));
   /* 한 줄을 채울 장수조차 안 되면 그 줄 안에서만 되풀이한다 — 달리 메울 방법이 없다 */
-  return out.map((l) => (l.length >= MIN_TILES ? l : Array.from({ length: MIN_TILES }, (_, i) => l[i % l.length])));
+  return out.map((l) => (l.length >= min ? l : Array.from({ length: min }, (_, i) => l[i % l.length])));
 }
 
 /** 사진 한 장. 파일이 없거나 깨지면 이름만 적힌 자리로 남는다 */
@@ -80,8 +78,8 @@ function Lane({ tiles, label, spin, back }: { tiles: (string | null)[]; label: s
 }
 
 /** 사진이 흐르는 칸. 결에 따라 세로 두 줄 · 누운 판 · 가로 두 줄이 된다 */
-function Shots({ item, flow, lanes, tiles }: { item: Strength; flow: Flow; lanes: number; tiles: number }) {
-  const body = split(item.shots, lanes, tiles).map((t, c) => (
+function Shots({ item, flow, lanes, tiles, min }: { item: Strength; flow: Flow; lanes: number; tiles: number; min: number }) {
+  const body = split(item.shots, lanes, tiles, min).map((t, c) => (
     <Lane key={c} tiles={t} label={item.ph} spin={SPIN[c % SPIN.length]} back={c % 2 === 1} />
   ));
   return (
@@ -92,10 +90,10 @@ function Shots({ item, flow, lanes, tiles }: { item: Strength; flow: Flow; lanes
 }
 
 /** 한 칸 — 사진이 위, 번호와 제목이 아래. 글은 그 한 줄이 전부다 */
-function Panel({ item, flow, lanes, tiles, delay }: { item: Strength; flow: Flow; lanes: number; tiles: number; delay: number }) {
+function Panel({ item, flow, lanes, tiles, min, delay }: { item: Strength; flow: Flow; lanes: number; tiles: number; min: number; delay: number }) {
   return (
     <article className="st-panel" style={{ transitionDelay: `${delay}s` }}>
-      <Shots item={item} flow={flow} lanes={lanes} tiles={tiles} />
+      <Shots item={item} flow={flow} lanes={lanes} tiles={tiles} min={min} />
       <span className="st-top">
         <b className="st-num">{item.num}</b>
         <h3 className="st-title">{item.title}</h3>
@@ -135,7 +133,7 @@ export default function Strengths() {
         {VIEWS.map((v, vi) => (
           <div className="st-view" key={vi}>
             {strengths.slice(vi * 2, vi * 2 + 2).map((item, i) => (
-              <Panel key={item.num} item={item} flow={v.flow} lanes={v.lanes} tiles={v.tiles} delay={i * 0.12} />
+              <Panel key={item.num} item={item} flow={v.flow} lanes={v.lanes} tiles={v.tiles} min={v.min} delay={i * 0.12} />
             ))}
           </div>
         ))}
