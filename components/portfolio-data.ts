@@ -672,6 +672,8 @@ export const strengths: Strength[] = [
       '/uploads/note-esw-schedule.webp',
       '/uploads/note-piuda-meetings.webp',
       '/uploads/note-capstone.webp',
+      '/uploads/note-viassist-progress.webp',
+      '/uploads/note-aws-sbg.webp',
     ],
   },
   {

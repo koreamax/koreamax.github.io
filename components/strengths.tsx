@@ -9,30 +9,45 @@ import { strengths, type Strength } from "@/components/portfolio-data";
  * 한 화면에 두 개씩 세 번. 짝마다 사진이 흐르는 결을 달리해 같은 화면이 세 번
  * 반복되지 않게 한다.
  *  · 01·02 기록      — 세로로 흐르는 두 줄. 문서와 글은 길쭉하게 읽힌다
- *  · 03·04 꾸준함·전달 — 비스듬히 누운 판 위를 다섯 줄이 서로 반대로 흐른다
+ *  · 03·04 꾸준함·전달 — 비스듬히 누운 판 위를 여러 줄이 서로 반대로 흐른다
  *  · 05·06 발표·도구  — 가로로 두 줄이 서로 반대로. 현장 사진은 옆으로 넘겨 보는 결이 맞다
  *
- * 사진이 아직 없으면 자리만 잡아 두고, 넣은 장수가 칸보다 적으면 있는 것을 돌려
- * 가며 채운다. 그래서 한 장만 넣어도 줄이 비지 않는다.
+ * 사진이 아직 없으면 이름만 적힌 자리로 남는다. 넣은 장수에 맞춰 줄 수가 줄어들어,
+ * 같은 사진이 두 줄에 동시에 떠 있는 일은 없다.
  */
 
 /** 사진을 미는 결 — 짝마다 하나씩 */
 type Flow = "col" | "deck" | "band";
 
-/** 한 화면에 두 개씩. 앞에서부터 둘씩 끊어 제 결을 준다. */
-const VIEWS: { flow: Flow; cols: number; rows: number }[] = [
-  { flow: "col", cols: 2, rows: 4 },
-  { flow: "deck", cols: 5, rows: 3 },
-  { flow: "band", cols: 2, rows: 5 },
+/** 한 화면에 두 개씩. 앞에서부터 둘씩 끊어 제 결을 준다.
+    lanes·tiles 는 사진이 아직 없을 때 자리만 잡아 둘 크기이자 줄 수의 상한이다. */
+const VIEWS: { flow: Flow; lanes: number; tiles: number }[] = [
+  { flow: "col", lanes: 2, tiles: 4 },
+  { flow: "deck", lanes: 3, tiles: 4 },
+  { flow: "band", lanes: 2, tiles: 5 },
 ];
 
 /** 줄 하나가 한 바퀴 도는 데 걸리는 시간(초). 줄마다 달라야 같이 움직이지 않는다 */
 const SPIN = [26, 34, 30, 38, 28];
 
-/* 줄 하나에 들어갈 칸. 있는 사진을 돌려 채우고, 없으면 빈 칸으로 자리만 잡아 둔다.
-   줄마다 시작 지점을 어긋나게 잡아야 옆 줄과 같은 사진이 나란히 서지 않는다. */
-const lane = (shots: string[], from: number, n: number) =>
-  Array.from({ length: n }, (_, i) => (shots.length ? shots[(from + i) % shots.length] : null));
+/** 한 줄이 칸을 끊김 없이 덮는 데 필요한 최소 장수 — 이보다 적으면 흐르다 빈 자리가 보인다 */
+const MIN_TILES = 3;
+
+/**
+ * 사진을 줄에 나눠 담는다. 한 장은 한 줄에만, 그 줄에 한 번만 들어간다.
+ *
+ * 줄 수를 고정해 놓고 모자란 만큼 사진을 돌려 채우면 같은 장이 두 줄에 함께 떠 있게
+ * 된다. 줄마다 속도가 달라 언젠가는 나란히 서기까지 한다. 그래서 반대로, 가진 장수에
+ * 맞춰 줄 수를 줄인다 — 여섯 장이면 두 줄에 세 장씩이지, 두 줄에 여섯 장씩이 아니다.
+ */
+function split(shots: string[], maxLanes: number, empty: number): (string | null)[][] {
+  if (!shots.length) return Array.from({ length: maxLanes }, () => Array.from({ length: empty }, () => null));
+  const lanes = Math.max(1, Math.min(maxLanes, Math.floor(shots.length / MIN_TILES)));
+  const out: string[][] = Array.from({ length: lanes }, () => []);
+  shots.forEach((s, i) => out[i % lanes].push(s));
+  /* 한 줄을 채울 장수조차 안 되면 그 줄 안에서만 되풀이한다 — 달리 메울 방법이 없다 */
+  return out.map((l) => (l.length >= MIN_TILES ? l : Array.from({ length: MIN_TILES }, (_, i) => l[i % l.length])));
+}
 
 /** 사진 한 장. 파일이 없거나 깨지면 이름만 적힌 자리로 남는다 */
 function Shot({ src, label }: { src: string | null; label: string }) {
@@ -64,9 +79,9 @@ function Lane({ tiles, label, spin, back }: { tiles: (string | null)[]; label: s
 }
 
 /** 사진이 흐르는 칸. 결에 따라 세로 두 줄 · 누운 판 · 가로 두 줄이 된다 */
-function Shots({ item, flow, cols, rows }: { item: Strength; flow: Flow; cols: number; rows: number }) {
-  const body = Array.from({ length: cols }, (_, c) => (
-    <Lane key={c} tiles={lane(item.shots, c * rows, rows)} label={item.ph} spin={SPIN[c % SPIN.length]} back={c % 2 === 1} />
+function Shots({ item, flow, lanes, tiles }: { item: Strength; flow: Flow; lanes: number; tiles: number }) {
+  const body = split(item.shots, lanes, tiles).map((t, c) => (
+    <Lane key={c} tiles={t} label={item.ph} spin={SPIN[c % SPIN.length]} back={c % 2 === 1} />
   ));
   return (
     <span className={`st-shots is-${flow}`}>
@@ -76,10 +91,10 @@ function Shots({ item, flow, cols, rows }: { item: Strength; flow: Flow; cols: n
 }
 
 /** 한 칸 — 사진이 위, 번호와 제목이 아래. 글은 그 한 줄이 전부다 */
-function Panel({ item, flow, cols, rows, delay }: { item: Strength; flow: Flow; cols: number; rows: number; delay: number }) {
+function Panel({ item, flow, lanes, tiles, delay }: { item: Strength; flow: Flow; lanes: number; tiles: number; delay: number }) {
   return (
     <article className="st-panel" style={{ transitionDelay: `${delay}s` }}>
-      <Shots item={item} flow={flow} cols={cols} rows={rows} />
+      <Shots item={item} flow={flow} lanes={lanes} tiles={tiles} />
       <span className="st-top">
         <b className="st-num">{item.num}</b>
         <h3 className="st-title">{item.title}</h3>
@@ -119,7 +134,7 @@ export default function Strengths() {
         {VIEWS.map((v, vi) => (
           <div className="st-view" key={vi}>
             {strengths.slice(vi * 2, vi * 2 + 2).map((item, i) => (
-              <Panel key={item.num} item={item} flow={v.flow} cols={v.cols} rows={v.rows} delay={i * 0.12} />
+              <Panel key={item.num} item={item} flow={v.flow} lanes={v.lanes} tiles={v.tiles} delay={i * 0.12} />
             ))}
           </div>
         ))}
