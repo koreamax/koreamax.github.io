@@ -77,8 +77,10 @@ export default function IntroBace() {
     document.documentElement.classList.add("intro-lock");
     // 빨간 막대는 처음엔 없다가 글자가 제자리를 잡는 동안 계속 자라난다
     if (rule) gsap.set(rule, { scaleY: 0, transformOrigin: "50% 0%" });
-    // 히어로 요소는 인트로가 걷힐 때 등장하도록 미리 숨겨 둔다 (오버레이 뒤라 보이지 않음)
+    // 히어로 요소는 인트로가 걷힐 때 등장하도록 미리 숨겨 둔다
     gsap.set(heroItems, { opacity: 0, y: 30 });
+    // 제자리에 놓인 ABCDE 와 나머지 글자도 숨긴다. 바꿔치기하는 순간 이것들이 켜진다.
+    gsap.set([...heroIni, ...heroRest], { opacity: 0 });
     const portrait = document.querySelector<HTMLElement>("[data-hero-portrait]");
     if (portrait) gsap.set(portrait, { scale: 0.97 });
 
@@ -111,7 +113,12 @@ export default function IntroBace() {
       0.2,
     );
 
-    // STEP 2 — 가운데 BACE 가 그대로 홈 화면의 제자리로 날아가고 배경이 걷힌다.
+    // 배경은 바꿔치기보다 먼저 걷어 둔다. 글자를 넘겨주는 순간에도 덮개가 남아 있으면
+    // 날아가기 시작한 글자가 그 밑에 가려 한 번 깜빡이는 것처럼 보인다.
+    // 페이지 바탕도 같은 #161616 이라 걷히는 동안 색이 달라지지 않는다.
+    tl.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.45, ease: "power1.inOut" }, 1.45);
+
+    // STEP 2 — 가운데 BACE 가 그대로 홈 화면의 제자리로 날아간다.
     // 글자마다 자기 타임라인을 갖고, 도착하기 전에 자기 단어가 이어 붙기 시작한다.
     tl.add(() => {
       /* 화면에 놓인 순서가 달라도 같은 글자끼리 이어지도록 data-flip-id 로 짝짓는다 */
@@ -143,7 +150,6 @@ export default function IntroBace() {
         t.to(el, { color: "#da291c", textShadow: "0 0 34px rgba(218,41,28,0.5)", duration: 0.7, ease: "power1.out", clearProps: "color,textShadow" }, 0.55);
         if (rest) t.to(rest, { opacity: 1, x: 0, duration: 0.7, ease: "power2.out", clearProps: "all" }, 0.62);
       });
-      gsap.to(overlay, { backgroundColor: "rgba(22,22,22,0)", duration: 0.9, ease: "power1.inOut" });
       gsap.set(overlay, { pointerEvents: "none" });
     }, 1.9);
 

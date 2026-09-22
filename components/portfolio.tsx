@@ -151,7 +151,12 @@ function Contacts() {
 
 /* ───────────────────────── 3D 프로젝트 복도 ───────────────────────── */
 
-const P = { persp: 30, cardH: 25, birth: 2.2, exit: 50, rb: -12, re: 48, fan: 3.3, tb: 6, te: 28, stops: 24 };
+/* 카드를 키우는 배수. 가로세로를 같은 값으로 키워야 화면 비율이 그대로라 잘리지 않는다 */
+const CARD_SCALE = 1.3;
+/* 카드가 커진 만큼 지나가는 길도 벌려야 서로 겹치지 않는다 (rb·re = 레일이 좌우로 벌어지는 폭) */
+const RAIL_SPREAD = 1.46;
+
+const P = { persp: 30, cardH: 25, birth: 2.2, exit: 50, rb: -12 * RAIL_SPREAD, re: 48 * RAIL_SPREAD, fan: 2.75, tb: 6, te: 28, stops: 24 };
 
 function keyframes(dir: 1 | -1, name: string): string {
   let s = "";
@@ -197,8 +202,8 @@ function Corridor() {
           CORRIDOR_RAILS[name].map((card, i, rail) => {
             /* 실제 화면이 있는 카드는 화면 비율에 맞춰 가로로 눕힌다 */
             const shots = card.shots ?? [];
-            const w = card.cardW ?? (shots.length ? 30 : 18);
-            const h = card.cardH ?? (shots.length ? 19 : 25);
+            const w = (card.cardW ?? (shots.length ? 30 : 18)) * CARD_SCALE;
+            const h = (card.cardH ?? (shots.length ? 19 : 25)) * CARD_SCALE;
             return (
               <div
                 key={name + i}
@@ -685,7 +690,7 @@ export default function Portfolio() {
       <nav data-hero-item className="navbar">
         <div className="navpill">
           <a href="#top" className="nav-logo" data-nav="#top" style={{ fontFamily: MONO }}>
-            이민형<span style={{ color: RED }}>.</span>
+            ABCDE<span style={{ color: RED }}>.</span>
           </a>
           {[
             ["#awards", "Awards"],
