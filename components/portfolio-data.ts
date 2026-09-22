@@ -536,7 +536,7 @@ export const categories: Category[] = [
     num: "03",
     name: "AI & Cloud",
     color: "#34d399",
-    stack: ["AWS Lambda", "EC2", "S3", "OpenSearch", "Embedding", "OpenAI"],
+    stack: ["Spring Boot", "AWS Bedrock", "Lambda", "EC2", "RDS", "OpenSearch", "GitHub Actions"],
     items: [
       {
         title: "WalkingCity",
@@ -544,7 +544,8 @@ export const categories: Category[] = [
           "동대문구 주민 취향에 맞는 산책 경로를 추천하고 왜 그 길인지까지 설명하는 서비스. 추천은 따로 떼어 Lambda 에서 돌고, 공공데이터는 임베딩해 검색으로 꺼내 쓴다.",
         arch: {
           src: "/uploads/walk-arch.webp",
-          caption: "취향 입력 · 경로 추천 · 추천 이유 · 지도 화면 — 직접 찍은 네 장",
+          caption:
+            "Spring Boot 는 GitHub Actions 를 거쳐 EC2 위 컨테이너로 올라가고 RDS 를 쓴다. AI 루트추천만 Lambda 가 맡아 Bedrock 에이전트(Claude Sonnet)와 JSON 을 주고받고, 공공데이터는 S3 → OpenSearch 벡터 DB → Titan 임베딩으로 만든 지식 베이스에서 꺼낸다. 날씨는 액션 그룹에 붙인 Lambda 가 따로 가져온다.",
         },
         issues: [
           {
@@ -553,11 +554,23 @@ export const categories: Category[] = [
             problem:
               "추천 한 번에 생성 모델 응답을 수십 초 기다려야 하는데 이를 EC2 위 애플리케이션이 직접 호출해, 기다리는 동안 스레드를 붙잡아 지도·로그인 같은 일반 요청까지 밀림",
             problemCode:
-              "answer = openai.chat(messages, timeout=90)   # the request thread sits on this for the better part of a minute while the map and the login queue up behind it",
+              "answer = bedrock.invoke_model(modelId=CLAUDE, body=prompt)   # the request thread sits on this for the better part of a minute while the map and the login queue up behind it",
             solution:
               "AI 추천만 Lambda 로 떼어 내 요청마다 따로 뜨고 끝나면 사라지게 하고 EC2 는 일반 트래픽만 맡게 해, 추천이 몰려도 나머지 화면이 느려지지 않게 됨",
             solutionCode:
               'lambda_client.invoke(FunctionName="walk-recommend", InvocationType="Event", Payload=body)   # EC2 hands it off and goes back to serving pages',
+          },
+          {
+            lens: "클라우드",
+            tag: "손으로 올리던 배포",
+            problem:
+              "서버에 직접 들어가 받아 빌드하고 띄우다 보니 내 컴퓨터에서 되던 것이 서버에서 안 되는 일이 되풀이되고, 빌드가 도는 동안에는 서비스가 멈춰 있음",
+            problemCode:
+              "ssh ec2 'git pull && ./gradlew build && pkill -f app.jar && nohup java -jar app.jar &'   # the build runs on the box, so its jdk and env decide whether today's deploy works, and the site is down while it does",
+            solution:
+              "GitHub Actions 가 이미지를 미리 구워 두고 EC2 는 컨테이너만 갈아끼우게 바꿔, 어디서 돌려도 같은 환경이 되고 배포가 교체 한 번으로 끝남",
+            solutionCode:
+              "docker build -t app:$SHA . ; docker push $ECR/app:$SHA ; ssh ec2 'docker pull $ECR/app:$SHA && docker run -d app:$SHA && docker rm -f old'   # the image is already built, the box only swaps what is running",
           },
           {
             lens: "AI",
@@ -570,6 +583,18 @@ export const categories: Category[] = [
               "공공데이터를 미리 임베딩해 검색으로 올려 두고 질문과 가까운 몇 건만 프롬프트에 실어, 자료가 늘어도 한 호출에 들어가는 토큰은 그대로이게 만듦",
             solutionCode:
               "hits = opensearch.knn(embed(query), k=5) ; prompt = SYSTEM + render(hits)   # the dataset can grow all it likes, the prompt stays the size of five trails",
+          },
+          {
+            lens: "AI",
+            tag: "그날 날씨를 모르는 추천",
+            problem:
+              "모델은 오늘 날씨를 알 수 없어 비 오는 날에도 강변 코스를 권했는데, 그렇다고 예보를 프롬프트에 미리 실으면 쓰지도 않을 값이 호출마다 따라가고 읽힐 즈음엔 이미 지난 값이 됨",
+            problemCode:
+              'prompt = SYSTEM + trails + f"today: {forecast}"   # the forecast rides along on every call whether the answer needs it or not, and it is already stale by the time the model reads it',
+            solution:
+              "날씨 조회를 Bedrock 에이전트의 액션 그룹에 Lambda 로 붙여, 권하려는 길이 날씨를 타는 경우에만 모델이 그 자리에서 불러 쓰게 함",
+            solutionCode:
+              'actionGroups=[{"name": "weather", "lambda": FORECAST_ARN, "schema": "getForecast(lat, lon)"}]   # the agent reaches for it only when the route it is about to suggest depends on the sky',
           },
         ],
         repo: "https://github.com/koreamax/walk_web",
@@ -710,7 +735,17 @@ export const strengths: Strength[] = [
     num: '04',
     title: '공지와 알림 전달',
     ph: '조교 · 코어 멤버',
-    shots: [],
+    shots: [
+      '/uploads/notice-devconf-poster.webp',
+      '/uploads/notice-asbg-recruit.webp',
+      '/uploads/notice-devconf-post.webp',
+      '/uploads/notice-lunch-start.webp',
+      '/uploads/notice-ai901.webp',
+      '/uploads/notice-course.webp',
+      '/uploads/notice-lunch-last.webp',
+      '/uploads/notice-assignment.webp',
+      '/uploads/notice-devops-recruit.webp',
+    ],
   },
   {
     num: '05',
