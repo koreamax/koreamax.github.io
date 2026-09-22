@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { categories } from "@/components/portfolio-data";
+import { categories, type CategoryItem, type CategoryIssue } from "@/components/portfolio-data";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { designViewport } from "@/components/fixed-canvas";
@@ -55,6 +55,62 @@ function CardStatus({ status }: { status: string }) {
         )}
       </div>
     </div>
+  );
+}
+
+/** 문제·해결 한 짝 */
+function IssueBlock({ iss, k }: { iss: CategoryIssue; k: number }) {
+  return (
+    <span className="pcard-issue">
+      <span className="pcard-issue-head">
+        <b className="pcard-issue-num">{String(k + 1).padStart(2, "0")}</b>
+        <b className="pcard-issue-tag">{iss.tag}</b>
+      </span>
+      <span className="pcard-block">
+        <b className="pb-problem">문제</b>
+        {iss.problem}
+      </span>
+      <span className="pcard-block">
+        <b className="pb-fix">해결</b>
+        {iss.solution}
+      </span>
+    </span>
+  );
+}
+
+/** 같은 관점끼리 묶는다 — 백엔드 이야기와 클라우드 이야기를 섞어 놓으면 읽히지 않는다 */
+function groupByLens(issues: CategoryIssue[]) {
+  const out: { lens: string; issues: CategoryIssue[] }[] = [];
+  for (const iss of issues) {
+    const lens = iss.lens ?? "";
+    const last = out[out.length - 1];
+    if (last && last.lens === lens) last.issues.push(iss);
+    else out.push({ lens, issues: [iss] });
+  }
+  return out;
+}
+
+/** 아키텍처 그림. 파일을 아직 넣지 않았으면 자리만 지킨다 */
+function ArchShot({ arch, title }: { arch: NonNullable<CategoryItem["arch"]>; title: string }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <span className="pw-arch">
+      {failed ? (
+        <span className="pw-arch-ph">{title} 아키텍처</span>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={arch.src}
+          alt={`${title} 아키텍처`}
+          /* 하이드레이션 전에 이미 실패한 그림은 onError 가 오지 않는다 — 붙는 순간 직접 확인한다 */
+          ref={(el) => {
+            if (el?.complete && el.naturalWidth === 0) setFailed(true);
+          }}
+          onError={() => setFailed(true)}
+        />
+      )}
+      <span className="pw-arch-cap">{arch.caption}</span>
+    </span>
   );
 }
 
@@ -274,7 +330,7 @@ export default function ProjectScenes() {
                   </h3>
                 </span>
                 <span className="pscene-count" data-count>
-                  {c.items.length} projects
+                  {c.items.length} project{c.items.length > 1 ? "s" : ""}
                 </span>
                 <span className="pscene-rule" data-rule aria-hidden />
               </div>
@@ -282,7 +338,34 @@ export default function ProjectScenes() {
               <div className="pscene-row" style={{ ["--n" as string]: c.items.length }}>
                 {c.items.map((it) => (
                   <a key={it.title} data-item href={it.repo} target="_blank" rel="noopener noreferrer" className="pcard-link">
-                    <GlowCard customSize pointerSpace="element" glowColor={GLOW[c.num] ?? "blue"} className="pcard">
+                    <GlowCard customSize pointerSpace="element" glowColor={GLOW[c.num] ?? "blue"} className={it.arch ? "pcard pcard-wide" : "pcard"}>
+                      {it.arch ? (
+                        /* 그림이 있는 장면 — 왼쪽에 아키텍처, 오른쪽에 관점별 이야기 */
+                        <>
+                          <span className="pw-left">
+                            <span className="pcard-top">
+                              <span className="pl-title">{it.title}</span>
+                              <span className="pl-go" aria-hidden>
+                                ↗
+                              </span>
+                            </span>
+                            <ArchShot arch={it.arch} title={it.title} />
+                            <span className="pcard-summary pw-summary">{it.summary}</span>
+                            <CardStatus status={it.status} />
+                          </span>
+                          <span className="pw-right">
+                            {groupByLens(it.issues ?? []).map((g) => (
+                              <span className="pw-lens" key={g.lens}>
+                                <b className="pw-lens-name">{g.lens}</b>
+                                {g.issues.map((iss, k) => (
+                                  <IssueBlock key={iss.tag} iss={iss} k={k} />
+                                ))}
+                              </span>
+                            ))}
+                          </span>
+                        </>
+                      ) : (
+                        <>
                     <span className="pcard-top">
                       <span className="pl-title">{it.title}</span>
                       <span className="pl-go" aria-hidden>
@@ -292,22 +375,7 @@ export default function ProjectScenes() {
                     <span className="pcard-summary">{it.summary}</span>
                     {/* 짚은 문제가 여럿이면 번호를 붙여 따로 적는다 — 한 덩어리로 뭉치면 읽히지 않는다 */}
                     {it.issues
-                      ? it.issues.map((iss, k) => (
-                          <span className="pcard-issue" key={iss.tag}>
-                            <span className="pcard-issue-head">
-                              <b className="pcard-issue-num">{String(k + 1).padStart(2, "0")}</b>
-                              <b className="pcard-issue-tag">{iss.tag}</b>
-                            </span>
-                            <span className="pcard-block">
-                              <b className="pb-problem">문제</b>
-                              {iss.problem}
-                            </span>
-                            <span className="pcard-block">
-                              <b className="pb-fix">해결</b>
-                              {iss.solution}
-                            </span>
-                          </span>
-                        ))
+                      ? it.issues.map((iss, k) => <IssueBlock key={iss.tag} iss={iss} k={k} />)
                       : (
                           <>
                             <span className="pcard-block">
@@ -321,6 +389,8 @@ export default function ProjectScenes() {
                           </>
                         )}
                     <CardStatus status={it.status} />
+                        </>
+                      )}
                     </GlowCard>
                   </a>
                 ))}

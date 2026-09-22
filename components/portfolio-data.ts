@@ -359,6 +359,8 @@ export const corridorCards: CorridorCard[] = [
 
 /** 한 프로젝트에서 짚은 문제 하나. 문제와 해결을 짝으로 붙여 둔다. */
 export interface CategoryIssue {
+  /** 어느 관점에서 본 이야기인지 — "백엔드" · "클라우드" 처럼. 같은 값이 이어지면 한 묶음으로 그려진다 */
+  lens?: string;
   /** 무엇에 관한 이야기인지 — 카드에서 번호 옆에 붙는 짧은 제목 */
   tag: string;
   /** 무엇이 왜 문제였는지. 이 프로젝트를 처음 보는 사람도 알아듣게 적는다 */
@@ -376,6 +378,8 @@ export interface CategoryItem {
   solution?: string;
   /** 문제마다 따로 적고 싶을 때. 있으면 problem/solution 대신 이쪽이 그려진다 */
   issues?: CategoryIssue[];
+  /** 아키텍처 그림. 있으면 카드가 장면을 통째로 차지하고 왼쪽 그림 · 오른쪽 글로 놓인다 */
+  arch?: { src: string; caption: string };
   repo: string;
   status: string;
 }
@@ -391,79 +395,60 @@ export interface Category {
 export const categories: Category[] = [
   {
     num: "01",
-    name: "Backend",
+    name: "Backend & Cloud",
     color: "#60a5fa",
-    stack: ["Spring Boot", "FastAPI", "Node.js", "MySQL", "PostgreSQL", "Redis"],
+    stack: ["Spring Boot", "gRPC", "PostgreSQL", "Redis", "AWS", "EKS", "Docker", "GitHub Actions"],
     items: [
       {
-        title: "beautytalk",
-        summary: "시각장애인·저시력 사용자를 위한 메이크업 도우미 API",
-        problem:
-          "얼굴 이미지 업로드와 분석, 추천 생성이 한 요청 안에서 동기로 처리돼 사용자가 몰리면 요청이 줄줄이 밀리고 타임아웃이 났다.",
-        solution:
-          "업로드와 분석을 분리해 분석은 작업 큐로 넘기고 결과만 따로 받아가도록 바꿨다. 이미지 전처리는 백그라운드 워커로 옮겨 API 스레드를 비웠고, 같은 사진에 대한 재분석은 캐시로 건너뛰게 했다.",
-        repo: "https://github.com/koreamax/beautytalk-app",
-        status: "종료",
-      },
-      {
-        title: "Mission Pawss!ble",
-        summary: "반려견 산책으로 도시 위험을 제보하고 지자체와 연결하는 플랫폼",
-        problem:
-          "같은 위험 지점을 여러 사람이 제보해 중복 데이터가 쌓였고, 처리 상태를 동시에 바꾸면 값이 덮어써지는 충돌이 생겼다.",
-        solution:
-          "위경도 근접 제보를 하나의 그룹 키로 묶어 중복을 합치고, 상태 변경에는 버전을 둔 낙관적 잠금을 적용했다. 사진 원본은 오브젝트 스토리지에 두고 데이터베이스에는 참조만 남겨 테이블을 가볍게 유지했다.",
-        repo: "https://github.com/koreamax/TECH4GOOD_OH",
-        status: "종료",
-      },
-      {
         title: "Wilson",
-        summary: "치매 노인을 위한 말벗 챗봇의 서비스 간 통신 설계",
+        summary:
+          "치매 노인을 위한 말벗 챗봇. React Native 앱이 ALB를 지나 Spring Boot에 닿고, Spring Boot는 gRPC로 EKS 위의 AI 서비스(오케스트레이터 · RAG · Ollama · STT/TTS · Chroma)를 부른다. 상태를 가진 것만 RDS · Redis · Chroma에 남기고 음성은 S3, 분석 요청은 SQS로 흘린다.",
+        arch: {
+          src: "/uploads/wilson-arch.png",
+          caption: "React Native → ALB → EC2 Spring Boot → gRPC → EKS (Ollama · RAG · Chroma · STT/TTS) / S3 · SQS · RDS · Redis",
+        },
         issues: [
           {
+            lens: "백엔드",
             tag: "말을 걸면 첫 턴이 실패",
             problem:
-              "백엔드와 AI 서버를 gRPC 장기 연결로 묶었는데 대화가 뜸한 사이 중간 장비가 유휴 연결을 말없이 끊어, 다음 발화에서야 끊긴 것을 알고 첫 턴이 실패함",
+              "Spring Boot와 AI 오케스트레이터를 gRPC 장기 연결로 묶었는데 대화가 뜸한 사이 중간 장비가 유휴 연결을 말없이 끊어, 다음 발화에서야 끊긴 것을 알고 첫 턴이 실패함",
             solution:
               "유휴 구간에도 연결 상태를 확인하도록 gRPC keep-alive ping을 켜고 끊긴 채널은 즉시 다시 맺게 해, 말을 걸었을 때 첫 턴이 실패하는 일이 사라짐",
           },
           {
+            lens: "백엔드",
             tag: "아침 첫 요청만 터지던 DB",
             problem:
-              "새벽에는 요청이 없어 커넥션 풀의 연결이 오래 놀았는데 DB가 먼저 그 연결을 닫아, 아침 첫 요청이 이미 죽은 연결을 집어 들고 실패함",
+              "새벽에는 요청이 없어 커넥션 풀의 연결이 오래 놀았는데 RDS가 먼저 그 연결을 닫아, 아침 첫 요청이 이미 죽은 연결을 집어 들고 실패함",
             solution:
               "풀이 유휴 연결을 주기적으로 확인하게 하고 연결 수명을 DB가 끊는 시간보다 짧게 잡아 미리 교체되도록 해, 아침 첫 요청이 끊기는 일이 없어짐",
           },
+          {
+            lens: "클라우드",
+            tag: "NAT를 거쳐 나가던 음성",
+            problem:
+              "STT·TTS 파드가 프라이빗 서브넷에 있어 S3에 음성을 넣고 꺼낼 때마다 NAT 게이트웨이를 통과했는데, 한 마디마다 오디오가 오가는 서비스라 사용자가 늘수록 NAT 처리 요금과 구간 지연이 같이 불어남",
+            solution:
+              "S3를 VPC 게이트웨이 엔드포인트로 붙여 오디오를 VPC 안에서 바로 주고받게 바꿔, NAT를 타는 구간과 거기서 나오던 전송 비용을 함께 걷어냄",
+          },
+          {
+            lens: "클라우드",
+            tag: "분석이 대답을 붙잡음",
+            problem:
+              "치매 의심 신호를 찾는 HuBERT 음성 분석이 대화 응답과 한 요청에 묶여 있어, 분석이 끝나야 답이 나가는 탓에 정작 말벗으로 쓰기 어려운 대기가 생김",
+            solution:
+              "분석을 SQS로 떼어 내 대화 흐름 밖에서 처리하고 결과는 뒤따라 보호자 쪽에 쌓이게 해, 응답은 바로 나가면서 분석은 빠짐없이 남는 구조로 정리함",
+          },
         ],
         repo: "https://github.com/koreamax/wilson_chatbot",
-        status: "종료",
-      },
-      {
-        title: "Seagnal",
-        summary: "해양 환경 정화 활동을 모으는 통합 ICT 플랫폼",
-        issues: [
-          {
-            tag: "지도 한 번에 쿼리 수천 번",
-            problem:
-              "핀 목록을 불러온 뒤 핀마다 후기를, 후기마다 사진을 다시 조회하는 구조여서, 핀 200개 기준 한 화면에 쿼리가 천 번 넘게 발생하고 지도 첫 로딩이 그만큼 지연됨",
-            solution:
-              "핀·후기·사진을 조인 한 번으로 묶고 누적 수거량은 집계 쿼리로 넘겨, 핀이 늘어도 요청당 쿼리 수가 고정되도록 개선함",
-          },
-          {
-            tag: "매번 처음부터 훑던 조회",
-            problem:
-              "로그인마다 이메일로 회원을 찾고 대시보드마다 전체 후기를 합산하는데 조회 기준에 인덱스가 없어, 매번 테이블을 끝까지 읽고 행이 쌓인 만큼 그대로 느려짐",
-            solution:
-              "자주 쓰는 조회 기준에 인덱스를 걸어 전체 스캔을 없애고, 자주 읽히지만 잘 바뀌지 않는 누적 통계는 Redis에 캐시해 같은 집계의 반복을 제거함",
-          },
-        ],
-        repo: "https://github.com/koreamax/piudaback",
         status: "종료",
       },
     ],
   },
   {
     num: "02",
-    name: "AI",
+    name: "AI & Backend",
     color: "#a78bfa",
     stack: ["PyTorch", "OpenCV", "OCR", "LLM", "VLM", "LangChain", "RAG"],
     items: [
@@ -511,7 +496,7 @@ export const categories: Category[] = [
   },
   {
     num: "03",
-    name: "Cloud",
+    name: "AI & Cloud",
     color: "#fbbf24",
     stack: ["AWS", "Azure", "GCP", "Docker", "Kubernetes", "Terraform"],
     items: [
