@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { categories, type CategoryItem, type CategoryIssue } from "@/components/portfolio-data";
@@ -62,44 +62,73 @@ function CardStatus({ status }: { status: string }) {
 /** 문제·해결이 담긴 에디터 창 — 왼쪽 구조도와 같은 창틀을 쓴다 */
 function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
   const groups = groupByLens(issues);
-  let step = 0; // 창 안에서 글이 차례로 앉도록 순번을 센다
+  let step = 0; // 글이 위에서 아래로 차례로 앉도록 순번을 센다
+  let ln = 0; // 빈 줄도 번호를 먹는다 — 에디터가 그렇다
+  const rows: ReactNode[] = [];
+  /* 한 줄은 번호 · 접두 · 본문 세 칸이다. 본문이 접혀도 접두 자리는 비어 있어 글머리가 맞는다 */
+  const push = (kind: string, prefix: ReactNode, body: ReactNode) =>
+    rows.push(
+      <span className={`pw-row ${kind}`} key={rows.length}>
+        <b className="pw-gutter">{++ln}</b>
+        <b className="pw-pre">{prefix}</b>
+        <span className="pw-line">{body}</span>
+      </span>,
+    );
+
+  groups.forEach((g, gi) => {
+    if (gi) push("", null, null);
+    push(
+      "is-comment",
+      null,
+      <SpecialText inView once speed={22} delay={0.06 * step++}>
+        {`// ${g.lens}`}
+      </SpecialText>,
+    );
+    g.issues.forEach((iss, k) => {
+      push(
+        "is-tag",
+        <em className="pw-idx">[{String(k + 1).padStart(2, "0")}]</em>,
+        <SpecialText inView once speed={18} delay={0.06 * step++}>
+          {iss.tag}
+        </SpecialText>,
+      );
+      /* 문제는 지워질 줄, 해결은 더해질 줄 — diff 로 읽으면 한눈에 갈린다 */
+      push(
+        "is-del",
+        <>
+          <em className="pw-sign">-</em>
+          <em className="pw-key">문제</em>
+        </>,
+        <CodeReveal text={iss.problem} delay={0.06 * step++} />,
+      );
+      push(
+        "is-add",
+        <>
+          <em className="pw-sign">+</em>
+          <em className="pw-key">해결</em>
+        </>,
+        <CodeReveal text={iss.solution} delay={0.06 * step++} />,
+      );
+      if (k < g.issues.length - 1) push("", null, null);
+    });
+  });
+
+  const n = issues.length;
   return (
-    <span className="pw-win">
-      <span className="pw-win-bar" aria-hidden>
-        <i className="pw-term-dot" />
-        <i className="pw-term-dot" />
-        <i className="pw-term-dot" />
-        <b>wilson — problem / fix</b>
+    <span className="pw-ed">
+      <span className="pw-ed-tabs" aria-hidden>
+        <span className="pw-ed-tab is-on">
+          <i className="pw-ed-dot" />
+          wilson.problems.diff
+        </span>
       </span>
-      <span className="pw-win-body">
+      <span className="pw-ed-code">{rows}</span>
+      <span className="pw-ed-panel" aria-hidden>
+        <b className="is-on">PROBLEMS {n}</b>
         {groups.map((g) => (
-          <span className="pw-field" key={g.lens}>
-            <b className="pw-field-legend">
-              <SpecialText inView once speed={24} delay={0.06 * step++}>
-                {`${g.lens} (${g.issues.length})`}
-              </SpecialText>
-            </b>
-            {g.issues.map((iss, k) => (
-              <span className="pcard-issue" key={iss.tag}>
-                <span className="pcard-issue-head">
-                  <b className="pcard-issue-num">{String(k + 1).padStart(2, "0")}</b>
-                  <b className="pcard-issue-tag">
-                    <SpecialText inView once speed={20} delay={0.06 * step++}>
-                      {iss.tag}
-                    </SpecialText>
-                  </b>
-                </span>
-                <span className="pcard-block">
-                  <b className="pb-problem">문제</b>
-                  <CodeReveal text={iss.problem} delay={0.06 * step++} />
-                </span>
-                <span className="pcard-block">
-                  <b className="pb-fix">해결</b>
-                  <CodeReveal text={iss.solution} delay={0.06 * step++} />
-                </span>
-              </span>
-            ))}
-          </span>
+          <b key={g.lens}>
+            {g.lens.toUpperCase()} {g.issues.length}
+          </b>
         ))}
       </span>
     </span>

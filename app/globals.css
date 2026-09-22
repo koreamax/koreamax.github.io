@@ -518,7 +518,7 @@ html { overflow-x: clip; }
 
 /* ───────── 아키텍처 그림을 낀 장면 ─────────
    그림 한 장이 장면을 통째로 쓰므로 왼쪽에 구조, 오른쪽에 관점별 이야기로 가른다. */
-.pwide { display: grid; grid-template-columns: 640px minmax(0, 1fr); gap: 40px; align-items: center; height: 100%; }
+.pwide { display: grid; grid-template-columns: 600px minmax(0, 1fr); gap: 40px; align-items: center; height: 100%; }
 .pw-left { display: flex; flex-direction: column; justify-content: center; }
 .pw-right { display: flex; min-width: 0; }
 
@@ -554,42 +554,65 @@ html { overflow-x: clip; }
   font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.22);
 }
 
-/* ── 문제·해결 창 ──
-   왼쪽 구조도와 같은 창틀을 쓰고, 관점마다 테두리를 두른 칸에 담는다. */
-.pw-win {
+/* ── 문제·해결을 코드로 읽는 판 ──
+   VS Code 를 그대로 옮긴다. 줄 번호가 있는 거터, 구문 색, 아래쪽 패널 탭.
+   문제는 지워질 줄(-), 해결은 더해질 줄(+) 로 놓아 diff 로 갈린다. */
+.pw-ed {
+  --vs-bg: #1e1e1e;
+  --vs-bar: #252526;
+  --vs-gutter: #6e7681;
+  --vs-comment: #6a9955;
+  --vs-string: #ce9178;
+  --vs-key: #569cd6;
+  --vs-fn: #dcdcaa;
   display: flex; flex-direction: column; flex: 1; min-width: 0;
-  border-radius: 10px; overflow: hidden;
-  background: #0b0d10; border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 18px 44px rgba(0,0,0,0.45);
-}
-.pw-win-bar {
-  position: relative; display: flex; align-items: center; gap: 6px;
-  padding: 8px 12px; background: rgba(255,255,255,0.045);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-}
-/* 제목은 창 한가운데 — 신호등이 왼쪽에 있어도 가운데에 선다 */
-.pw-win-bar b {
-  position: absolute; left: 0; right: 0; text-align: center;
+  border-radius: 8px; overflow: hidden;
+  background: var(--vs-bg); border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.5);
   font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.3px; color: rgba(255,255,255,0.4);
-}
-.pw-win-body { display: flex; flex-direction: column; gap: 10px; padding: 11px; }
-
-/* 관점 한 칸 — 사진의 "Edit Text Content" 테두리 자리 */
-.pw-field {
-  position: relative; display: flex; flex-direction: column; gap: 8px;
-  padding: 13px 12px 10px; border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.09); background: rgba(255,255,255,0.016);
-}
-.pw-field-legend {
-  position: absolute; top: -7px; left: 11px; padding: 0 6px;
-  background: #0b0d10; color: var(--cat);
-  font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px;
 }
 
-.pw-right .pcard-issue { padding-top: 0; border-top: 0; gap: 4px; }
-.pw-right .pcard-issue + .pcard-issue { padding-top: 7px; border-top: 1px solid rgba(255,255,255,0.06); }
-.pw-right .pcard-block { font-size: 11.6px; line-height: 1.46; }
+/* 파일 탭 한 장 */
+.pw-ed-tabs { display: flex; background: var(--vs-bar); }
+.pw-ed-tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 16px 7px 13px; font-size: 11px; letter-spacing: 0.2px;
+  color: rgba(255,255,255,0.45); border-right: 1px solid rgba(0,0,0,0.4);
+}
+.pw-ed-tab.is-on { background: var(--vs-bg); color: rgba(255,255,255,0.85); box-shadow: inset 0 1px 0 var(--cat); }
+.pw-ed-dot { width: 7px; height: 7px; border-radius: 9999px; background: var(--vs-fn); }
+
+/* 코드 — 한 줄이 거터 + 본문 두 칸이다. 본문이 접혀도 번호는 맨 윗줄에 남는다 */
+.pw-ed-code { display: grid; grid-template-columns: auto auto minmax(0, 1fr); padding: 7px 0 8px; font-size: 11px; line-height: 1.56; }
+.pw-row { display: contents; }
+.pw-gutter { padding: 0 12px 0 14px; text-align: right; font-weight: 400; color: var(--vs-gutter); font-variant-numeric: tabular-nums; }
+.pw-pre { padding-right: 9px; font-weight: 400; white-space: nowrap; }
+.pw-line { padding-right: 16px; min-height: 1.56em; color: rgba(255,255,255,0.78); overflow-wrap: anywhere; }
+
+.pw-row.is-comment .pw-line { color: var(--vs-comment); }
+.pw-row.is-tag .pw-line { color: var(--vs-fn); }
+.pw-idx { padding-left: 8px; font-style: normal; color: var(--vs-gutter); }
+
+/* diff 두 줄 — 부호 칸을 띄워 두 줄의 글머리가 같은 자리에서 시작한다 */
+.pw-row.is-del .pw-line, .pw-row.is-add .pw-line { color: var(--vs-string); }
+.pw-row.is-del .pw-pre, .pw-row.is-del .pw-line { background: rgba(248,81,73,0.07); }
+.pw-row.is-add .pw-pre, .pw-row.is-add .pw-line { background: rgba(63,185,80,0.07); }
+.pw-row.is-del .pw-pre { box-shadow: inset 2px 0 0 #f85149; }
+.pw-row.is-add .pw-pre { box-shadow: inset 2px 0 0 #3fb950; }
+.pw-row.is-del .pw-gutter { background: rgba(248,81,73,0.05); }
+.pw-row.is-add .pw-gutter { background: rgba(63,185,80,0.05); }
+.pw-sign { display: inline-block; width: 1.5em; padding-left: 8px; font-style: normal; font-weight: 700; }
+.pw-row.is-del .pw-sign { color: #f85149; }
+.pw-row.is-add .pw-sign { color: #3fb950; }
+.pw-key { font-style: normal; color: var(--vs-key); }
+
+/* 아래쪽 패널 탭 — 사진의 PROBLEMS · OUTPUT · TERMINAL 줄 자리 */
+.pw-ed-panel {
+  display: flex; align-items: center; gap: 18px; margin-top: auto;
+  padding: 7px 14px; background: var(--vs-bar); border-top: 1px solid rgba(0,0,0,0.45);
+}
+.pw-ed-panel b { font-size: 9.5px; font-weight: 600; letter-spacing: 1.3px; color: rgba(255,255,255,0.32); }
+.pw-ed-panel b.is-on { color: rgba(255,255,255,0.72); box-shadow: 0 6px 0 -5px var(--cat); }
 
 /* 폴백(모바일·감속 모드)에서는 위아래로 흐른다 */
 .pstage.pstage-flow .pwide { grid-template-columns: 1fr; gap: 20px; height: auto; }
