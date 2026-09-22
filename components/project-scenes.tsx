@@ -61,8 +61,8 @@ function CardStatus({ status }: { status: string }) {
 /** 문제·해결이 담긴 에디터 창 — 왼쪽 구조도와 같은 창틀을 쓴다 */
 /* 들어오자마자 바뀌면 코드가 깔려 있었다는 걸 못 본다 — 잠깐 그대로 둔다 */
 const CODE_HOLD = 0.55;
-/** 글자 수에 맞춘 길이 — 짧은 제목은 짧게, 긴 문단은 길게 */
-const span = (len: number) => 160 + len * 4.6;
+/** 글자 수에 맞춘 길이. 다 같이 시작하니 길이는 비슷하게 두어 함께 끝나게 한다 */
+const span = (len: number) => 800 + len * 6;
 
 function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
   const groups = groupByLens(issues);

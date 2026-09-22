@@ -7,6 +7,7 @@ import IntroBace from "@/components/intro-bace";
 import ProjectScenes from "@/components/project-scenes";
 import { designViewport } from "@/components/fixed-canvas";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { LiquidMetalPill } from "@/components/ui/liquid-metal-pill";
 import {
   awards,
   corridorCards,
@@ -824,7 +825,7 @@ export default function Portfolio() {
             </h2>
             <div className="spread-awards">
               {awards.map((a, i) => (
-                <span key={i} className="sp-award">
+                <LiquidMetalPill key={i} className="sp-award">
                   <span className="sp-logo">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={a.logo} alt="" />
@@ -834,7 +835,7 @@ export default function Portfolio() {
                     <span className="sp-p">{a.title}</span>
                   </span>
                   <span className="sp-d">{a.date}</span>
-                </span>
+                </LiquidMetalPill>
               ))}
             </div>
           </div>
