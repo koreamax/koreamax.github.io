@@ -467,46 +467,67 @@ export const categories: Category[] = [
     num: "02",
     name: "AI & Backend",
     color: "#a78bfa",
-    stack: ["PyTorch", "OpenCV", "OCR", "LLM", "VLM", "LangChain", "RAG"],
+    stack: ["Flutter", "FastAPI", "VLM", "STT", "TTS", "Redis", "Celery"],
     items: [
       {
-        title: "GSV Paper",
-        summary: "구글 스트리트뷰 간판을 검출하고 텍스트를 뽑아내는 파이프라인",
-        problem:
-          "거리 사진 속 간판은 기울고 작고 일부가 가려져 있어 OCR만으로는 글자를 놓쳤고, 한 장에 간판이 여러 개라 엉뚱한 영역까지 읽어 들였다.",
-        solution:
-          "YOLO로 간판 영역을 먼저 검출해 잘라낸 뒤 해상도를 키워 OCR에 넘기는 2단 구조로 바꿨다. OCR 신뢰도가 기준 아래일 때만 VLM에게 이미지를 넘겨 문자열을 보정하게 해서, 비용이 큰 모델은 어려운 간판에만 쓰이도록 했다.",
-        repo: "https://github.com/koreamax/GSV_SIGNBOARD",
-        status: "진행 중",
-      },
-      {
         title: "beautytalk",
-        summary: "메이크업 설명을 말로 풀어주는 생성 모델 튜닝",
-        problem:
-          "설명의 말투와 단계 순서를 맞추려고 QLoRA로 파인튜닝했지만, 확보한 학습 데이터가 적어 금세 과적합됐다. 학습에 없던 요청에는 지시를 놓치고 엉뚱한 형식으로 답했다.",
-        solution:
-          "파인튜닝을 접고 few-shot 프롬프트로 방향을 바꿨다. 대표 예시 몇 개를 고정 블록으로 넣어 말투와 단계 구조를 잡고, 출력 형식을 강제해 응답이 흔들리지 않게 했다. 데이터가 적을 때는 학습보다 프롬프트 설계가 더 빨리 안정된다는 걸 확인했다.",
+        summary:
+          "시각장애인·저시력 사용자를 위한 메이크업 도우미. 앱이 찍은 화면을 백엔드가 받아 전처리하고, 화장품·메이크업 판정을 모델에 맡긴 뒤 결과를 음성으로 돌려준다.",
+        arch: {
+          src: "/uploads/beauty-arch.webp",
+          caption: "Flutter 앱 → FastAPI → 전처리 · VLM 판정 → TTS. 무거운 일은 작업 큐로 넘기고 결과만 따로 받아 간다.",
+        },
+        issues: [
+          {
+            lens: "AI",
+            tag: "설명이 길어 끝까지 못 듣는다",
+            problem:
+              "화장품을 비추면 모델이 본 것을 문장으로 길게 풀어 쓰는데, 화면을 훑을 수 없는 사용자는 정작 필요한 색과 제형이 나올 때까지 그 문장을 끝까지 들어야 함",
+            problemCode:
+              'prompt = "Describe this cosmetic product."   # free-form answer: the shade turns up somewhere in the fourth sentence, forty seconds into the speech',
+            solution:
+              "무엇을 어떤 순서로 말할지 칸을 정해 모델이 그 칸만 채우게 하고 색부터 읽도록 바꿔, 첫 마디만 들어도 무엇인지 알 수 있게 정리함",
+            solutionCode:
+              'schema = {"category": str, "shade": str, "finish": str, "how_to": str} ; prompt = "Fill every field in under twelve words, shade first."',
+          },
+          {
+            lens: "AI",
+            tag: "빛에 따라 달라지던 색 판정",
+            problem:
+              "화장품 색을 찍힌 픽셀에서 곧바로 읽어, 전구가 노랗거나 그늘이 지면 같은 제품이 볼 때마다 다른 색으로 나와 추천이 흔들림",
+            problemCode:
+              "rgb = frame[cy, cx]   # the shade is read straight off the pixel, so a warm bulb pushes every product half a tone to the right",
+            solution:
+              "사진 안의 흰 기준면으로 색을 먼저 맞춘 뒤 읽게 해, 조명이 달라도 같은 제품이 같은 색으로 나오도록 고정함",
+            solutionCode:
+              "gain = TARGET_WHITE / white_patch(frame) ; rgb = (frame * gain)[cy, cx]   # normalise the frame before anything reads a colour out of it",
+          },
+          {
+            lens: "백엔드",
+            tag: "한 요청에 묶여 있던 업로드와 분석",
+            problem:
+              "사진 업로드와 전처리, 모델 호출, 추천 생성이 한 요청 안에서 차례로 돌아, 사람이 몰리면 앞 요청이 끝날 때까지 뒤가 통째로 밀리고 결국 타임아웃으로 끊김",
+            problemCode:
+              '@app.post("/analyze") def analyze(f): img = preprocess(f.read()) ; return recommend(vlm(img))   # upload, inference and recommendation all inside one request',
+            solution:
+              "업로드와 분석을 갈라 분석은 작업 큐로 넘기고 결과만 따로 받아 가게 하고, 같은 사진의 재분석은 캐시로 건너뛰게 해 API 가 붙잡히지 않도록 정리함",
+            solutionCode:
+              'key = sha1(blob) ; job = queue.enqueue(analyze_task, key) ; return {"job": job.id}   # the worker preprocesses and infers, the same photo never runs twice',
+          },
+          {
+            lens: "백엔드",
+            tag: "같은 안내를 매번 다시 읽던 음성",
+            problem:
+              "화면마다 나오는 같은 안내 문구를 그때그때 음성으로 새로 만들어, 말이 나오기까지 매번 같은 시간을 기다리고 호출 비용도 그만큼 반복됨",
+            problemCode:
+              "speech = tts.synthesize(text) ; return StreamingResponse(speech)   # the same sentence is synthesised again on every screen that happens to say it",
+            solution:
+              "문구와 목소리가 같으면 만들어 둔 음성을 다시 쓰도록 해시로 캐시해, 반복되는 안내는 기다림 없이 나오고 호출은 새 문구에만 들어가게 함",
+            solutionCode:
+              "key = sha1(text + voice) ; return cached(key) or store(key, tts.synthesize(text))   # repeats come back off disk, only new sentences reach the API",
+          },
+        ],
         repo: "https://github.com/koreamax/beautytalk-app",
-        status: "종료",
-      },
-      {
-        title: "VIAssist",
-        summary: "시각장애인 보행 보조 웨어러블의 온디바이스 추론",
-        problem:
-          "YOLO 검출, Optical Flow, VLM, TTS를 한 기기에서 동시에 돌리자 프레임이 밀렸다. 보행 안내는 늦으면 쓸모가 없는데 지연이 체감될 만큼 커졌다.",
-        solution:
-          "모델을 양자화해 메모리와 연산량을 줄이고 추론 엔진에 맞게 변환해 지연을 낮췄다. 무거운 VLM은 매 프레임이 아니라 장면이 바뀌었을 때만 호출하도록 트리거를 나눠, 실시간으로 돌아야 하는 검출과 흐름 추정에 자원을 몰아줬다.",
-        repo: "https://github.com/koreamax/VIAssist_Total",
-        status: "종료",
-      },
-      {
-        title: "LLM ROUTER",
-        summary: "질문에 맞는 모델로 보내 비용과 품질을 함께 잡는 라우터",
-        problem:
-          "쉬운 질문까지 큰 모델로 보내면 비용이 불어나고, 반대로 작은 모델로 몰면 어려운 질문에서 정답률이 떨어졌다. 둘 중 하나를 고르는 문제가 아니었다.",
-        solution:
-          "질문 임베딩과 길이·형식 같은 난이도 특징으로 라우팅 분류기를 학습시켜 모델을 고르게 했다. 분류기의 확신도에 임계값을 두고 애매한 질문만 큰 모델로 올려보내, 비용과 정확도가 만나는 지점을 찾아 조정했다.",
-        repo: "https://github.com/koreamax/SKTLLMROUTER0.710",
         status: "종료",
       },
     ],
@@ -515,55 +536,40 @@ export const categories: Category[] = [
     num: "03",
     name: "AI & Cloud",
     color: "#fbbf24",
-    stack: ["AWS", "Azure", "GCP", "Docker", "Kubernetes", "Terraform"],
+    stack: ["AWS Lambda", "EC2", "S3", "OpenSearch", "Embedding", "OpenAI"],
     items: [
       {
-        title: "Mission Pawss!ble",
-        summary: "제보 이미지가 몰리는 시민참여 서비스의 인프라",
-        problem:
-          "제보 사진이 애플리케이션 서버를 거쳐 업로드되다 보니 트래픽이 몰릴 때 서버가 함께 흔들렸고, 배포할 때마다 서비스가 잠깐씩 끊겼다.",
-        solution:
-          "프리사인드 URL을 발급해 사진을 오브젝트 스토리지로 직접 올리게 하여 서버에서 업로드 부하를 걷어냈다. 애플리케이션은 컨테이너로 올리고 새 버전이 준비된 뒤 전환하는 방식으로 배포해 중단을 없앴다.",
-        repo: "https://github.com/koreamax/TECH4GOOD_OH",
-        status: "종료",
-      },
-      {
-        title: "Wilson",
-        summary: "무거운 추론 서비스를 감당하기 위한 쿠버네티스 운영",
-        problem:
-          "대화 생성 서비스가 요청마다 자원을 크게 먹어 한 대로는 동시 사용자를 감당하지 못했다. 같은 인스턴스에 있던 가벼운 API까지 덩달아 느려졌다.",
-        solution:
-          "추론 서비스와 일반 API를 별도 디플로이먼트로 나눠 쿠버네티스에 올리고, 추론 쪽만 리소스 요청과 상한을 크게 잡아 따로 오토스케일되게 했다. 노드 선택으로 추론 파드를 전용 노드에 배치해 두 워크로드가 서로를 밀어내지 않도록 격리했다.",
-        repo: "https://github.com/koreamax/wilson_chatbot",
-        status: "종료",
-      },
-      {
-        title: "Cloud Island",
-        summary: "AWS CloudTrail 로그를 탐험하듯 읽는 시각화",
-        problem:
-          "CloudTrail 이벤트는 JSON으로 끝없이 쌓이는데, 누가 어떤 자원에 무엇을 했는지 사람이 읽어 내려가서는 흐름이 잡히지 않았다.",
-        solution:
-          "로그를 수집해 주체·행동·자원 축으로 정규화한 뒤, 계정과 서비스를 행성과 궤도로 매핑해 3D 공간에 배치했다. 시간축을 따라 이동하며 이벤트가 어디서 발생했는지 한눈에 따라갈 수 있게 만들었다.",
-        repo: "https://github.com/koreamax/cloud-island",
-        status: "종료",
-      },
-      {
         title: "WalkingCity",
-        summary: "취향에 맞는 산책 경로를 추천하고 이유까지 설명하는 서비스",
+        summary:
+          "동대문구 주민 취향에 맞는 산책 경로를 추천하고 왜 그 길인지까지 설명하는 서비스. 추천은 따로 떼어 Lambda 에서 돌고, 공공데이터는 임베딩해 검색으로 꺼내 쓴다.",
+        arch: {
+          src: "/uploads/walk-arch.webp",
+          caption: "취향 입력 · 경로 추천 · 추천 이유 · 지도 화면 — 직접 찍은 네 장",
+        },
         issues: [
           {
+            lens: "클라우드",
             tag: "추천 한 건이 서버 전체를 붙잡음",
             problem:
               "추천 한 번에 생성 모델 응답을 수십 초 기다려야 하는데 이를 EC2 위 애플리케이션이 직접 호출해, 기다리는 동안 스레드를 붙잡아 지도·로그인 같은 일반 요청까지 밀림",
+            problemCode:
+              "answer = openai.chat(messages, timeout=90)   # the request thread sits on this for the better part of a minute while the map and the login queue up behind it",
             solution:
-              "AI 추천만 Lambda로 떼어 내 요청마다 따로 뜨고 끝나면 사라지게 하고 EC2는 일반 트래픽만 맡게 해, 추천이 몰려도 나머지 화면이 느려지지 않게 됨",
+              "AI 추천만 Lambda 로 떼어 내 요청마다 따로 뜨고 끝나면 사라지게 하고 EC2 는 일반 트래픽만 맡게 해, 추천이 몰려도 나머지 화면이 느려지지 않게 됨",
+            solutionCode:
+              'lambda_client.invoke(FunctionName="walk-recommend", InvocationType="Event", Payload=body)   # EC2 hands it off and goes back to serving pages',
           },
           {
+            lens: "AI",
             tag: "공공데이터만큼 불어나던 토큰",
             problem:
               "산책로·공원 공공데이터를 프롬프트에 통째로 실어, 호출 한 번에 드는 토큰이 데이터 양을 그대로 따라가 자료를 더할수록 비용과 응답 시간이 같이 늘어남",
+            problemCode:
+              "prompt = SYSTEM + json.dumps(load_all_trails())   # every call carries the whole dataset, so adding a district adds tokens to every single request",
             solution:
-              "S3에 올린 공공데이터를 임베딩해 OpenSearch에 담고 질문과 가까운 조각만 꺼내 넣도록 바꿔, 자료가 늘어도 호출당 토큰이 일정하게 유지됨",
+              "공공데이터를 미리 임베딩해 검색으로 올려 두고 질문과 가까운 몇 건만 프롬프트에 실어, 자료가 늘어도 한 호출에 들어가는 토큰은 그대로이게 만듦",
+            solutionCode:
+              "hits = opensearch.knn(embed(query), k=5) ; prompt = SYSTEM + render(hits)   # the dataset can grow all it likes, the prompt stays the size of five trails",
           },
         ],
         repo: "https://github.com/koreamax/walk_web",

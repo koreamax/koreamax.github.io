@@ -64,7 +64,7 @@ const CODE_HOLD = 0.55;
 /** 글자 수에 맞춘 길이. 다 같이 시작하니 길이는 비슷하게 두어 함께 끝나게 한다 */
 const span = (len: number) => 800 + len * 6;
 
-function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
+function ProblemWindow({ issues, title }: { issues: CategoryIssue[]; title: string }) {
   const groups = groupByLens(issues);
   /* 한 줄씩 차례로 넘기면 눈이 따라다니느라 정신없다 — 파일 전체가 한 번에 넘어간다 */
   const slot = (len: number) => ({ delay: CODE_HOLD, dur: span(len) });
@@ -117,7 +117,7 @@ function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
       <span className="pw-ed-tabs" aria-hidden>
         <span className="pw-ed-tab is-on">
           <i className="pw-ed-dot" />
-          wilson.problems.diff
+          {title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.problems.diff
         </span>
       </span>
       <span className="pw-ed-code">{rows}</span>
@@ -523,7 +523,7 @@ export default function ProjectScenes() {
                           <ArchShot arch={it.arch} />
                         </span>
                         <span className="pw-right" data-item>
-                          <ProblemWindow issues={it.issues ?? []} />
+                          <ProblemWindow issues={it.issues ?? []} title={it.title} />
                         </span>
                       </span>
                     </span>

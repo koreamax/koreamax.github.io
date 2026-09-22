@@ -32,8 +32,8 @@ export function LiquidMetalPill({ children, className = "" }: { children: ReactN
           {
             u_repetition: 4,
             u_softness: 0.5,
-            u_shiftRed: 0.3,
-            u_shiftBlue: 0.3,
+            u_shiftRed: 0.62,
+            u_shiftBlue: 0.08,
             u_distortion: 0,
             u_contour: 0,
             u_angle: 45,

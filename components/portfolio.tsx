@@ -456,12 +456,14 @@ const clamp = (v: number) => Math.max(0, Math.min(1, v));
 const MARQUEE_ITEMS = ["AI", "BACKEND", "CLOUD", "DEVELOPER", "EMBEDDED"];
 /** 히어로 왼쪽 ABCDE 스택 — 인트로의 다섯 글자가 이 자리로 날아와 그대로 남는다 */
 /* 인트로에서는 ABCDE 로 모였다가, 다 풀리면 Developer 가 맨 아래로 간다 */
+/* 위에서 아래로 A·B·C·D·E. 인트로의 가로 한 줄이 그대로 세로로 내려앉아야 하므로
+   순서가 어긋나면 그 두 글자가 날아가며 서로를 가로질러 비뚤어져 보인다. */
 const ABCDE = [
   { ini: "A", rest: "I" },
   { ini: "B", rest: "ackend" },
   { ini: "C", rest: "loud" },
-  { ini: "E", rest: "mbedded" },
   { ini: "D", rest: "eveloper" },
+  { ini: "E", rest: "mbedded" },
 ];
 
 /* ───────────────────────── 컴포넌트 ───────────────────────── */
