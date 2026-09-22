@@ -5,6 +5,7 @@ import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import TechBadge from "@/components/tech-badge";
 import IntroBace from "@/components/intro-bace";
 import ProjectScenes from "@/components/project-scenes";
+import Strengths from "@/components/strengths";
 import { designViewport } from "@/components/fixed-canvas";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { LiquidMetalPill } from "@/components/ui/liquid-metal-pill";
@@ -531,6 +532,7 @@ export default function Portfolio() {
       ["[data-spread]", "#awards"],
       ["#work", "#work"],
       [".pstage", "#work"],
+      ["#how", "#how"],
       ["#timeline", "#timeline"],
     ];
     let lastActive = "";
@@ -702,6 +704,7 @@ export default function Portfolio() {
           {[
             ["#awards", "Awards"],
             ["#work", "Projects"],
+            ["#how", "How"],
             ["#timeline", "Timeline"],
           ].map(([href, label]) => (
             <a key={href} href={href} className="nav-link" data-nav={href}>
@@ -918,6 +921,9 @@ export default function Portfolio() {
       </section>
 
       <ProjectScenes />
+
+      {/* ── 일하는 방식 ── */}
+      <Strengths />
 
       {/* ── TIMELINE ── */}
       <section id="timeline" style={{ maxWidth: 1280, margin: "0 auto", padding: "64px 24px" }}>
