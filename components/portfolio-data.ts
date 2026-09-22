@@ -665,7 +665,7 @@ export interface Strength {
 export const strengths: Strength[] = [
   {
     num: '01',
-    title: '기록하는 습관',
+    title: 'Notion에 기록하는 습관',
     ph: '노션 기록',
     shots: [
       '/uploads/note-esw-home.webp',
@@ -673,18 +673,27 @@ export const strengths: Strength[] = [
       '/uploads/note-piuda-meetings.webp',
       '/uploads/note-capstone.webp',
       '/uploads/note-viassist-progress.webp',
+      '/uploads/note-viassist-board.webp',
       '/uploads/note-aws-sbg.webp',
     ],
   },
   {
     num: '02',
-    title: '공부한 것 정리',
+    title: 'Github와 Velog 등 공부한 내용 정리',
     ph: '깃허브 · 블로그',
-    shots: [],
+    shots: [
+      '/uploads/study-gh-os.webp',
+      '/uploads/study-velog-cloud.webp',
+      '/uploads/study-gh-k8s.webp',
+      '/uploads/study-velog-docker.webp',
+      '/uploads/study-gh-coding-test.webp',
+      '/uploads/study-velog-sktfly.webp',
+      '/uploads/study-ovs-notes.webp',
+    ],
   },
   {
     num: '03',
-    title: '꾸준히 이어 온 활동',
+    title: '꾸준히 이어 온 스터디',
     ph: '스터디 · 근로',
     shots: [],
   },
@@ -696,13 +705,13 @@ export const strengths: Strength[] = [
   },
   {
     num: '05',
-    title: '발표와 데모',
+    title: '발표에 대한 자신감',
     ph: '발표 · 데모',
     shots: [],
   },
   {
     num: '06',
-    title: 'AI 활용',
+    title: 'AI 활용 능력',
     ph: 'GPT · Claude · Gemini',
     shots: [],
   },
