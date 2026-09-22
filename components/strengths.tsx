@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { strengths, type Strength } from "@/components/portfolio-data";
+import { events, strengths, type Strength } from "@/components/portfolio-data";
 
 /**
  * 일하는 방식 — 만든 것 말고, 만드는 동안 하는 일.
@@ -10,14 +10,15 @@ import { strengths, type Strength } from "@/components/portfolio-data";
  * 반복되지 않게 한다.
  *  · 01·02 기록      — 세로로 흐르는 두 줄. 문서와 글은 길쭉하게 읽힌다
  *  · 03·04 꾸준함·전달 — 비스듬히 누운 판 위를 여러 줄이 서로 반대로 흐른다
- *  · 05·06 발표·도구  — 가로로 두 줄이 서로 반대로. 현장 사진은 옆으로 넘겨 보는 결이 맞다
+ *  · 05 성실함        — 사진이 없다. 지나온 줄(events)이 카드가 되어 가로로 흐르고,
+ *                      혼자 마지막 화면을 통째로 쓴다
  *
  * 사진이 아직 없으면 이름만 적힌 자리로 남는다. 넣은 장수에 맞춰 줄 수가 줄어들어,
  * 같은 사진이 두 줄에 동시에 떠 있는 일은 없다.
  */
 
-/** 사진을 미는 결 — 짝마다 하나씩 */
-type Flow = "col" | "deck" | "band";
+/** 사진을 미는 결 — 짝마다 하나씩. line 만은 사진이 아니라 지나온 줄을 민다 */
+type Flow = "col" | "deck" | "line";
 
 /** 한 화면에 두 개씩. 앞에서부터 둘씩 끊어 제 결을 준다.
     lanes·tiles 는 사진이 없을 때 자리만 잡아 둘 크기이자 줄 수의 상한,
@@ -25,7 +26,7 @@ type Flow = "col" | "deck" | "band";
 const VIEWS: { flow: Flow; lanes: number; tiles: number; min: number }[] = [
   { flow: "col", lanes: 2, tiles: 4, min: 3 },
   { flow: "deck", lanes: 3, tiles: 4, min: 2 },
-  { flow: "band", lanes: 2, tiles: 5, min: 3 },
+  { flow: "line", lanes: 2, tiles: 0, min: 1 },
 ];
 
 /** 줄 하나가 한 바퀴 도는 데 걸리는 시간(초). 읽을 수 있을 만큼 느리게 —
@@ -77,7 +78,35 @@ function Lane({ tiles, label, spin, back }: { tiles: (string | null)[]; label: s
   );
 }
 
-/** 사진이 흐르는 칸. 결에 따라 세로 두 줄 · 누운 판 · 가로 두 줄이 된다 */
+/**
+ * 지나온 줄 — 사진 대신 events 가 카드가 되어 가로로 흐른다.
+ * 홀짝으로 갈라 두 줄에 나눠 실으니 한 줄에 같은 일이 두 번 뜨지 않는다.
+ */
+function Trail() {
+  const rows = [events.filter((_, i) => i % 2 === 0), events.filter((_, i) => i % 2 === 1)];
+  return (
+    <span className="st-shots is-line">
+      {rows.map((row, r) => (
+        <span className={`st-lane ${r % 2 ? "is-back" : ""}`} key={r} style={{ ["--spin" as string]: `${r ? 86 : 72}s` }}>
+          {[0, 1].map((dup) =>
+            row.map((e, i) => (
+              <span className="st-card" key={`${dup}-${i}`} aria-hidden={dup === 1 || undefined}>
+                <b className="st-card-when">{e.date}</b>
+                <b className="st-card-what">{e.title}</b>
+                <span className="st-card-desc">{e.desc}</span>
+                <b className="st-card-kind" data-on={e.ongoing || undefined}>
+                  {e.kind}
+                </b>
+              </span>
+            )),
+          )}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/** 사진이 흐르는 칸. 결에 따라 세로 두 줄 · 누운 판이 된다 */
 function Shots({ item, flow, lanes, tiles, min }: { item: Strength; flow: Flow; lanes: number; tiles: number; min: number }) {
   const body = split(item.shots, lanes, tiles, min).map((t, c) => (
     <Lane key={c} tiles={t} label={item.ph} spin={SPIN[c % SPIN.length]} back={c % 2 === 1} />
@@ -93,7 +122,7 @@ function Shots({ item, flow, lanes, tiles, min }: { item: Strength; flow: Flow; 
 function Panel({ item, flow, lanes, tiles, min, delay }: { item: Strength; flow: Flow; lanes: number; tiles: number; min: number; delay: number }) {
   return (
     <article className="st-panel" style={{ transitionDelay: `${delay}s` }}>
-      <Shots item={item} flow={flow} lanes={lanes} tiles={tiles} min={min} />
+      {flow === "line" ? <Trail /> : <Shots item={item} flow={flow} lanes={lanes} tiles={tiles} min={min} />}
       <span className="st-top">
         <b className="st-num">{item.num}</b>
         <h3 className="st-title">{item.title}</h3>
@@ -128,10 +157,10 @@ export default function Strengths() {
   }, []);
 
   return (
-    <section id="how" ref={rootRef} className="st-sec">
+    <section id="timeline" ref={rootRef} className="st-sec">
       <div className="st-views">
         {VIEWS.map((v, vi) => (
-          <div className="st-view" key={vi}>
+          <div className={`st-view ${strengths.slice(vi * 2, vi * 2 + 2).length < 2 ? "is-solo" : ""}`} key={vi}>
             {strengths.slice(vi * 2, vi * 2 + 2).map((item, i) => (
               <Panel key={item.num} item={item} flow={v.flow} lanes={v.lanes} tiles={v.tiles} min={v.min} delay={i * 0.12} />
             ))}

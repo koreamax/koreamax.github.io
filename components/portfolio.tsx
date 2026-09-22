@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import TechBadge from "@/components/tech-badge";
 import IntroBace from "@/components/intro-bace";
 import ProjectScenes from "@/components/project-scenes";
@@ -12,10 +11,8 @@ import { LiquidMetalPill } from "@/components/ui/liquid-metal-pill";
 import {
   awards,
   corridorCards,
-  events,
   moreProjects,
   projects,
-  quals,
   spreadCards,
 } from "@/components/portfolio-data";
 
@@ -74,15 +71,6 @@ const statusColor = (status: string) => (status.includes("진행") ? GREEN : RED
 const BHS = "'Black Han Sans', sans-serif";
 const MONO = "'Nanum Gothic Coding', monospace";
 
-const eyebrow: CSSProperties = {
-  margin: "0 0 8px",
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: 2,
-  textTransform: "uppercase",
-  color: RED,
-};
-
 const pillBtn: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
@@ -108,17 +96,6 @@ const contactBtn: CSSProperties = {
   fontWeight: 700,
   letterSpacing: 1.2,
   textTransform: "uppercase",
-};
-
-const logoBox: CSSProperties = {
-  flex: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 64,
-  height: 64,
-  borderRadius: 8,
-  background: "#ffffff",
 };
 
 /** 연락처 버튼 묶음 — 히어로 첫 화면에 둔다 */
@@ -381,54 +358,6 @@ function ImageSlot({ src, placeholder, radius = 0 }: { src?: string; placeholder
   );
 }
 
-/* ───────────────────────── 타임라인 진행 상태 ───────────────────────── */
-
-const FLUX_ONGOING = { "--flux-from": "#16a34a", "--flux-to": "#4ade80" } as CSSProperties;
-const FLUX_DONE = { "--flux-from": "#da291c", "--flux-to": "#ff8a7a" } as CSSProperties;
-
-/** 하고 있는 활동은 초록 바가 계속 흐르고, 끝난 활동은 빨간 바가 꽉 찬 채로 멈춰 있다 */
-function StatusMeter({ kind, ongoing }: { kind: string; ongoing: boolean }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>{kind}</span>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", justifyContent: "flex-end" }}>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: 1,
-            color: ongoing ? GREEN : RED,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            whiteSpace: "nowrap",
-          }}
-        >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: 9999,
-              background: ongoing ? GREEN : RED,
-              boxShadow: ongoing ? `0 0 8px ${GREEN}` : "none",
-              animation: ongoing ? "statusPulse 1.4s ease-in-out infinite" : "none",
-            }}
-          />
-          {ongoing ? "진행 중" : "완료"}
-        </span>
-        <div style={{ width: 96, ...(ongoing ? FLUX_ONGOING : FLUX_DONE) }}>
-          {ongoing ? (
-            <ProgressiveFluxLoader showLabel={false} duration={4} loop className="max-w-none gap-0" barClassName="h-1.5 bg-white/10 shadow-none" />
-          ) : (
-            <ProgressiveFluxLoader showLabel={false} value={100} className="max-w-none gap-0" barClassName="h-1.5 bg-white/10 shadow-none" />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ───────────────────────── 스크롤 연출 설정 ───────────────────────── */
 
 /* 최종 위치는 화면 안(±50vw / ±50vh)에 머물면서 가운데(수상 목록) 를 비운다.
    번호가 붙은 카드는 01 02 / 03 04 로 읽히도록 네 모서리에 놓는다. */
@@ -532,7 +461,6 @@ export default function Portfolio() {
       ["[data-spread]", "#awards"],
       ["#work", "#work"],
       [".pstage", "#work"],
-      ["#how", "#how"],
       ["#timeline", "#timeline"],
     ];
     let lastActive = "";
@@ -704,7 +632,6 @@ export default function Portfolio() {
           {[
             ["#awards", "Awards"],
             ["#work", "Projects"],
-            ["#how", "How"],
             ["#timeline", "Timeline"],
           ].map(([href, label]) => (
             <a key={href} href={href} className="nav-link" data-nav={href}>
@@ -925,51 +852,6 @@ export default function Portfolio() {
       {/* ── 일하는 방식 ── */}
       <Strengths />
 
-      {/* ── TIMELINE ── */}
-      <section id="timeline" style={{ maxWidth: 1280, margin: "0 auto", padding: "64px 24px" }}>
-        <p style={eyebrow}>Latest</p>
-        <h2 style={{ margin: "0 0 48px", fontFamily: BHS, fontSize: 48, lineHeight: 1.1 }}>지금 어디에?</h2>
-        <div>
-          {events.map((e) => (
-            <div
-              key={e.date + e.title}
-              className="row-hover row-time"
-              style={{ alignItems: "baseline", padding: "28px 12px", borderTop: "1px solid rgba(255,255,255,0.12)" }}
-            >
-              <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, color: RED }}>{e.date}</span>
-              <div>
-                <h3 style={{ margin: "0 0 6px", fontSize: 20, fontWeight: 700 }}>{e.title}</h3>
-                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "rgba(255,255,255,0.55)", maxWidth: 640 }}>{e.desc}</p>
-              </div>
-              <StatusMeter kind={e.kind} ongoing={e.ongoing} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── QUALIFICATIONS ── */}
-      <section id="quals" style={{ background: "#111111", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ maxWidth: 760, margin: "0 auto", padding: "112px 24px" }}>
-          <p style={eyebrow}>Qualifications</p>
-          <h2 style={{ margin: "0 0 32px", fontFamily: BHS, fontSize: 40, lineHeight: 1.1 }}>자격증</h2>
-          {quals.map((q) => (
-            <div key={q.title} className="row-hover" style={{ display: "flex", gap: 16, alignItems: "center", padding: "20px 12px", borderTop: "1px solid rgba(255,255,255,0.12)" }}>
-              <span style={{ ...logoBox, padding: 6 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={q.logo} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
-              </span>
-              <span style={{ minWidth: 0, flex: 1 }}>
-                <span style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "baseline" }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.4 }}>{q.title}</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: RED, whiteSpace: "nowrap" }}>{q.date}</span>
-                </span>
-                <span style={{ display: "block", marginTop: 6, fontSize: 13, color: "rgba(255,255,255,0.55)" }}>{q.org}</span>
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── CONTACT / FOOTER ── */}
       <footer id="contact" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(255,255,255,0.08)", flexWrap: "wrap", gap: 12 }}>
@@ -993,3 +875,4 @@ export default function Portfolio() {
     </div>
   );
 }
+

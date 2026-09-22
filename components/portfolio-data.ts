@@ -182,10 +182,31 @@ export const events: TimelineEvent[] = [
     ongoing: false,
   },
   {
+    date: "2023.08 – 2025.02",
+    title: "네트워크 관리병",
+    desc: "부대 전산망과 네트워크 장비를 맡아 운용하고 관리.",
+    kind: "Military",
+    ongoing: false,
+  },
+  {
     date: "2023.01 – 06",
     title: "코리아 IT 아카데미 JSP & Spring Boot 백엔드 과정",
     desc: "Backend Developer 과정 수료.",
     kind: "Program",
+    ongoing: false,
+  },
+  {
+    date: "2021.12 – 2023.07",
+    title: "CU 편의점",
+    desc: "발주와 진열, 매대 정리, 응대까지 매장에서 하는 일 전반.",
+    kind: "Work",
+    ongoing: false,
+  },
+  {
+    date: "2019.12 – 2021.07",
+    title: "돈까스 전문점",
+    desc: "홀 서빙과 주방 보조, 설거지.",
+    kind: "Work",
     ongoing: false,
   },
 ];
@@ -747,16 +768,11 @@ export const strengths: Strength[] = [
       '/uploads/notice-devops-recruit.webp',
     ],
   },
+  /* 05 는 사진이 아니라 지나온 줄들을 싣는다 — events 를 그대로 흘려보낸다 */
   {
     num: '05',
-    title: '발표에 대한 자신감',
-    ph: '발표 · 데모',
-    shots: [],
-  },
-  {
-    num: '06',
-    title: 'AI 활용 능력',
-    ph: 'GPT · Claude · Gemini',
+    title: '쉬지않고 달려온 성실함',
+    ph: '',
     shots: [],
   },
 ];
