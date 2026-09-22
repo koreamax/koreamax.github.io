@@ -518,9 +518,9 @@ html { overflow-x: clip; }
 
 /* ───────── 아키텍처 그림을 낀 장면 ─────────
    그림 한 장이 장면을 통째로 쓰므로 왼쪽에 구조, 오른쪽에 관점별 이야기로 가른다. */
-.pwide { display: grid; grid-template-columns: 700px minmax(0, 1fr); gap: 40px; align-items: center; height: 100%; }
+.pwide { display: grid; grid-template-columns: 640px minmax(0, 1fr); gap: 40px; align-items: center; height: 100%; }
 .pw-left { display: flex; flex-direction: column; justify-content: center; }
-.pw-right { display: flex; flex-direction: column; gap: 15px; min-width: 0; }
+.pw-right { display: flex; min-width: 0; }
 
 /* 구조도는 터미널 한 장에 글자로 찍는다 — 창틀, 제목 줄, 본문 */
 .pw-term {
@@ -554,15 +554,42 @@ html { overflow-x: clip; }
   font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.22);
 }
 
-/* 관점 이름 — 백엔드 이야기와 클라우드 이야기를 눈으로 먼저 가른다 */
-.pw-lens { display: flex; flex-direction: column; gap: 8px; }
-.pw-lens-name {
-  display: flex; align-items: center; gap: 9px;
-  font-size: 11px; font-weight: 800; letter-spacing: 2.2px; text-transform: uppercase; color: var(--cat);
+/* ── 문제·해결 창 ──
+   왼쪽 구조도와 같은 창틀을 쓰고, 관점마다 테두리를 두른 칸에 담는다. */
+.pw-win {
+  display: flex; flex-direction: column; flex: 1; min-width: 0;
+  border-radius: 10px; overflow: hidden;
+  background: #0b0d10; border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.45);
 }
-.pw-lens-name::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, color-mix(in srgb, var(--cat) 45%, transparent), transparent); }
-.pw-right .pcard-issue { padding-top: 0; border-top: 0; gap: 5px; }
-.pw-right .pcard-block { font-size: 11.8px; line-height: 1.52; }
+.pw-win-bar {
+  position: relative; display: flex; align-items: center; gap: 6px;
+  padding: 8px 12px; background: rgba(255,255,255,0.045);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+/* 제목은 창 한가운데 — 신호등이 왼쪽에 있어도 가운데에 선다 */
+.pw-win-bar b {
+  position: absolute; left: 0; right: 0; text-align: center;
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.3px; color: rgba(255,255,255,0.4);
+}
+.pw-win-body { display: flex; flex-direction: column; gap: 10px; padding: 11px; }
+
+/* 관점 한 칸 — 사진의 "Edit Text Content" 테두리 자리 */
+.pw-field {
+  position: relative; display: flex; flex-direction: column; gap: 8px;
+  padding: 13px 12px 10px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.09); background: rgba(255,255,255,0.016);
+}
+.pw-field-legend {
+  position: absolute; top: -7px; left: 11px; padding: 0 6px;
+  background: #0b0d10; color: var(--cat);
+  font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px;
+}
+
+.pw-right .pcard-issue { padding-top: 0; border-top: 0; gap: 4px; }
+.pw-right .pcard-issue + .pcard-issue { padding-top: 7px; border-top: 1px solid rgba(255,255,255,0.06); }
+.pw-right .pcard-block { font-size: 11.6px; line-height: 1.46; }
 
 /* 폴백(모바일·감속 모드)에서는 위아래로 흐른다 */
 .pstage.pstage-flow .pwide { grid-template-columns: 1fr; gap: 20px; height: auto; }

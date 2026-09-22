@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { categories, type CategoryItem, type CategoryIssue } from "@/components/portfolio-data";
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import { GlowCard } from "@/components/ui/spotlight-card";
+import { SpecialText } from "@/components/ui/special-text";
 import { designViewport } from "@/components/fixed-canvas";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -58,7 +59,54 @@ function CardStatus({ status }: { status: string }) {
   );
 }
 
-/** 문제·해결 한 짝 */
+/** 문제·해결이 담긴 에디터 창 — 왼쪽 구조도와 같은 창틀을 쓴다 */
+function ProblemWindow({ issues }: { issues: CategoryIssue[] }) {
+  const groups = groupByLens(issues);
+  let step = 0; // 창 안에서 글이 차례로 앉도록 순번을 센다
+  return (
+    <span className="pw-win">
+      <span className="pw-win-bar" aria-hidden>
+        <i className="pw-term-dot" />
+        <i className="pw-term-dot" />
+        <i className="pw-term-dot" />
+        <b>wilson — problem / fix</b>
+      </span>
+      <span className="pw-win-body">
+        {groups.map((g) => (
+          <span className="pw-field" key={g.lens}>
+            <b className="pw-field-legend">
+              <SpecialText inView once speed={24} delay={0.06 * step++}>
+                {`${g.lens} (${g.issues.length})`}
+              </SpecialText>
+            </b>
+            {g.issues.map((iss, k) => (
+              <span className="pcard-issue" key={iss.tag}>
+                <span className="pcard-issue-head">
+                  <b className="pcard-issue-num">{String(k + 1).padStart(2, "0")}</b>
+                  <b className="pcard-issue-tag">
+                    <SpecialText inView once speed={20} delay={0.06 * step++}>
+                      {iss.tag}
+                    </SpecialText>
+                  </b>
+                </span>
+                <span className="pcard-block">
+                  <b className="pb-problem">문제</b>
+                  <CodeReveal text={iss.problem} delay={0.06 * step++} />
+                </span>
+                <span className="pcard-block">
+                  <b className="pb-fix">해결</b>
+                  <CodeReveal text={iss.solution} delay={0.06 * step++} />
+                </span>
+              </span>
+            ))}
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
+
+/** 문제·해결 한 짝 — 그림 없는 장면에서 쓴다 */
 function IssueBlock({ iss, k }: { iss: CategoryIssue; k: number }) {
   return (
     <span className="pcard-issue">
@@ -118,6 +166,69 @@ function ArchShot({ arch }: { arch: NonNullable<CategoryItem["arch"]> }) {
       )}
     </span>
   );
+}
+
+/* SpecialText 와 같은 글리프. 한글 자리는 한글 폭으로 채워야 줄이 안 흔들린다 */
+const NARROW = "_!X$0-+*#";
+const WIDE = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ";
+const pick = (wide: boolean) => (wide ? WIDE : NARROW)[(Math.random() * (wide ? WIDE.length : NARROW.length)) | 0];
+
+/** 문단이 코드처럼 쏟아졌다가 글로 앉는다 — 긴 글은 React state 대신 rAF 로 굴린다 */
+function CodeReveal({ text, delay = 0, className = "" }: { text: string; delay?: number; className?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.textContent = text;
+      return;
+    }
+    const chars = [...text];
+    /* 글자 폭을 미리 재 두면 흩어진 동안에도 줄바꿈이 그대로 있다 */
+    const wide = chars.map((c) => c.charCodeAt(0) > 0x1100);
+    const DUR = 380 + chars.length * 6;
+    const EDGE = 7; // 앞머리 이만큼은 아직 굳지 않은 채 깜빡인다
+    let raf = 0;
+    let t0 = 0;
+
+    const frame = (t: number) => {
+      if (!t0) t0 = t;
+      const p = Math.min(1, (t - t0) / DUR);
+      const set = p * chars.length;
+      let out = "";
+      for (let i = 0; i < chars.length; i++) {
+        if (chars[i] === " " || i < set - EDGE) out += chars[i];
+        else out += pick(wide[i]);
+      }
+      el.textContent = out;
+      if (p < 1) raf = requestAnimationFrame(frame);
+      else el.textContent = text;
+    };
+
+    /* 흩어진 채로 기다린다 — 장면이 눈에 들어와야 앉기 시작한다 */
+    el.textContent = chars.map((c, i) => (c === " " ? c : pick(wide[i]))).join("");
+    let timer = 0;
+    const io = new IntersectionObserver(
+      (es) => {
+        if (!es.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        timer = window.setTimeout(() => {
+          raf = requestAnimationFrame(frame);
+        }, delay * 1000);
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+
+    return () => {
+      io.disconnect();
+      window.clearTimeout(timer);
+      cancelAnimationFrame(raf);
+    };
+  }, [text, delay]);
+
+  return <span ref={ref} className={className} />;
 }
 
 const SHOW = "inset(0% 0% 0% 0%)";
@@ -351,14 +462,7 @@ export default function ProjectScenes() {
                           <ArchShot arch={it.arch} />
                         </span>
                         <span className="pw-right">
-                          {groupByLens(it.issues ?? []).map((g) => (
-                            <span className="pw-lens" key={g.lens}>
-                              <b className="pw-lens-name">{g.lens}</b>
-                              {g.issues.map((iss, k) => (
-                                <IssueBlock key={iss.tag} iss={iss} k={k} />
-                              ))}
-                            </span>
-                          ))}
+                          <ProblemWindow issues={it.issues ?? []} />
                         </span>
                       </span>
                     ) : (
