@@ -541,13 +541,17 @@ html { overflow-x: clip; }
   margin-left: 8px; font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
   font-size: 11px; font-weight: 500; letter-spacing: 0.3px; color: rgba(255,255,255,0.4);
 }
-.pw-term-body {
-  margin: 0; padding: 16px 18px 18px;
-  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
-  font-size: 12.8px; line-height: 1.36; letter-spacing: 0;
-  white-space: pre; tab-size: 4;
-  color: color-mix(in srgb, var(--cat) 62%, #e9eef7);
-  text-shadow: 0 0 12px color-mix(in srgb, var(--cat) 26%, transparent);
+/* draw.io 그림은 흰 바탕이라 밝은 판을 깔아 두고 폭을 꽉 채운다 */
+.pw-term-img { display: block; width: 100%; height: auto; background: #ffffff; }
+/* 그림이 아직 없을 때 — 들어올 자리를 그림과 똑같은 비율로 비워 둔다.
+   파일을 넣으면 이 자리에 그대로 들어차므로 배치가 흔들리지 않는다. */
+.pw-term-ph {
+  display: flex; align-items: center; justify-content: center; aspect-ratio: 1532 / 602;
+  background:
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.022) 0 10px, transparent 10px 20px),
+    rgba(255,255,255,0.015);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.22);
 }
 
 /* 관점 이름 — 백엔드 이야기와 클라우드 이야기를 눈으로 먼저 가른다 */

@@ -380,9 +380,9 @@ export interface CategoryItem {
   issues?: CategoryIssue[];
   /** 아키텍처. 있으면 카드가 장면을 통째로 차지하고 왼쪽 그림 · 오른쪽 글로 놓인다 */
   arch?: {
-    /** 터미널 판에 한 글자씩 찍히는 구조도 — 한 줄이 한 행이다 */
-    ascii: string;
-    /** 터미널 제목 줄 */
+    /** 구조도 그림 */
+    src: string;
+    /** 창 제목 줄 */
     label: string;
     /** 그림을 못 보는 사람을 위한 한 줄 */
     caption: string;
@@ -414,30 +414,7 @@ export const categories: Category[] = [
           label: "wilson — architecture",
           caption:
             "React Native 앱이 ALB를 지나 EC2의 Spring Boot에 닿고, Spring Boot는 gRPC로 EKS 위의 오케스트레이터 · RAG · Ollama · STT/TTS · Chroma를 부른다. 상태는 RDS와 Redis에, 음성은 S3에, 분석 요청은 SQS에 둔다.",
-          ascii: `                          aws  ap-northeast-2
-                        +- vpc ------------------------------------------------------+
-                        |  public subnet      private subnet                         |
-  client                |  +-----------+      +------------------------------+       |
-  +-----------------+   |  | IGW       |      | EC2   Spring Boot            |       |
-  | React Native    |----->| ALB       |----->| (docker)                     |       |
-  +-----------------+   |  | NAT       |      +------------------------------+       |
-                        |  +-----------+             |                |              |
-                        |                            | gRPC           |              |
-                        |                            |                |              |
-                        |                            v                v              |
-                        |  +- eks --------------------------+   +- state ----------+ |
-                        |  | orchestrator   rag    ollama   |   | RDS postgres     | |
-                        |  | stt / tts      chroma          |   | Redis            | |
-                        |  +--------------------------------+   +------------------+ |
-                        |        |                   |                               |
-                        |        | gateway endpoint  |                               |
-                        |        v                   v                               |
-                        |    +------------+     +--------------+                     |
-                        |    | S3  audio  |     | SQS  hubert  |                     |
-                        |    +------------+     +--------------+                     |
-                        +------------------------------------------------------------+
-
-  GitHub Actions  -->  ECR  -->  VPC endpoint`,
+          src: "/uploads/wilson-arch.png",
         },
         issues: [
           {

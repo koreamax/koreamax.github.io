@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { categories, type CategoryItem, type CategoryIssue } from "@/components/portfolio-data";
@@ -90,73 +90,9 @@ function groupByLens(issues: CategoryIssue[]) {
   return out;
 }
 
-/** 흩어진 글자가 제자리를 찾아 가며 구조도가 떠오르는 터미널 판 */
-const SCATTER = "░▒▓·:.=+*#%@";
-
-function AsciiArch({ arch }: { arch: NonNullable<CategoryItem["arch"]> }) {
-  const preRef = useRef<HTMLPreElement>(null);
-
-  useEffect(() => {
-    const pre = preRef.current;
-    if (!pre) return;
-    const rows = arch.ascii.split("\n");
-    const settle = () => {
-      pre.textContent = arch.ascii;
-    };
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      settle();
-      return;
-    }
-
-    /* 칸마다 제자리를 찾는 시점을 조금씩 다르게 준다 — 왼쪽 위부터 쓸려 나가되 흔들림을 섞는다 */
-    const when = rows.map((line, y) =>
-      [...line].map((_, x) => {
-        const sweep = (x / 84) * 0.55 + (y / rows.length) * 0.2;
-        return sweep + Math.random() * 0.3;
-      }),
-    );
-    const DUR = 1500;
-    const TAIL = 0.22; // 제자리를 찾기 직전 이만큼은 흩어진 글자로 깜빡인다
-    let raf = 0;
-    let t0 = 0;
-    let running = false;
-
-    const frame = (t: number) => {
-      if (!t0) t0 = t;
-      const p = Math.min(1, (t - t0) / DUR);
-      let out = "";
-      for (let y = 0; y < rows.length; y++) {
-        const line = rows[y];
-        for (let x = 0; x < line.length; x++) {
-          const ch = line[x];
-          const at = when[y][x];
-          if (ch === " " || p >= at) out += ch;
-          else if (p >= at - TAIL) out += SCATTER[(Math.random() * SCATTER.length) | 0];
-          else out += " ";
-        }
-        out += "\n";
-      }
-      pre.textContent = out;
-      if (p < 1) raf = requestAnimationFrame(frame);
-      else running = false;
-    };
-
-    const play = () => {
-      if (running) return;
-      running = true;
-      t0 = 0;
-      raf = requestAnimationFrame(frame);
-    };
-
-    /* 장면이 눈에 들어올 때마다 다시 찍힌다 */
-    const io = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? play() : undefined)), { threshold: 0.25 });
-    io.observe(pre);
-    return () => {
-      io.disconnect();
-      cancelAnimationFrame(raf);
-    };
-  }, [arch.ascii]);
-
+/** 구조도 한 장. 창틀에 얹어야 흰 바탕이 검은 화면 위에서 겉돌지 않는다 */
+function ArchShot({ arch }: { arch: NonNullable<CategoryItem["arch"]> }) {
+  const [failed, setFailed] = useState(false);
   return (
     <span className="pw-term">
       <span className="pw-term-bar" aria-hidden>
@@ -165,9 +101,21 @@ function AsciiArch({ arch }: { arch: NonNullable<CategoryItem["arch"]> }) {
         <i className="pw-term-dot" />
         <b>{arch.label}</b>
       </span>
-      <pre className="pw-term-body" ref={preRef} aria-label={arch.caption}>
-        {arch.ascii}
-      </pre>
+      {failed ? (
+        <span className="pw-term-ph">architecture</span>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          className="pw-term-img"
+          src={arch.src}
+          alt={arch.caption}
+          /* 하이드레이션 전에 이미 실패한 그림은 onError 가 오지 않는다 */
+          ref={(el) => {
+            if (el?.complete && el.naturalWidth === 0) setFailed(true);
+          }}
+          onError={() => setFailed(true)}
+        />
+      )}
     </span>
   );
 }
@@ -400,7 +348,7 @@ export default function ProjectScenes() {
                       /* 그림이 있는 장면 — 껍데기 없이 왼쪽 아키텍처, 오른쪽 관점별 이야기만 */
                       <span className="pwide">
                         <span className="pw-left">
-                          <AsciiArch arch={it.arch} />
+                          <ArchShot arch={it.arch} />
                         </span>
                         <span className="pw-right">
                           {groupByLens(it.issues ?? []).map((g) => (
