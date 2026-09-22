@@ -518,16 +518,37 @@ html { overflow-x: clip; }
 
 /* ───────── 아키텍처 그림을 낀 장면 ─────────
    그림 한 장이 장면을 통째로 쓰므로 왼쪽에 구조, 오른쪽에 관점별 이야기로 가른다. */
-.pcard.pcard-wide { display: grid; grid-template-columns: 622px minmax(0, 1fr); gap: 34px; align-items: start; }
-.pw-left { display: flex; flex-direction: column; gap: 12px; height: 100%; }
-.pw-right { display: flex; flex-direction: column; gap: 13px; min-width: 0; }
+.pwide { display: grid; grid-template-columns: 700px minmax(0, 1fr); gap: 40px; align-items: center; height: 100%; }
+.pw-left { display: flex; flex-direction: column; justify-content: center; }
+.pw-right { display: flex; flex-direction: column; gap: 15px; min-width: 0; }
 
-/* draw.io 그림은 흰 바탕이라 밝은 판에 얹어야 겉돌지 않는다 */
-.pw-arch { display: block; border-radius: 12px; overflow: hidden; background: #f4f5f7; border: 1px solid rgba(255,255,255,0.1); }
-.pw-arch img { display: block; width: 100%; height: auto; }
-.pw-arch-ph { display: flex; align-items: center; justify-content: center; height: 244px; font-size: 12px; font-weight: 800; letter-spacing: 1.4px; color: rgba(0,0,0,0.32); }
-.pw-arch-cap { display: block; padding: 7px 11px 8px; font-size: 10.5px; line-height: 1.45; color: rgba(0,0,0,0.5); background: #e8eaee; }
-.pw-summary { border-bottom: 0; padding-bottom: 0; font-size: 12.5px; line-height: 1.55; }
+/* 구조도는 터미널 한 장에 글자로 찍는다 — 창틀, 제목 줄, 본문 */
+.pw-term {
+  display: block; border-radius: 10px; overflow: hidden;
+  background: #0b0d10; border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.45);
+}
+.pw-term-bar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 12px; background: rgba(255,255,255,0.045);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.pw-term-dot { width: 9px; height: 9px; border-radius: 9999px; background: rgba(255,255,255,0.16); }
+.pw-term-dot:first-child { background: #ff5f57; }
+.pw-term-dot:nth-child(2) { background: #febc2e; }
+.pw-term-dot:nth-child(3) { background: #28c840; }
+.pw-term-bar b {
+  margin-left: 8px; font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.3px; color: rgba(255,255,255,0.4);
+}
+.pw-term-body {
+  margin: 0; padding: 16px 18px 18px;
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
+  font-size: 12.8px; line-height: 1.36; letter-spacing: 0;
+  white-space: pre; tab-size: 4;
+  color: color-mix(in srgb, var(--cat) 62%, #e9eef7);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--cat) 26%, transparent);
+}
 
 /* 관점 이름 — 백엔드 이야기와 클라우드 이야기를 눈으로 먼저 가른다 */
 .pw-lens { display: flex; flex-direction: column; gap: 8px; }
@@ -540,4 +561,4 @@ html { overflow-x: clip; }
 .pw-right .pcard-block { font-size: 11.8px; line-height: 1.52; }
 
 /* 폴백(모바일·감속 모드)에서는 위아래로 흐른다 */
-.pstage.pstage-flow .pcard.pcard-wide { grid-template-columns: 1fr; gap: 20px; }
+.pstage.pstage-flow .pwide { grid-template-columns: 1fr; gap: 20px; height: auto; }
