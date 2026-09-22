@@ -339,7 +339,9 @@ section[id], span[id], footer[id] { scroll-margin-top: 92px; }
 
 /* 직무는 왼쪽 위에 */
 .pscene-head { display: flex; align-items: baseline; gap: 20px; }
-.pscene-num { font-family: 'Black Han Sans', sans-serif; font-size: 64px; line-height: 1.22; letter-spacing: 0; color: var(--cat); }
+/* 제목과 나란히 서는 번호. 줄 높이도 글자 크기도 제목과 같게 두고, 블록으로 잡아
+   상자 높이까지 맞춘다 — 장면이 조립될 때 yPercent 로 같이 밀려야 줄이 안 어긋난다. */
+.pscene-num { display: block; font-family: 'Black Han Sans', sans-serif; font-size: 64px; line-height: 1.22; letter-spacing: -0.01em; color: var(--cat); font-variant-numeric: tabular-nums; }
 .pscene-name { margin: 0; font-family: 'Black Han Sans', sans-serif; font-size: 64px; line-height: 1.22; letter-spacing: -0.01em; color: #ffffff; }
 .pscene-count { font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #e8b64c; }
 
@@ -460,15 +462,17 @@ html { overflow-x: clip; }
   align-items: center;
   gap: 2px;
   height: 52px;
-  padding: 0 8px 0 18px;
+  /* 로고도 링크와 같은 칸이라 양쪽 여백이 같아야 줄이 한 리듬으로 읽힌다 */
+  padding: 0 8px;
   border-radius: 9999px;
   background: rgba(20, 20, 20, 0.72);
   backdrop-filter: blur(16px) saturate(140%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
 }
-/* 옆 링크와 같은 값 — 크기(12px)·굵기(700)에 자간(1.4px)까지 맞춰야 같은 글씨로 읽힌다 */
-.dc .nav-logo { display: inline-flex; align-items: center; height: 36px; margin-right: 14px; padding: 0 14px; border-radius: 9999px; font-weight: 700; font-size: 12px; letter-spacing: 1.4px; }
+/* 옆 링크와 같은 값 — 크기(12px)·굵기(700)·자간(1.4px)에 여백과 색까지 맞춰야 같은 글씨로 읽힌다.
+   로고만 늘 흰색이면 자간이 같아도 혼자 굵어 보이고, margin 이 더 붙으면 칸 간격도 저만 벌어진다. */
+.dc .nav-logo { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 9999px; font-weight: 700; font-size: 12px; letter-spacing: 1.4px; color: rgba(255, 255, 255, 0.62); }
 .dc .nav-link {
   position: relative;
   display: inline-flex;
@@ -499,8 +503,9 @@ html { overflow-x: clip; }
 .dc .nav-link.is-active:hover::after { background: #ffffff; box-shadow: none; }
 @media (max-width: 460px) {
   html.flow .dc .navbar { padding: 0 10px !important; top: 14px; }
-  html.flow .dc .navpill { height: 46px; padding: 0 6px 0 12px !important; }
-  html.flow .dc .nav-logo { height: 32px; margin-right: 4px !important; padding: 0 8px; font-size: 13px !important; }
+  html.flow .dc .navpill { height: 46px; padding: 0 6px !important; }
+  /* 좁은 화면에서도 로고와 링크는 한 벌 — 크기·자간·여백을 같이 간다 */
+  html.flow .dc .nav-logo { height: 32px; margin-right: 0 !important; padding: 0 8px !important; font-size: 10px !important; letter-spacing: 0.6px !important; }
   html.flow .dc .nav-link { height: 32px; padding: 0 8px !important; font-size: 10px !important; letter-spacing: 0.6px !important; }
 }
 
@@ -516,7 +521,7 @@ html { overflow-x: clip; }
 .pcard-issue .pcard-block b { display: inline; margin: 0 6px 0 0; font-size: 10px; vertical-align: 1px; }
 
 /* 맨 위에서는 이름이 켜진다 — 소개 구간을 가리키는 표시 */
-.dc .nav-logo.is-active { position: relative; }
+.dc .nav-logo.is-active { position: relative; color: #ffffff; }
 /* 다른 링크와 같은 16px 짜리 짧은 밑줄 */
 .dc .nav-logo.is-active::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 16px; height: 2px; border-radius: 2px; transform: translateX(-50%); background: #da291c; box-shadow: 0 0 10px rgba(218, 41, 28, 0.8); }
 
@@ -629,12 +634,12 @@ html { overflow-x: clip; }
 /* ───────────── 리퀴드 메탈 칸 ─────────────
    테두리에서 금속이 흐르고 안쪽은 어두운 판. 누르는 버튼이 아니라 읽는 칸이라 hover 는 없다. */
 .lm-pill { position: relative; display: inline-flex; border-radius: 999px; isolation: isolate; }
-.lm-shader { position: absolute; inset: 0; z-index: 0; border-radius: 999px; overflow: hidden; background: #1b1b1b; }
+.lm-shader { position: absolute; inset: 0; z-index: 0; border-radius: 999px; overflow: hidden; background: #1b1b1b; opacity: 0.62; }
 .lm-shader canvas { display: block; width: 100% !important; height: 100% !important; border-radius: 999px; }
 /* 금속은 테두리에 흐른다. 안쪽은 어두운 판이라 글이 읽히고,
    테두리는 한 바퀴 전체가 고르게 빛나야 해서 무늬를 잘게 여러 번 준다. */
 .lm-face {
-  position: absolute; inset: 2px; z-index: 1; border-radius: 999px;
+  position: absolute; inset: 1.2px; z-index: 1; border-radius: 999px;
   background: linear-gradient(180deg, #1c1c1c 0%, #000000 100%);
 }
 .lm-body { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 11px; padding: 6px 15px 6px 8px; }

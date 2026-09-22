@@ -535,7 +535,7 @@ export const categories: Category[] = [
   {
     num: "03",
     name: "AI & Cloud",
-    color: "#fbbf24",
+    color: "#34d399",
     stack: ["AWS Lambda", "EC2", "S3", "OpenSearch", "Embedding", "OpenAI"],
     items: [
       {
@@ -580,7 +580,7 @@ export const categories: Category[] = [
   {
     num: "04",
     name: "Embedded & AI",
-    color: "#34d399",
+    color: "#fbbf24",
     stack: ["NVIDIA Jetson", "YOLO", "Optical Flow", "VLM", "TTS", "C/C++"],
     items: [
       {

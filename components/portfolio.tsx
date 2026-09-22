@@ -455,15 +455,15 @@ const clamp = (v: number) => Math.max(0, Math.min(1, v));
 
 const MARQUEE_ITEMS = ["AI", "BACKEND", "CLOUD", "DEVELOPER", "EMBEDDED"];
 /** 히어로 왼쪽 ABCDE 스택 — 인트로의 다섯 글자가 이 자리로 날아와 그대로 남는다 */
-/* 인트로에서는 ABCDE 로 모였다가, 다 풀리면 Developer 가 맨 아래로 간다 */
-/* 위에서 아래로 A·B·C·D·E. 인트로의 가로 한 줄이 그대로 세로로 내려앉아야 하므로
-   순서가 어긋나면 그 두 글자가 날아가며 서로를 가로질러 비뚤어져 보인다. */
+/* 인트로에서는 가로로 A·B·C·D·E 로 모였다가, 풀리면 Developer 가 맨 아래로 간다.
+   문장으로 읽으면 "AI · Backend · Cloud · Embedded 개발자" 이므로 D 가 마지막이다.
+   그래서 세로 순서만 A·B·C·E·D 로 어긋나고, 인트로에서 D 와 E 가 서로를 지나친다. */
 const ABCDE = [
   { ini: "A", rest: "I" },
   { ini: "B", rest: "ackend" },
   { ini: "C", rest: "loud" },
-  { ini: "D", rest: "eveloper" },
   { ini: "E", rest: "mbedded" },
+  { ini: "D", rest: "eveloper" },
 ];
 
 /* ───────────────────────── 컴포넌트 ───────────────────────── */
@@ -496,8 +496,11 @@ export default function Portfolio() {
     const cleanup: (() => void)[] = [];
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // 섹션 제목 fade-up (Trevor Noah 스타일)
-    const rv = [...root.querySelectorAll<HTMLElement>("section h2, section h3, blockquote")].filter((el) => !el.closest("[data-spread]"));
+    /* 섹션 제목 fade-up (Trevor Noah 스타일).
+       제 입장을 스스로 챙기는 구간은 건드리지 않는다 — 여기서 얹은 translateY 가 남아
+       그 구간의 타임라인과 겹치면, 나란히 놓인 번호와 제목이 서로 다른 만큼 밀려
+       줄이 어긋난다. */
+    const rv = [...root.querySelectorAll<HTMLElement>("section h2, section h3, blockquote")].filter((el) => !el.closest("[data-spread], .pstage"));
     rv.forEach((el) => {
       el.style.opacity = "0";
       el.style.transform = "translateY(36px)";
@@ -868,7 +871,8 @@ export default function Portfolio() {
                 </div>
               ) : (
                 <div className="spread-label" style={{ position: "absolute", inset: 0, background: "#1f1f1f", border: "1px solid rgba(255,255,255,0.12)", display: "flex", flexDirection: "column", gap: 6, padding: 16 }}>
-                  <span style={{ fontFamily: BHS, fontSize: 16, color: RED, lineHeight: 1 }}>{c.num}</span>
+                  {/* 번호와 이름은 한 벌이다 — 장면 머리(.pscene-head)처럼 크기도 줄 높이도 같게 둔다 */}
+                  <span style={{ fontFamily: BHS, fontSize: 18, color: RED, lineHeight: 1 }}>{c.num}</span>
                   <span style={{ fontFamily: BHS, fontSize: 18, color: "#ffffff", lineHeight: 1, marginBottom: 2 }}>{c.label}</span>
                   <span className="sp-stack">
                     {c.items.map((it) => (

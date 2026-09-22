@@ -64,6 +64,24 @@ const CODE_HOLD = 0.55;
 /** 글자 수에 맞춘 길이. 다 같이 시작하니 길이는 비슷하게 두어 함께 끝나게 한다 */
 const span = (len: number) => 800 + len * 6;
 
+/** 관점 이름을 코드에 적을 때 쓰는 말 — 주석 줄에 깔아 둔다 */
+const LENS_NOTE: Record<string, string> = {
+  백엔드: "# backend",
+  클라우드: "# cloud",
+  AI: "# ai",
+  임베디드: "# embedded",
+};
+
+/**
+ * 코드 끝에 달아 둔 영어 설명만 뽑아낸다.
+ * 태그 줄에는 깔아 둘 코드가 따로 없다. 없다고 아무 글자나 흩뿌리면 한글 초성이
+ * 깔려 코드처럼 읽히지 않으니, 바로 아래 줄 코드에 이미 적어 둔 설명을 끌어다 쓴다.
+ */
+function codeNote(code?: string): string | undefined {
+  const m = code?.match(/(?:\/\/|#)\s*(.+)$/);
+  return m ? `// ${m[1]}` : undefined;
+}
+
 function ProblemWindow({ issues, title }: { issues: CategoryIssue[]; title: string }) {
   const groups = groupByLens(issues);
   /* 한 줄씩 차례로 넘기면 눈이 따라다니느라 정신없다 — 파일 전체가 한 번에 넘어간다 */
@@ -83,12 +101,12 @@ function ProblemWindow({ issues, title }: { issues: CategoryIssue[]; title: stri
   groups.forEach((g, gi) => {
     if (gi) push("", null, null);
     const head = `// ${g.lens}`;
-    push("is-comment", null, <CodeReveal text={head} {...slot(head.length)} />);
+    push("is-comment", null, <CodeReveal text={head} code={LENS_NOTE[g.lens]} {...slot(head.length)} />);
     g.issues.forEach((iss, k) => {
       push(
         "is-tag",
         <em className="pw-idx">[{String(k + 1).padStart(2, "0")}]</em>,
-        <CodeReveal text={iss.tag} {...slot(iss.tag.length)} />,
+        <CodeReveal text={iss.tag} code={codeNote(iss.problemCode)} {...slot(iss.tag.length)} />,
       );
       /* 문제는 지워질 줄, 해결은 더해질 줄 — diff 로 읽으면 한눈에 갈린다 */
       push(
@@ -185,10 +203,16 @@ function ArchShot({ arch }: { arch: NonNullable<CategoryItem["arch"]> }) {
   );
 }
 
-/* SpecialText 와 같은 글리프. 한글 자리는 한글 폭으로 채워야 줄이 안 흔들린다 */
-const NARROW = "_!X$0-+*#";
-const WIDE = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ";
-const pick = (wide: boolean) => (wide ? WIDE : NARROW)[(Math.random() * (wide ? WIDE.length : NARROW.length)) | 0];
+/* 아직 글이 안 온 칸에서 깜빡이는 글리프.
+   여기는 코드가 깔린 에디터라 한글 초성이 섞이면 코드로 안 읽힌다 — 영문과 기호만 쓴다.
+   한글 한 자 자리는 두 자로 메워야 줄 폭이 그대로다. */
+const GLYPH = "abcdefgilmnoprstuvxy0123456789_-+*/=<>(){}[];.#$";
+const one = () => GLYPH[(Math.random() * GLYPH.length) | 0];
+const pick = (slots: number) => {
+  let s = "";
+  for (let i = 0; i < slots; i++) s += one();
+  return s;
+};
 
 /* 한글 한 자가 영문 몇 자 폭인지 — 폰트마다 다르므로 실제로 재서 쓴다.
    어림잡아 2로 두면 깔아 둔 코드가 설명보다 짧거나 길어져 칸이 안 맞는다. */
@@ -202,6 +226,42 @@ function measureWide(el: HTMLElement) {
   const narrow = cv.measureText("a".repeat(20)).width / 20;
   const wide = cv.measureText("가".repeat(20)).width / 20;
   return (wideRatio = narrow > 0 ? wide / narrow : 2);
+}
+
+/* 고정 무대에서는 네 장면이 같은 자리에 겹쳐 있고, 차례가 아닌 장면은 autoAlpha 로만
+   감춰 둔다. IntersectionObserver 는 감춰진 것도 "보인다"고 해서, 무대에 들어서는 순간
+   뒤쪽 장면(04 VIAssist)까지 한꺼번에 코드가 풀려 버리고 정작 그 장면에 닿았을 땐
+   이미 글이 되어 있다. 그래서 제 장면이 실제로 켜졌는지 한 번 더 보고 시작한다. */
+const waiting = new Set<{ el: HTMLElement; run: () => void }>();
+let pump = 0;
+
+function sceneLit(el: HTMLElement, seen: Map<HTMLElement, boolean>) {
+  const scene = el.closest<HTMLElement>(".pscene") ?? el;
+  const known = seen.get(scene);
+  if (known !== undefined) return known;
+  const cs = getComputedStyle(scene);
+  const lit = cs.visibility !== "hidden" && Number(cs.opacity) > 0.05;
+  seen.set(scene, lit);
+  return lit;
+}
+
+/* 줄이 수십 개라 저마다 제 눈으로 살피면 프레임마다 같은 계산을 되풀이한다 — 한 번 재고 나눠 쓴다 */
+function tick() {
+  pump = 0;
+  const seen = new Map<HTMLElement, boolean>();
+  for (const w of [...waiting]) {
+    if (!sceneLit(w.el, seen)) continue;
+    waiting.delete(w);
+    w.run();
+  }
+  if (waiting.size) pump = requestAnimationFrame(tick);
+}
+
+function whenLit(el: HTMLElement, run: () => void) {
+  const w = { el, run };
+  waiting.add(w);
+  if (!pump) pump = requestAnimationFrame(tick);
+  return () => waiting.delete(w);
 }
 
 /**
@@ -218,9 +278,12 @@ function CodeReveal({ text, code, delay = 0, dur }: { text: string; code?: strin
     const chars = [...text];
     const r = measureWide(el);
     const w = chars.map((c) => (c.charCodeAt(0) > 0x1100 ? r : 1));
+    /* 한 글자가 영문 몇 칸을 먹는지 — 깜빡이는 칸을 그만큼 채워야 줄 폭이 그대로다 */
+    const slot = w.map((x) => Math.max(1, Math.round(x)));
     const total = Math.round(w.reduce((a, b) => a + b, 0));
-    /* 코드는 설명과 꼭 같은 폭만큼만 깔린다 */
-    const src = (code ?? "").padEnd(total, " ").slice(0, total);
+    /* 코드는 설명과 꼭 같은 폭만큼만 깔린다. 깔아 둘 코드가 없으면 그 자리는
+       영문 글리프로 메운다 — 한글 초성을 섞으면 코드로 안 읽힌다. */
+    const src = (code ?? pick(total)).padEnd(total, " ").slice(0, total);
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       el.textContent = text;
@@ -244,29 +307,29 @@ function CodeReveal({ text, code, delay = 0, dur }: { text: string; code?: strin
         used += w[i];
       }
       for (let k = 0; k < EDGE && i < chars.length; k++, i++) {
-        out += chars[i] === " " ? " " : pick(w[i] > 1);
+        out += chars[i] === " " ? " " : pick(slot[i]);
         used += w[i];
       }
-      if (code) out += src.slice(Math.round(used));
-      else {
-        /* 깔아 둘 코드가 없는 줄 — 아직 안 온 칸은 흩뿌린 글자가 메운다 */
-        for (; i < chars.length; i++) out += chars[i] === " " ? " " : pick(w[i] > 1);
-      }
+      out += src.slice(Math.round(used));
       el.textContent = out;
       if (p < 1) raf = requestAnimationFrame(frame);
       else el.textContent = text;
     };
 
-    /* 장면이 눈에 들어오기 전까지는 코드(또는 흩뿌린 글자)만 깔려 있다 */
-    el.textContent = code ? src : chars.map((c, i) => (c === " " ? " " : pick(w[i] > 1))).join("");
+    /* 장면이 눈에 들어오기 전까지는 깔아 둔 코드만 보인다 */
+    el.textContent = src;
     let timer = 0;
+    let drop = () => {};
     const io = new IntersectionObserver(
       (es) => {
         if (!es.some((e) => e.isIntersecting)) return;
         io.disconnect();
-        timer = window.setTimeout(() => {
-          raf = requestAnimationFrame(frame);
-        }, delay * 1000);
+        /* 자리에 들어왔더라도 제 장면이 켜질 때까지 기다린다 */
+        drop = whenLit(el, () => {
+          timer = window.setTimeout(() => {
+            raf = requestAnimationFrame(frame);
+          }, delay * 1000);
+        });
       },
       { threshold: 0.2 },
     );
@@ -274,6 +337,7 @@ function CodeReveal({ text, code, delay = 0, dur }: { text: string; code?: strin
 
     return () => {
       io.disconnect();
+      drop();
       window.clearTimeout(timer);
       cancelAnimationFrame(raf);
     };
@@ -294,8 +358,8 @@ const SHOW = "inset(0% 0% 0% 0%)";
 const GLOW: Record<string, "blue" | "purple" | "green" | "orange"> = {
   "01": "blue",
   "02": "purple",
-  "03": "orange",
-  "04": "green",
+  "03": "green",
+  "04": "orange",
 };
 
 /** 장면 하나를 넘기는 데 필요한 스크롤 (화면 높이 배수) */
