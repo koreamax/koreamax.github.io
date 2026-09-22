@@ -9,8 +9,8 @@ import { strengths, type Strength } from "@/components/portfolio-data";
  * 한 화면에 두 개씩 세 번. 짝마다 사진이 흐르는 결을 달리해 같은 화면이 세 번
  * 반복되지 않게 한다.
  *  · 01·02 기록      — 세로로 흐르는 두 줄. 문서와 글은 길쭉하게 읽힌다
- *  · 03·04 꾸준함·전달 — 비스듬히 누운 판 위를 세 줄이 서로 반대로 흐른다
- *  · 05·06 발표·도구  — 가로로 한 줄. 현장 사진은 옆으로 넘겨 보는 결이 맞다
+ *  · 03·04 꾸준함·전달 — 비스듬히 누운 판 위를 다섯 줄이 서로 반대로 흐른다
+ *  · 05·06 발표·도구  — 가로로 두 줄이 서로 반대로. 현장 사진은 옆으로 넘겨 보는 결이 맞다
  *
  * 사진이 아직 없으면 자리만 잡아 두고, 넣은 장수가 칸보다 적으면 있는 것을 돌려
  * 가며 채운다. 그래서 한 장만 넣어도 줄이 비지 않는다.
@@ -49,9 +49,9 @@ function Shot({ src, label }: { src: string | null; label: string }) {
 }
 
 /** 한 줄 — 같은 칸을 두 벌 이어 붙여 끝이 처음과 만나게 한다 */
-function Lane({ tiles, label, spin, back, className = "" }: { tiles: (string | null)[]; label: string; spin: number; back?: boolean; className?: string }) {
+function Lane({ tiles, label, spin, back }: { tiles: (string | null)[]; label: string; spin: number; back?: boolean }) {
   return (
-    <span className={`st-lane ${back ? "is-back" : ""} ${className}`} style={{ ["--spin" as string]: `${spin}s` }}>
+    <span className={`st-lane ${back ? "is-back" : ""}`} style={{ ["--spin" as string]: `${spin}s` }}>
       {[0, 1].map((dup) =>
         tiles.map((src, i) => (
           <span className="st-tile" key={`${dup}-${i}`} aria-hidden={dup === 1 || undefined}>
@@ -63,7 +63,7 @@ function Lane({ tiles, label, spin, back, className = "" }: { tiles: (string | n
   );
 }
 
-/** 사진이 흐르는 칸. 결에 따라 세로 두 줄 · 누운 판 · 가로 한 줄이 된다 */
+/** 사진이 흐르는 칸. 결에 따라 세로 두 줄 · 누운 판 · 가로 두 줄이 된다 */
 function Shots({ item, flow, cols, rows }: { item: Strength; flow: Flow; cols: number; rows: number }) {
   const body = Array.from({ length: cols }, (_, c) => (
     <Lane key={c} tiles={lane(item.shots, c * rows, rows)} label={item.ph} spin={SPIN[c % SPIN.length]} back={c % 2 === 1} />
@@ -75,17 +75,14 @@ function Shots({ item, flow, cols, rows }: { item: Strength; flow: Flow; cols: n
   );
 }
 
-/** 한 칸 — 사진이 위, 번호와 글이 아래 */
+/** 한 칸 — 사진이 위, 번호와 제목이 아래. 글은 그 한 줄이 전부다 */
 function Panel({ item, flow, cols, rows, delay }: { item: Strength; flow: Flow; cols: number; rows: number; delay: number }) {
   return (
     <article className="st-panel" style={{ transitionDelay: `${delay}s` }}>
       <Shots item={item} flow={flow} cols={cols} rows={rows} />
-      <span className="st-text">
-        <span className="st-top">
-          <b className="st-num">{item.num}</b>
-          <h3 className="st-title">{item.title}</h3>
-        </span>
-        <p className="st-lead">{item.lead}</p>
+      <span className="st-top">
+        <b className="st-num">{item.num}</b>
+        <h3 className="st-title">{item.title}</h3>
       </span>
     </article>
   );
@@ -116,17 +113,8 @@ export default function Strengths() {
     return () => io.disconnect();
   }, []);
 
-  /* 구간을 여는 띠는 사진이 한 장이라도 들어왔을 때만 깐다 — 빈 칸만 흐르면 허전하다 */
-  const strip = strengths.flatMap((s) => s.shots);
-
   return (
-    <section id="how" ref={rootRef} className={`st-sec ${strip.length > 0 ? "has-strip" : ""}`}>
-      {strip.length > 0 && (
-        <div className="st-strip" aria-hidden>
-          <Lane tiles={strip.concat(strip).slice(0, 12)} label="" spin={48} className="st-strip-lane" />
-        </div>
-      )}
-
+    <section id="how" ref={rootRef} className="st-sec">
       <div className="st-views">
         {VIEWS.map((v, vi) => (
           <div className="st-view" key={vi}>

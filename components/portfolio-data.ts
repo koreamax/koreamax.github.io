@@ -650,14 +650,13 @@ export const categories: Category[] = [
 
 /* ───────────────────────── 일하는 방식 ─────────────────────────
    만든 것 말고, 만드는 동안 하는 일. 한 화면에 두 개씩 세 번에 걸쳐 보여 준다.
+   글은 제목 한 줄이 전부다 — 사진이 말하게 두고 이름만 붙인다.
    shots 는 public/uploads/ 아래 파일 경로. 비워 두면 자리만 잡아 두고,
    넣은 장수가 칸보다 적으면 있는 것을 돌려 가며 채운다. */
 export interface Strength {
   num: string;
-  /** 한 줄로 읽히는 제목 */
+  /** 제목 — 이 칸이 무엇인지 */
   title: string;
-  /** 제목을 풀어 쓴 한 문장 */
-  lead: string;
   /** 사진이 없을 때 그 자리에 적히는 말 */
   ph: string;
   shots: string[];
@@ -665,45 +664,44 @@ export interface Strength {
 
 export const strengths: Strength[] = [
   {
-    num: "01",
-    title: "회의가 끝나면 문서가 남는다",
-    lead: "회의록·일정·결정 사항을 노션 한곳에 모아, 나중에 합류한 사람도 읽고 바로 따라오는 상태로 둔다",
-    ph: "노션 정리",
+    num: '01',
+    title: '기록하는 습관',
+    ph: '노션 기록',
+    shots: [
+      '/uploads/note-esw-home.webp',
+      '/uploads/note-esw-schedule.webp',
+      '/uploads/note-piuda-meetings.webp',
+      '/uploads/note-capstone.webp',
+    ],
+  },
+  {
+    num: '02',
+    title: '공부한 것 정리',
+    ph: '깃허브 · 블로그',
     shots: [],
   },
   {
-    num: "02",
-    title: "공부한 것은 남겨 둔다",
-    lead: "읽고 만든 것을 깃허브와 블로그에 정리해, 같은 문제를 만난 사람이 검색으로 닿는 글로 남긴다",
-    ph: "깃허브 · 블로그",
+    num: '03',
+    title: '꾸준히 이어 온 활동',
+    ph: '스터디 · 근로',
     shots: [],
   },
   {
-    num: "03",
-    title: "끊기지 않고 이어 간다",
-    lead: "스터디도 근무도 학기 단위로 끊지 않고 이어 와, 기간이 아니라 누적으로 남은 기록이 있다",
-    ph: "꾸준히 이어 온 활동",
+    num: '04',
+    title: '공지와 알림 전달',
+    ph: '조교 · 코어 멤버',
     shots: [],
   },
   {
-    num: "04",
-    title: "공지는 내가 돌린다",
-    lead: "조교와 코어 멤버로 공지와 일정을 먼저 정리해 돌려 왔다. 사람에게 말 거는 데 드는 비용이 적다",
-    ph: "공지 · 알림",
+    num: '05',
+    title: '발표와 데모',
+    ph: '발표 · 데모',
     shots: [],
   },
   {
-    num: "05",
-    title: "앞에 서는 게 어렵지 않다",
-    lead: "발표와 데모를 맡아 왔다. 자료를 만들고 말로 풀어 내는 자리에 부담이 없다",
-    ph: "발표 · 데모",
-    shots: [],
-  },
-  {
-    num: "06",
-    title: "AI는 도구로 쓴다",
-    lead: "GPT·Claude·Gemini를 용도에 따라 갈라 쓴다. 맡길 곳과 직접 짤 곳을 구분하는 것까지가 활용이다",
-    ph: "AI 활용",
+    num: '06',
+    title: 'AI 활용',
+    ph: 'GPT · Claude · Gemini',
     shots: [],
   },
 ];
