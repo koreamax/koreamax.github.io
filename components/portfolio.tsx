@@ -430,7 +430,7 @@ export default function Portfolio() {
        제 입장을 스스로 챙기는 구간은 건드리지 않는다 — 여기서 얹은 translateY 가 남아
        그 구간의 타임라인과 겹치면, 나란히 놓인 번호와 제목이 서로 다른 만큼 밀려
        줄이 어긋난다. */
-    const rv = [...root.querySelectorAll<HTMLElement>("section h2, section h3, blockquote")].filter((el) => !el.closest("[data-spread], .pstage"));
+    const rv = [...root.querySelectorAll<HTMLElement>("section h2, section h3, blockquote")].filter((el) => !el.closest("[data-spread], .pstage, .st-sec"));
     rv.forEach((el) => {
       el.style.opacity = "0";
       el.style.transform = "translateY(36px)";

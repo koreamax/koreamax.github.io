@@ -695,15 +695,15 @@ export const categories: Category[] = [
 ];
 
 /* ───────────────────────── 일하는 방식 ─────────────────────────
-   만든 것 말고, 만드는 동안 하는 일. 한 화면에 두 개씩 세 번에 걸쳐 보여 준다.
+   만든 것 말고, 만드는 동안 하는 일. 세 가지가 한 화면씩을 통째로 쓴다.
    글은 제목 한 줄이 전부다 — 사진이 말하게 두고 이름만 붙인다.
-   shots 는 public/uploads/ 아래 파일 경로. 비워 두면 자리만 잡아 두고,
-   넣은 장수가 칸보다 적으면 있는 것을 돌려 가며 채운다. */
+   shots 는 public/uploads/ 아래 파일 경로. 장수가 늘면 화면을 가르는 줄이 늘고
+   칸이 작아진다 (몇 장에 몇 줄인지는 components/strengths.tsx 의 GEO 참고). */
 export interface Strength {
   num: string;
-  /** 제목 — 이 칸이 무엇인지 */
+  /** 제목 — 이 화면이 무엇인지 */
   title: string;
-  /** 사진이 없을 때 그 자리에 적히는 말 */
+  /** 사진이 깨졌을 때 그 자리에 적히는 말 */
   ph: string;
   shots: string[];
 }
@@ -711,7 +711,7 @@ export interface Strength {
 export const strengths: Strength[] = [
   {
     num: '01',
-    title: 'Notion에 기록하는 습관',
+    title: '업무, 회의, 일정 등을 Notion에 기록하는 습관',
     ph: '노션 기록',
     shots: [
       '/uploads/note-esw-home.webp',
@@ -723,39 +723,34 @@ export const strengths: Strength[] = [
       '/uploads/note-aws-sbg.webp',
     ],
   },
+  /* 스터디 자체와 거기서 정리한 글을 한 화면에 — 줄마다 섞이도록 번갈아 놓는다 */
   {
     num: '02',
-    title: 'Github와 Velog 등 공부한 내용 정리',
-    ph: '깃허브 · 블로그',
+    title: '꾸준히 학습하는 스터디와 GitHub와 Velog 등에 학습 내용 정리',
+    ph: '스터디 · 정리',
     shots: [
       '/uploads/study-velog-3tier.webp',
+      '/uploads/ovs-study-cover.webp',
       '/uploads/study-velog-hypervisor.webp',
+      '/uploads/os-study-readme.webp',
       '/uploads/study-gh-os-note.webp',
+      '/uploads/devops-study-weeks.webp',
       '/uploads/study-gh-network.webp',
+      '/uploads/k8s-study-readme.webp',
       '/uploads/study-velog-vpc.webp',
+      '/uploads/os-study-weeks.webp',
       '/uploads/study-velog-sktfly.webp',
+      '/uploads/coding-test-study.webp',
       '/uploads/study-gh-k8s-note.webp',
       '/uploads/study-ovs-sdn.webp',
       '/uploads/study-velog-hypervisor2.webp',
     ],
   },
+  /* 세로로 긴 휴대폰 화면 셋은 맨 앞에 — 앞에서부터 줄마다 하나씩 돌아가 흩어진다 */
   {
     num: '03',
-    title: '꾸준히 이어 온 스터디',
-    ph: '스터디 · 근로',
-    shots: [
-      '/uploads/ovs-study-cover.webp',
-      '/uploads/os-study-readme.webp',
-      '/uploads/devops-study-weeks.webp',
-      '/uploads/k8s-study-readme.webp',
-      '/uploads/os-study-weeks.webp',
-      '/uploads/coding-test-study.webp',
-    ],
-  },
-  {
-    num: '04',
-    title: '공지와 알림 전달',
-    ph: '조교 · 코어 멤버',
+    title: 'AWS SBG Core Member와 대학교 조교로서 발표와 공지 및 알림',
+    ph: '발표 · 공지',
     shots: [
       '/uploads/notice-devconf-poster.webp',
       '/uploads/notice-asbg-recruit.webp',
@@ -767,12 +762,5 @@ export const strengths: Strength[] = [
       '/uploads/notice-assignment.webp',
       '/uploads/notice-devops-recruit.webp',
     ],
-  },
-  /* 05 는 사진이 아니라 지나온 줄들을 싣는다 — events 를 그대로 흘려보낸다 */
-  {
-    num: '05',
-    title: '쉬지않고 달려온 성실함',
-    ph: '',
-    shots: [],
   },
 ];
