@@ -461,7 +461,7 @@ export default function Portfolio() {
       ["[data-spread]", "#awards"],
       ["#work", "#work"],
       [".pstage", "#work"],
-      ["#timeline", "#timeline"],
+      ["#how", "#how"],
     ];
     let lastActive = "";
 
@@ -632,7 +632,7 @@ export default function Portfolio() {
           {[
             ["#awards", "Awards"],
             ["#work", "Projects"],
-            ["#timeline", "Timeline"],
+            ["#how", "How"],
           ].map(([href, label]) => (
             <a key={href} href={href} className="nav-link" data-nav={href}>
               {label}

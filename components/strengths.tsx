@@ -160,7 +160,7 @@ export default function Strengths() {
   }, []);
 
   return (
-    <section id="timeline" ref={rootRef} className="st-sec">
+    <section id="how" ref={rootRef} className="st-sec">
       {strengths.map((item, i) => (
         <Screen key={item.num} item={item} flow={FLOWS[i % FLOWS.length]} />
       ))}

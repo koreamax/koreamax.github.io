@@ -721,6 +721,11 @@ export const strengths: Strength[] = [
       '/uploads/note-viassist-progress.webp',
       '/uploads/note-viassist-board.webp',
       '/uploads/note-aws-sbg.webp',
+      '/uploads/note-esw-todo.webp',
+      '/uploads/note-skt-routing.webp',
+      '/uploads/note-esw-review.webp',
+      '/uploads/note-skt-schedule.webp',
+      '/uploads/note-capstone-crane.webp',
     ],
   },
   /* 스터디 자체와 거기서 정리한 글을 한 화면에 — 줄마다 섞이도록 번갈아 놓는다 */
@@ -744,6 +749,9 @@ export const strengths: Strength[] = [
       '/uploads/study-gh-k8s-note.webp',
       '/uploads/study-ovs-sdn.webp',
       '/uploads/study-velog-hypervisor2.webp',
+      '/uploads/study-velog-eip.webp',
+      '/uploads/study-velog-3tier-diagram.webp',
+      '/uploads/study-gh-rancher.webp',
     ],
   },
   /* 세로로 긴 휴대폰 화면 셋은 맨 앞에 — 앞에서부터 줄마다 하나씩 돌아가 흩어진다 */
@@ -761,6 +769,10 @@ export const strengths: Strength[] = [
       '/uploads/notice-lunch-last.webp',
       '/uploads/notice-assignment.webp',
       '/uploads/notice-devops-recruit.webp',
+      '/uploads/notice-bedrock-talk.webp',
+      '/uploads/notice-asbg-intro.webp',
+      '/uploads/notice-skt-qna.webp',
+      '/uploads/notice-asbg-session.webp',
     ],
   },
 ];
