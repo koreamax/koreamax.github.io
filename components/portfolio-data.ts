@@ -127,6 +127,8 @@ export interface TimelineEvent {
   title: string;
   desc: string;
   kind: string;
+  /** 제목 아래 한 줄 — 맡은 자리, 또는 줄여 쓴 이름의 풀네임 */
+  sub?: string;
   /** true = 아직 하고 있는 활동, false = 끝난 활동 */
   ongoing: boolean;
 }
@@ -142,13 +144,15 @@ export const events: TimelineEvent[] = [
   {
     date: "2026.06 – 09",
     title: "SKT FLY AI CHALLENGER 9기",
+    sub: "AI & Cloud Developer",
     desc: "AI & Cloud Developer — 개인 최우수상·프로젝트 부문 SK텔레콤 대표이사상 수상.",
     kind: "Program",
     ongoing: false,
   },
   {
     date: "2026.05 ~",
-    title: "AWS Student Builder Groups at DGU 1기",
+    title: "AWS Student Builder Groups 1기",
+    sub: "Core Member",
     desc: "Core Member(운영진)로 커뮤니티 운영.",
     kind: "Community",
     ongoing: true,
@@ -163,13 +167,15 @@ export const events: TimelineEvent[] = [
   {
     date: "2025.07 ~",
     title: "CSDC LAB 학부연구생",
+    sub: "Computer Security & Distributed Computing LAB",
     desc: "학부연구생 — 보안·분산 컴퓨팅 연구.",
     kind: "Research",
     ongoing: true,
   },
   {
     date: "2025.07 – 2026.04",
-    title: "AWS Cloud Club at DGU 1기",
+    title: "AWS Cloud Club 1기",
+    sub: "General Member",
     desc: "General Member로 클라우드 커뮤니티 활동.",
     kind: "Community",
     ongoing: false,
@@ -177,6 +183,7 @@ export const events: TimelineEvent[] = [
   {
     date: "2025.03 – 12",
     title: "FARM SYSTEM 4기 웹/보안 트랙",
+    sub: "Backend Developer",
     desc: "Backend Developer.",
     kind: "Community",
     ongoing: false,
@@ -191,6 +198,7 @@ export const events: TimelineEvent[] = [
   {
     date: "2023.01 – 06",
     title: "코리아 IT 아카데미 JSP & Spring Boot 백엔드 과정",
+    sub: "Backend Developer",
     desc: "Backend Developer 과정 수료.",
     kind: "Program",
     ongoing: false,
