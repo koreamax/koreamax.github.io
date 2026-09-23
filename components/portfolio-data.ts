@@ -129,6 +129,8 @@ export interface TimelineEvent {
   kind: string;
   /** 제목 아래 한 줄 — 맡은 자리, 또는 줄여 쓴 이름의 풀네임 */
   sub?: string;
+  /** 단체 로고 — 없으면 갈래를 나타내는 그림으로 대신한다 */
+  logo?: string;
   /** true = 아직 하고 있는 활동, false = 끝난 활동 */
   ongoing: boolean;
 }
@@ -137,6 +139,7 @@ export const events: TimelineEvent[] = [
   {
     date: "2026.09 ~",
     title: "IoT Microprocessor 강의 조교",
+    sub: "Teaching Assistant",
     desc: "동국대학교 IoT 마이크로프로세서 강의 Teaching Assistant.",
     kind: "TA",
     ongoing: true,
@@ -144,6 +147,7 @@ export const events: TimelineEvent[] = [
   {
     date: "2026.06 – 09",
     title: "SKT FLY AI CHALLENGER 9기",
+    logo: "/uploads/logo-fly-ai.webp",
     sub: "AI & Cloud Developer",
     desc: "AI & Cloud Developer — 개인 최우수상·프로젝트 부문 SK텔레콤 대표이사상 수상.",
     kind: "Program",
@@ -152,6 +156,7 @@ export const events: TimelineEvent[] = [
   {
     date: "2026.05 ~",
     title: "AWS Student Builder Groups 1기",
+    logo: "/uploads/logo-asbg.webp",
     sub: "Core Member",
     desc: "Core Member(운영진)로 커뮤니티 운영.",
     kind: "Community",
@@ -160,6 +165,7 @@ export const events: TimelineEvent[] = [
   {
     date: "2026.03 – 06",
     title: "Computer Architecture 강의 조교",
+    sub: "Teaching Assistant",
     desc: "컴퓨터 구조 강의 Teaching Assistant.",
     kind: "TA",
     ongoing: false,
@@ -175,6 +181,7 @@ export const events: TimelineEvent[] = [
   {
     date: "2025.07 – 2026.04",
     title: "AWS Cloud Club 1기",
+    logo: "/uploads/logo-cloud-club.webp",
     sub: "General Member",
     desc: "General Member로 클라우드 커뮤니티 활동.",
     kind: "Community",
@@ -183,6 +190,7 @@ export const events: TimelineEvent[] = [
   {
     date: "2025.03 – 12",
     title: "FARM SYSTEM 4기 웹/보안 트랙",
+    logo: "/uploads/logo-farm-system.webp",
     sub: "Backend Developer",
     desc: "Backend Developer.",
     kind: "Community",
@@ -198,6 +206,7 @@ export const events: TimelineEvent[] = [
   {
     date: "2023.01 – 06",
     title: "코리아 IT 아카데미 JSP & Spring Boot 백엔드 과정",
+    logo: "/uploads/logo-korea-it.webp",
     sub: "Backend Developer",
     desc: "Backend Developer 과정 수료.",
     kind: "Program",

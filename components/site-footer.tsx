@@ -1,3 +1,4 @@
+import { FlaskConical, Presentation } from "lucide-react";
 import { events, quals, type TimelineEvent } from "@/components/portfolio-data";
 
 /**
@@ -5,7 +6,13 @@ import { events, quals, type TimelineEvent } from "@/components/portfolio-data";
  * 칸 안은 events 에 적힌 순서(최근 것부터) 그대로 둔다.
  * 개발과 닿아 있는 것만 싣는다 — 아르바이트·군 복무(Work, Military)는 데이터에만 둔다.
  * 학교 이름은 적지 않는다. 마지막 칸은 자격증 — 발급처 로고를 곁들인다.
+ *
+ * 모든 줄은 [로고 칸][글] 한 모양이다. 연구실·조교는 학교가 드러나지 않게 로고 대신
+ * 갈래 그림을 같은 크기 칸에 넣어, 칸마다 글이 같은 선에서 시작하게 맞춘다.
  */
+
+/** 로고가 없는 갈래에 대신 넣는 그림 */
+const GLYPH: Record<string, typeof FlaskConical> = { Research: FlaskConical, TA: Presentation };
 const COLUMNS: { label: string; kinds: string[] }[] = [
   { label: "Program", kinds: ["Program"] },
   { label: "Community", kinds: ["Community"] },
@@ -38,15 +45,31 @@ const SOCIALS = [
   },
 ];
 
+/** 로고 칸 — 오른쪽 아래 점이 진행 중(초록)·종료(빨강)를 알린다 */
+function Mark({ e }: { e: TimelineEvent }) {
+  const Glyph = GLYPH[e.kind];
+  return (
+    <span className={`ft-logo ${e.logo ? "is-fill" : "is-glyph"}`}>
+      {e.logo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={e.logo} alt="" />
+      ) : (
+        Glyph && <Glyph size={18} strokeWidth={1.6} aria-hidden />
+      )}
+      <i className={`ft-dot ${e.ongoing ? "is-on" : ""}`} aria-label={e.ongoing ? "진행 중" : "종료"} />
+    </span>
+  );
+}
+
 function Entry({ e }: { e: TimelineEvent }) {
   return (
-    <li className="ft-item">
-      <span className="ft-title">
-        <i className={`ft-dot ${e.ongoing ? "is-on" : ""}`} aria-label={e.ongoing ? "진행 중" : "종료"} />
-        {e.title}
+    <li className="ft-row">
+      <Mark e={e} />
+      <span className="ft-item">
+        <span className="ft-title">{e.title}</span>
+        {e.sub && <span className="ft-sub">{e.sub}</span>}
+        <span className="ft-date">{e.date}</span>
       </span>
-      {e.sub && <span className="ft-sub">{e.sub}</span>}
-      <span className="ft-date">{e.date}</span>
     </li>
   );
 }
@@ -72,7 +95,7 @@ export default function SiteFooter() {
             <p className="ft-label">Certification</p>
             <ul className="ft-list">
               {quals.map((q) => (
-                <li key={q.title} className="ft-cert">
+                <li key={q.title} className="ft-row">
                   <span className="ft-logo">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={q.logo} alt="" />

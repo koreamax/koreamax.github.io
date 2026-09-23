@@ -737,19 +737,22 @@ html { overflow-x: clip; }
 .ft-label { margin: 0 0 20px; font-size: 13px; font-weight: 700; letter-spacing: 0.02em; color: rgba(255, 255, 255, 0.42); }
 .ft-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 16px; }
 .ft-item { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.ft-title { display: inline-flex; align-items: flex-start; gap: 8px; font-size: 14.5px; line-height: 1.45; color: rgba(255, 255, 255, 0.78); transition: color .2s ease; }
+.ft-title { font-size: 14.5px; line-height: 1.45; color: rgba(255, 255, 255, 0.78); transition: color .2s ease; }
 .ft-item:hover .ft-title { color: #ffffff; }
 .ft-sub { font-size: 12.5px; line-height: 1.45; color: rgba(255, 255, 255, 0.5); }
-.ft-item > .ft-sub, .ft-item > .ft-date { padding-left: 14px; }
-.ft-cert .ft-item > .ft-sub, .ft-cert .ft-item > .ft-date { padding-left: 0; }
 .ft-date { font-family: 'Nanum Gothic Coding', monospace; font-size: 12px; color: rgba(255, 255, 255, 0.34); }
-/* 끝난 활동은 빨강, 하고 있는 활동은 초록 — 프로젝트 카드의 진행 표시와 같은 말 */
-.ft-dot { flex: none; width: 6px; height: 6px; margin-top: 7.5px; border-radius: 50%; background: #da291c; }
-.ft-dot.is-on { background: #22c55e; box-shadow: 0 0 8px #22c55e; animation: statusPulse 1.4s ease-in-out infinite; }
-/* 자격증 — 흰 바탕 칸에 발급처 로고 */
-.ft-cert { display: flex; align-items: flex-start; gap: 12px; }
-.ft-logo { flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 5px; border-radius: 8px; background: #ffffff; }
-.ft-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+/* 로고 칸 오른쪽 아래 점 — 끝난 활동은 빨강, 하고 있는 활동은 초록. 프로젝트 카드의 진행 표시와 같은 말 */
+.ft-dot { position: absolute; right: -3px; bottom: -3px; width: 10px; height: 10px; border-radius: 50%; background: #da291c; border: 2px solid #111111; }
+.ft-dot.is-on { background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.8); }
+/* 한 줄 = [로고 칸][글]. 칸 크기가 모두 같아 네 칸의 글이 한 선에서 시작한다 */
+.ft-row { display: flex; align-items: flex-start; gap: 14px; }
+.ft-logo { position: relative; flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 5px; border-radius: 9px; background: #ffffff; }
+.ft-logo img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: inherit; }
+/* 단체 로고는 여백까지 그림에 담아 두었다 — 칸을 꽉 채운다 */
+.ft-logo.is-fill { padding: 0; }
+.ft-logo.is-fill img { width: 100%; height: 100%; object-fit: cover; }
+/* 로고를 싣지 않는 갈래 — 같은 크기 칸에 선 그림만 */
+.ft-logo.is-glyph { background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.62); }
 
 .ft-bar { margin-top: 56px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .ft-socials { display: flex; gap: 8px; }
