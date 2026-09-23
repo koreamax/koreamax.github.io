@@ -1,4 +1,4 @@
-import { FlaskConical, Presentation } from "lucide-react";
+import { Cpu, Layers, ShieldCheck } from "lucide-react";
 import { events, quals, type TimelineEvent } from "@/components/portfolio-data";
 
 /**
@@ -8,11 +8,16 @@ import { events, quals, type TimelineEvent } from "@/components/portfolio-data";
  * 학교 이름은 적지 않는다. 마지막 칸은 자격증 — 발급처 로고를 곁들인다.
  *
  * 모든 줄은 [로고 칸][글] 한 모양이다. 연구실·조교는 학교가 드러나지 않게 로고 대신
- * 갈래 그림을 같은 크기 칸에 넣어, 칸마다 글이 같은 선에서 시작하게 맞춘다.
+ * 과목을 나타내는 그림을 색 칸에 넣는다 — 옆 칸 로고처럼 색이 있어 튀지 않고,
+ * 무엇을 했는지도 한눈에 읽힌다. 칸 크기가 같아 네 칸의 글이 한 선에서 시작한다.
  */
 
-/** 로고가 없는 갈래에 대신 넣는 그림 */
-const GLYPH: Record<string, typeof FlaskConical> = { Research: FlaskConical, TA: Presentation };
+/** 로고 대신 넣는 과목 그림과 칸 색 */
+const GLYPH: Record<string, { Icon: typeof Cpu; color: string }> = {
+  "IoT Microprocessor 강의 조교": { Icon: Cpu, color: "#10b981" },
+  "Computer Architecture 강의 조교": { Icon: Layers, color: "#3b82f6" },
+  "CSDC LAB 학부연구생": { Icon: ShieldCheck, color: "#8b5cf6" },
+};
 const COLUMNS: { label: string; kinds: string[] }[] = [
   { label: "Program", kinds: ["Program"] },
   { label: "Community", kinds: ["Community"] },
@@ -47,14 +52,14 @@ const SOCIALS = [
 
 /** 로고 칸 — 오른쪽 아래 점이 진행 중(초록)·종료(빨강)를 알린다 */
 function Mark({ e }: { e: TimelineEvent }) {
-  const Glyph = GLYPH[e.kind];
+  const glyph = GLYPH[e.title];
   return (
-    <span className={`ft-logo ${e.logo ? "is-fill" : "is-glyph"}`}>
+    <span className={`ft-logo ${e.logo ? "is-fill" : "is-glyph"}`} style={glyph && { background: glyph.color }}>
       {e.logo ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={e.logo} alt="" />
       ) : (
-        Glyph && <Glyph size={18} strokeWidth={1.6} aria-hidden />
+        glyph && <glyph.Icon size={20} strokeWidth={1.8} aria-hidden />
       )}
       <i className={`ft-dot ${e.ongoing ? "is-on" : ""}`} aria-label={e.ongoing ? "진행 중" : "종료"} />
     </span>

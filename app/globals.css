@@ -751,8 +751,8 @@ html { overflow-x: clip; }
 /* 단체 로고는 여백까지 그림에 담아 두었다 — 칸을 꽉 채운다 */
 .ft-logo.is-fill { padding: 0; }
 .ft-logo.is-fill img { width: 100%; height: 100%; object-fit: cover; }
-/* 로고를 싣지 않는 갈래 — 같은 크기 칸에 선 그림만 */
-.ft-logo.is-glyph { background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.62); }
+/* 로고를 싣지 않는 연구실·조교 — 과목 색 칸에 흰 그림 (색은 site-footer.tsx) */
+.ft-logo.is-glyph { color: #ffffff; }
 
 .ft-bar { margin-top: 56px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .ft-socials { display: flex; gap: 8px; }
