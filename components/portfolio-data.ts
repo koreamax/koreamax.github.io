@@ -706,6 +706,8 @@ export interface Strength {
   /** 사진이 깨졌을 때 그 자리에 적히는 말 */
   ph: string;
   shots: string[];
+  /** 아직 사진이 덜 모인 화면 — 데이터는 두되 페이지에는 싣지 않는다 */
+  draft?: boolean;
 }
 
 export const strengths: Strength[] = [
@@ -757,6 +759,7 @@ export const strengths: Strength[] = [
   /* 세로로 긴 휴대폰 화면 셋은 맨 앞에 — 앞에서부터 줄마다 하나씩 돌아가 흩어진다 */
   {
     num: '03',
+    draft: true,
     title: 'AWS SBG Core Member와 대학교 조교로서 발표와 공지 및 알림',
     ph: '발표 · 공지',
     shots: [
