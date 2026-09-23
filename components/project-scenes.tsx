@@ -528,8 +528,9 @@ export default function ProjectScenes() {
           /* 아래에서 마스크가 걷히며 올라온다 */
           tl.fromTo(b.cards, { clipPath: "inset(0% 0% 100% 0%)", y: 70 }, { clipPath: SHOW, y: 0, duration: 0.22, stagger: 0.025, ease: "power3.out" }, P(0.7));
         } else if (i === 1) {
-          /* 왼쪽에서 오른쪽으로 닦여 나온다 */
-          tl.fromTo(b.cards, { clipPath: "inset(0% 100% 0% 0%)", x: -40 }, { clipPath: SHOW, x: 0, duration: 0.22, stagger: 0.025, ease: "power3.out" }, P(0.7));
+          /* 왼쪽에서 오른쪽으로 닦여 나온다. 옆으로만 움직이니 숨겨 둘 때 내려 둔 y 는 여기서 걷어 낸다 —
+             안 그러면 이 장면만 카드가 60 내려앉은 채로 멈춘다 */
+          tl.fromTo(b.cards, { clipPath: "inset(0% 100% 0% 0%)", x: -40, y: 0 }, { clipPath: SHOW, x: 0, y: 0, duration: 0.22, stagger: 0.025, ease: "power3.out" }, P(0.7));
         } else {
           /* 가운데부터 펼쳐지며 아주 약한 overshoot */
           tl.fromTo(

@@ -5,6 +5,7 @@ import TechBadge from "@/components/tech-badge";
 import IntroBace from "@/components/intro-bace";
 import ProjectScenes from "@/components/project-scenes";
 import Strengths from "@/components/strengths";
+import SiteFooter from "@/components/site-footer";
 import { designViewport } from "@/components/fixed-canvas";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { LiquidMetalPill } from "@/components/ui/liquid-metal-pill";
@@ -853,25 +854,7 @@ export default function Portfolio() {
       <Strengths />
 
       {/* ── CONTACT / FOOTER ── */}
-      <footer id="contact" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(255,255,255,0.08)", flexWrap: "wrap", gap: 12 }}>
-          <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 15 }}>
-            이민형<span style={{ color: RED }}>.</span>
-          </span>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>© 2026 Minhyung Lee. All Rights Reserved.</span>
-          <div style={{ display: "flex", gap: 20 }}>
-            {[
-              ["https://github.com/koreamax", "GitHub"],
-              ["https://velog.io/@koreamax01/posts", "Velog"],
-              ["https://www.linkedin.com/in/koreamax", "LinkedIn"],
-            ].map(([href, label]) => (
-              <a key={label} href={href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.4, textTransform: "uppercase", color: "rgba(255,255,255,0.55)" }}>
-                {label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
