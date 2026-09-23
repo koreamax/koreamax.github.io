@@ -653,8 +653,9 @@ html { overflow-x: clip; }
 .st-sec { position: relative; }
 /* 한 화면. 창 높이를 따르되 720~900 사이로 묶는다 — 줄 수를 정하는 자(strengths.tsx)가
    이 범위를 기준으로 재 두었다. 창이 이보다 길거나 짧아도 같은 사진이 두 번 걸리지 않는다 */
-.st-screen { position: relative; height: clamp(720px, calc(var(--vh) * 100), 900px); overflow: hidden; }
-.st-wall { position: absolute; inset: 0; display: flex; }
+.st-screen { position: relative; height: clamp(720px, calc(var(--vh) * 100), 900px); overflow: hidden; display: flex; flex-direction: column; }
+/* 벽은 제목 띠 아래 남은 자리를 채운다 */
+.st-wall { position: relative; flex: 1; min-height: 0; display: flex; }
 
 .st-lane { display: flex; will-change: transform; animation-duration: var(--spin, 60s); animation-timing-function: linear; animation-iteration-count: infinite; }
 /* 화면 밖으로 나간 벽은 멈춘다 — 셋이 한꺼번에 사진 수십 장을 밀 까닭이 없다 */
@@ -665,6 +666,8 @@ html { overflow-x: clip; }
 @keyframes stLaneRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 
 .st-tile { flex: none; overflow: hidden; border-radius: 12px; background: #1b1b1b; }
+/* 아직 사진이 안 들어온 칸 — 벽의 결만 이어 주고 눈에 띄지 않게 */
+.st-tile.is-empty { background: rgba(255, 255, 255, 0.025); }
 .st-tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .st-ph {
   display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 8px;
@@ -674,7 +677,7 @@ html { overflow-x: clip; }
 
 /* 01 · 세로 줄 — 화면 폭을 줄 수로 갈라 위아래로 흐른다 */
 .st-wall.is-col {
-  gap: 16px; padding: 0 16px; align-items: flex-start;
+  gap: 16px; padding: 0 72px; align-items: flex-start;
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
   mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
 }
@@ -709,21 +712,17 @@ html { overflow-x: clip; }
 .st-plane .st-lane.is-back { animation-name: stLaneDown; }
 .st-plane .st-tile { width: 100%; aspect-ratio: 1 / 1; margin-bottom: 16px; }
 
-/* 번호와 제목 — 벽 위 아래쪽. 밑에서부터 어둡게 깔아 어떤 사진 위에서도 읽힌다 */
-.st-caption {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; pointer-events: none;
-  padding: 200px 72px 64px;
-  background: linear-gradient(to top, #161616 20%, rgba(22, 22, 22, 0.86) 52%, rgba(22, 22, 22, 0));
-}
+/* 번호와 제목 — 벽 위의 제 띠. 벽에 얹으면 벽의 한 줄이 통째로 가려진다 */
+.st-caption { flex: none; height: 150px; display: flex; align-items: flex-end; padding: 0 72px 26px; }
 /* 번호와 제목은 한 벌 — 크기도 줄 높이도 같게 두고 첫 줄 밑줄을 맞춘다 */
 .st-top {
-  display: flex; align-items: baseline; gap: 18px; max-width: 1100px;
+  display: flex; align-items: baseline; gap: 16px; max-width: 1296px;
   opacity: 0; transform: translateY(26px);
   transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1);
 }
 .st-screen.is-in .st-top { opacity: 1; transform: none; }
-.st-num, .st-title { font-family: 'Black Han Sans', sans-serif; font-size: 50px; line-height: 1.2; letter-spacing: -0.01em; }
+.st-num, .st-title { font-family: 'Black Han Sans', sans-serif; font-size: 42px; line-height: 1.2; letter-spacing: -0.01em; }
 .st-num { flex: none; color: #da291c; font-variant-numeric: tabular-nums; }
-.st-title { margin: 0; color: #ffffff; text-shadow: 0 4px 32px rgba(0, 0, 0, 0.55); }
+.st-title { margin: 0; color: #ffffff; }
 
 @media (prefers-reduced-motion: reduce) { .st-lane { animation: none !important; } .st-top { opacity: 1; transform: none; } }
