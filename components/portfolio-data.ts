@@ -162,7 +162,7 @@ export const events: TimelineEvent[] = [
   },
   {
     date: "2025.07 ~",
-    title: "Computer Security & Distributed Computing LAB",
+    title: "CSDC LAB 학부연구생",
     desc: "학부연구생 — 보안·분산 컴퓨팅 연구.",
     kind: "Research",
     ongoing: true,
@@ -178,7 +178,7 @@ export const events: TimelineEvent[] = [
     date: "2025.03 – 12",
     title: "FARM SYSTEM 4기 웹/보안 트랙",
     desc: "Backend Developer.",
-    kind: "Program",
+    kind: "Community",
     ongoing: false,
   },
   {

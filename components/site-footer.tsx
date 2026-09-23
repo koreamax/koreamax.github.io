@@ -1,15 +1,21 @@
+import type { CSSProperties } from "react";
 import { events, type TimelineEvent } from "@/components/portfolio-data";
+import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 
 /**
  * 맨 아래 — 지나온 활동을 갈래별로 한 칸씩 모아 둔다.
  * 칸 안은 events 에 적힌 순서(최근 것부터) 그대로 둔다.
+ * 개발과 닿아 있는 것만 싣는다 — 아르바이트·군 복무(Work, Military)는 데이터에만 둔다.
  */
 const COLUMNS: { label: string; kinds: string[] }[] = [
   { label: "Program", kinds: ["Program"] },
   { label: "Community", kinds: ["Community"] },
   { label: "Research · TA", kinds: ["Research", "TA"] },
-  { label: "Work & Service", kinds: ["Work", "Military"] },
 ];
+
+/* 프로젝트 카드의 진행 바와 같은 색 — 하고 있으면 초록이 흐르고, 끝났으면 빨강이 꽉 찬다 */
+const FLUX_ONGOING = { "--flux-from": "#16a34a", "--flux-to": "#4ade80" } as CSSProperties;
+const FLUX_DONE = { "--flux-from": "#da291c", "--flux-to": "#ff8a7a" } as CSSProperties;
 
 const SOCIALS = [
   {
@@ -41,10 +47,19 @@ function Entry({ e }: { e: TimelineEvent }) {
   return (
     <li className="ft-item">
       <span className="ft-title">
-        {e.ongoing && <i className="ft-live" aria-label="진행 중" />}
+        <i className={`ft-dot ${e.ongoing ? "is-on" : ""}`} aria-label={e.ongoing ? "진행 중" : "종료"} />
         {e.title}
       </span>
-      <span className="ft-date">{e.date}</span>
+      <span className="ft-meta" style={e.ongoing ? FLUX_ONGOING : FLUX_DONE}>
+        <span className="ft-date">{e.date}</span>
+        <span className="ft-bar-line">
+          {e.ongoing ? (
+            <ProgressiveFluxLoader showLabel={false} duration={4} loop className="max-w-none gap-0" barClassName="h-1 bg-white/10 shadow-none" />
+          ) : (
+            <ProgressiveFluxLoader showLabel={false} value={100} className="max-w-none gap-0" barClassName="h-1 bg-white/10 shadow-none" />
+          )}
+        </span>
+      </span>
     </li>
   );
 }
