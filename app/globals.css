@@ -775,3 +775,63 @@ html { overflow-x: clip; }
 .ft-copy { display: inline-flex; align-items: baseline; gap: 14px; font-size: 12px; color: rgba(255, 255, 255, 0.4); }
 .ft-name { font-family: 'Nanum Gothic Coding', monospace; font-size: 15px; font-weight: 700; color: #ffffff; }
 .ft-name span { color: #da291c; }
+
+/* ───────── HOW 들어가기 전 — 스크롤로 넘기는 수첩 (components/how-intro.tsx) ───────── */
+/* 트랙이 스크롤 길이를 갖고, 장면은 화면에 붙어 있다 — 그동안 수첩이 한 장씩 넘어간다 */
+.hw-track { position: relative; height: calc(var(--vh) * 260); }
+.hw-intro {
+  position: sticky; top: 0; height: calc(var(--vh) * 100); overflow: hidden;
+  display: grid; grid-template-columns: 480px 640px; justify-content: center; align-items: center; gap: 96px;
+  padding-top: 48px; box-sizing: border-box;
+}
+/* 바탕은 공책 한 장 — 옅은 줄과 왼쪽 빨간 여백선 */
+.hw-intro::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 118px, rgba(218, 41, 28, 0.22) 118px 119px, transparent 119px),
+    repeating-linear-gradient(180deg, transparent 0 39px, rgba(255, 255, 255, 0.035) 39px 40px);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
+}
+.hw-track.hw-flow { height: auto; }
+.hw-track.hw-flow .hw-intro { position: relative; height: auto; padding: 120px 24px; }
+
+/* 왼쪽 — 제목과 두 화면의 차례, 지금 몇 장째인지 */
+.hw-copy { position: relative; opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1); }
+.hw-intro.is-in .hw-copy { opacity: 1; transform: none; }
+.hw-kicker { margin: 0 0 14px; font-family: 'Nanum Gothic Coding', monospace; font-size: 13px; font-weight: 700; letter-spacing: 4px; color: #da291c; }
+.hw-title { margin: 0; font-family: 'Black Han Sans', sans-serif; font-size: 64px; line-height: 1.1; color: #ffffff; }
+.hw-index { margin: 34px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.hw-index li { display: flex; gap: 14px; align-items: baseline; font-size: 16px; line-height: 1.5; color: rgba(255, 255, 255, 0.72); }
+.hw-index b { flex: none; font-family: 'Black Han Sans', sans-serif; font-size: 18px; font-weight: 400; color: #da291c; }
+.hw-count { margin: 40px 0 0; display: flex; align-items: baseline; gap: 8px; font-family: 'Nanum Gothic Coding', monospace; }
+.hw-count b { min-width: 2.4em; font-size: 28px; font-weight: 700; color: #ffffff; font-variant-numeric: tabular-nums; }
+.hw-count span { font-size: 14px; color: rgba(255, 255, 255, 0.35); }
+
+/* 오른쪽 — 위쪽이 스프링으로 묶인 수첩. 밑에 두 장이 더 깔려 두께가 보인다 */
+.hw-pad { position: relative; width: 640px; aspect-ratio: 16 / 10; perspective: 1700px; perspective-origin: 50% 0; }
+.hw-pad::after {
+  content: ""; position: absolute; inset: 0; border-radius: 10px; z-index: -1;
+  box-shadow: 0 6px 0 -2px #262626, 0 12px 0 -4px #1e1e1e, 0 34px 60px rgba(0, 0, 0, 0.55);
+}
+.hw-sheets { position: absolute; inset: 0; transform-style: preserve-3d; }
+.hw-page { position: absolute; inset: 0; transform-origin: 50% 0; transform-style: preserve-3d; will-change: transform; }
+.hw-front, .hw-back { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 10px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.hw-front { display: block; object-fit: cover; background: #1b1b1b; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+/* 넘어간 장의 뒷면 — 줄 쳐진 빈 종이 */
+.hw-back {
+  transform: rotateX(180deg);
+  background: repeating-linear-gradient(180deg, #222 0 27px, #2a2a2a 27px 28px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.hw-last {
+  position: absolute; inset: 0; border-radius: 10px; background: #1b1b1b; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+}
+.hw-last b { font-family: 'Black Han Sans', sans-serif; font-size: 120px; font-weight: 400; line-height: 1; color: #ffffff; letter-spacing: 0.02em; }
+.hw-last b span { color: #da291c; }
+.hw-last em { font-style: normal; font-family: 'Nanum Gothic Coding', monospace; font-size: 12px; letter-spacing: 3px; color: rgba(255, 255, 255, 0.4); }
+/* 스프링 — 수첩 윗변을 꿰는 고리들 */
+.hw-rings { position: absolute; top: -15px; left: 6%; right: 6%; z-index: 40; display: flex; justify-content: space-between; pointer-events: none; }
+.hw-rings i { width: 9px; height: 28px; border-radius: 6px; background: linear-gradient(90deg, #3a3a3a, #8a8a8a 45%, #3a3a3a); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6); }
+@media (prefers-reduced-motion: reduce) { .hw-copy { opacity: 1; transform: none; transition: none; } }
