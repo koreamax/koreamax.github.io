@@ -175,7 +175,7 @@ const CORRIDOR_RAILS = {
 
 function Corridor() {
   return (
-    <div data-corridor-stage style={{ position: "absolute", inset: 0, pointerEvents: "none", perspective: "30cqw", perspectiveOrigin: "50% 55%" }}>
+    <div data-corridor-stage data-offscreen-pause style={{ position: "absolute", inset: 0, pointerEvents: "none", perspective: "30cqw", perspectiveOrigin: "50% 55%" }}>
       <style dangerouslySetInnerHTML={{ __html: CORRIDOR_CSS }} />
       <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
         {(["ishr", "ishl"] as const).map((name) =>
@@ -569,19 +569,30 @@ export default function Portfolio() {
       }
     }
 
-    let lastY = -1;
-    let lastW = -1;
+    /* 스크롤 위치나 창 폭이 바뀔 때만, 한 프레임에 한 번 부른다.
+       예전엔 매 프레임 scrollY 를 들여다봤는데, 가만히 있어도 루프가 돌아 저사양에서 다른 애니메이션을 깎아 먹었다 */
     let raf = 0;
-    const loop = () => {
-      if (window.scrollY !== lastY || window.innerWidth !== lastW) {
-        lastY = window.scrollY;
-        lastW = window.innerWidth;
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
         onScroll();
-      }
-      raf = requestAnimationFrame(loop);
+      });
     };
-    raf = requestAnimationFrame(loop);
-    cleanup.push(() => cancelAnimationFrame(raf));
+    /* 끝없이 도는 애니메이션(복도 카드 · 흐르는 띠 · 떠 있는 얼굴)은 화면 밖에 있는 동안만 멈춘다.
+       보이는 동안은 그대로 돈다 — 멈춘 자리에서 이어 돌 뿐 모양은 같다 */
+    const offscreen = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle("is-off", !e.isIntersecting)));
+    root.querySelectorAll("[data-offscreen-pause]").forEach((el) => offscreen.observe(el));
+    cleanup.push(() => offscreen.disconnect());
+
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    schedule();
+    cleanup.push(() => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    });
 
     // 섹션 입장: 카드/칩이 뷰포트에 들어올 때 한 번 슬라이드 업 (stagger)
     if (!reduced) {
@@ -684,7 +695,7 @@ export default function Portfolio() {
             </div>
 
             <div className="hero-face">
-              <div className="face-wrap" style={{ animation: "heroFloat 5s ease-in-out infinite" }}>
+              <div className="face-wrap" data-offscreen-pause style={{ animation: "heroFloat 5s ease-in-out infinite" }}>
                 {/* gsap 입장 애니메이션은 안쪽 래퍼에만 걸어 레이아웃을 건드리지 않는다 */}
                 <div data-hero-item data-hero-portrait style={{ height: "100%" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -727,7 +738,7 @@ export default function Portfolio() {
 
       {/* ── MARQUEE ── */}
       <div className="band" style={{ overflow: "hidden", background: RED, padding: "14px 0", display: "flex" }}>
-        <div style={{ display: "flex", flex: "none", width: "max-content", alignItems: "center", animation: "marquee 46s linear infinite", fontFamily: BHS, fontSize: 16, letterSpacing: 2, color: "#ffffff" }}>
+        <div data-offscreen-pause style={{ display: "flex", flex: "none", width: "max-content", alignItems: "center", animation: "marquee 46s linear infinite", fontFamily: BHS, fontSize: 16, letterSpacing: 2, color: "#ffffff" }}>
           {[0, 1].map((g) => (
             <div key={g} style={{ display: "flex", flex: "none", alignItems: "center" }}>
               {Array.from({ length: 4 }).map((_, r) =>

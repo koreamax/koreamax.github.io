@@ -242,28 +242,28 @@ export const awards: Award[] = [
     title: "SKT FLY AI CHALLENGER 9기 개인 최우수상",
     prize: "SK텔레콤 대표이사상",
     repo: "https://github.com/sktflyai9th5",
-    logo: "/uploads/pasted-1789520118922-0.png",
+    logo: "/uploads/sm/pasted-1789520118922-0.png",
   },
   {
     date: "2026.09",
     title: "SKT FLY AI CHALLENGER 9기 프로젝트 부문",
     prize: "SK텔레콤 대표이사상",
     repo: "https://github.com/sktflyai9th5",
-    logo: "/uploads/pasted-1789520118922-0.png",
+    logo: "/uploads/sm/pasted-1789520118922-0.png",
   },
   {
     date: "2025.12",
     title: "제15회 피우다 프로젝트 공모전",
     prize: "정보통신산업진흥원장상",
     repo: "https://github.com/koreamax/piudaback",
-    logo: "/uploads/pasted-1789520130431-0.png",
+    logo: "/uploads/sm/pasted-1789520130431-0.png",
   },
   {
     date: "2025.08",
     title: "2025 K-HTML 해커톤",
     prize: "동대문구청장상",
     repo: "https://github.com/koreamax/walk_web",
-    logo: "/uploads/pasted-1789520173436-0.png",
+    logo: "/uploads/sm/pasted-1789520173436-0.png",
   },
 ];
 
@@ -279,13 +279,13 @@ export const quals: Qualification[] = [
     date: "2026.08",
     title: "Microsoft Azure AI Fundamentals",
     org: "Microsoft Learn",
-    logo: "/uploads/pasted-1789520722540-0.png",
+    logo: "/uploads/sm/pasted-1789520722540-0.png",
   },
   {
     date: "2026.08",
     title: "AWS Certified Cloud Practitioner",
     org: "AWS Training and Certification",
-    logo: "/uploads/pasted-1789520776720-0.png",
+    logo: "/uploads/sm/pasted-1789520776720-0.png",
   },
   {
     date: "2025.04",

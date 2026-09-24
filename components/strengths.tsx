@@ -23,9 +23,9 @@ type Flow = "col" | "row" | "deck";
 const FLOWS: Flow[] = ["col", "row", "deck"];
 
 /* ── 칸을 정하는 자 ──
-   전부 도면 px 기준. 화면 가로는 늘 1440. 01 과 02 가 한 화면에 함께 들어온다 — 구역 전체가
-   창 높이(680~900)이고, 위 88 은 떠 있는 메뉴 자리, 아래 16 과 두 화면 사이 16 을 뺀 나머지를
-   둘이 반씩 나눈다. 한 화면에서 위 56 은 제목 띠라 벽은 224~334 이다. 세로로 흐르는 벽은 가장 긴 벽을, 가로 줄은 칸이 가장
+   전부 도면 px 기준. 화면 가로는 늘 1440. 01 과 02 가 한 화면에 좌우로 나란히 들어온다 —
+   구역 전체가 창 높이(680~900)이고 위 88 은 떠 있는 메뉴 자리, 아래는 16. 좌우 여백 80 과
+   가운데 틈 32 를 뺀 폭을 둘이 반씩(624) 나눈다. 한 화면에서 위 60 은 제목 띠라 벽 높이는 516~736 이다. 세로로 흐르는 벽은 가장 긴 벽을, 가로 줄은 칸이 가장
    작아지는 가장 낮은 벽을 기준으로 재야 어느 창에서도 같은 사진이 두 번 안 보인다.
 
    기준은 엄격하게 잡는다 — 칸의 한 귀퉁이만 걸려도 보인 것으로 친다. 그러면 한 줄의
@@ -33,14 +33,17 @@ const FLOWS: Flow[] = ["col", "row", "deck"];
 const W = 1440;
 const SEC_MAX = 900;
 const SEC_MIN = 680;
-/** 구역 위 · 아래 여백과 두 화면 사이 — 메뉴 자리 88, 아래 16, 사이 16 */
-const SEC_PAD = 88 + 16 + 16;
-const BAND = 56;
-const WALL_MAX = (SEC_MAX - SEC_PAD) / 2 - BAND;
-const WALL_MIN = (SEC_MIN - SEC_PAD) / 2 - BAND;
+/** 구역 위 · 아래 여백 — 메뉴 자리 88, 아래 16 */
+const SEC_PAD = 88 + 16;
+const BAND = 60;
+const WALL_MAX = SEC_MAX - SEC_PAD - BAND;
+const WALL_MIN = SEC_MIN - SEC_PAD - BAND;
 const GAP = 16;
-/** 벽 좌우 여백 — 제목 띠의 글머리와 맞춘다 */
-const SIDE = 180;
+/** 구역 좌우 여백과 두 화면 사이 틈 */
+const SIDE = 80;
+const SPLIT = 32;
+/** 한 화면의 폭 */
+const HALF = (W - 2 * SIDE - SPLIT) / 2;
 /** 한 줄이 지나가는 빠르기(도면 px/초). 읽을 수 있을 만큼 느리게 */
 const SPEED = 16;
 /** 줄마다 조금씩 다르게 — 나란히 같이 움직이지 않게 */
@@ -53,18 +56,18 @@ type Geo = {
   /** 한 줄이 벽에 걸치는 길이 (칸 길이만큼 앞뒤로 삐져나온 것까지 포함하기 전) */
   along: number;
 };
-/* 01 은 네 줄로 갈라 칸을 작게, 02 는 벽이 낮아 두 줄로 — 칸이 너무 납작해지지 않게 */
-const COL_LANES = 4;
-const ROW_LANES = 2;
-const colLen = (W - 2 * SIDE - (COL_LANES - 1) * GAP) / COL_LANES / 1.6;
+/* 01 은 반쪽 폭을 두 줄로, 02 는 벽 높이를 세 줄로 */
+const COL_LANES = 2;
+const ROW_LANES = 3;
+const colLen = (HALF - (COL_LANES - 1) * GAP) / COL_LANES / 1.6;
 /* 가로 줄 벽은 위아래 여백 16 씩에 줄 사이 16 */
 const rowLen = ((WALL_MIN - (ROW_LANES + 1) * GAP) / ROW_LANES) * 1.6;
 const deckLen = (1.3 * W - 6 * GAP) / 5;
 const GEO: Record<Flow, Geo> = {
-  /* 네 줄, 16:10 칸. 벽 높이만큼 걸친다 */
+  /* 두 줄, 16:10 칸. 벽 높이만큼 걸친다 */
   col: { lanes: COL_LANES, len: colLen, along: WALL_MAX },
-  /* 두 줄, 벽 높이를 둘로 나눈 16:10 칸. 좌우 여백을 뺀 폭만큼 걸친다 */
-  row: { lanes: ROW_LANES, len: rowLen, along: W - 2 * SIDE },
+  /* 세 줄, 벽 높이를 셋으로 나눈 16:10 칸. 반쪽 폭만큼 걸친다 */
+  row: { lanes: ROW_LANES, len: rowLen, along: HALF },
   /* 다섯 줄, 폭 1.3배 판을 다섯으로 나눈 네모 칸. 기울고 원근이 걸려 걸치는 길이는 재서
      얻었다 — 900 화면에서 1200 + 0.8t 였고, 벽이 짧아진 만큼 줄여 쓴다. 기운 칸은 외곽
      상자가 아니라 실제로 그려진 픽셀을 짚어 가며 쟀다 */
@@ -91,18 +94,24 @@ function lay(f: Flow, shots: string[]) {
   });
 }
 
+/* 벽의 칸은 300px 남짓이라 원본(1200px)을 풀면 디코딩만 무겁다 — 640px 사본(public/uploads/w640)을 쓴다.
+   사본이 없으면 원본으로, 원본도 없으면 빈 칸으로 남는다 */
+const small = (src: string) => src.replace("/uploads/", "/uploads/w640/");
+
 /** 사진 한 장. 파일이 없거나 깨지면 빈 칸으로 남는다 */
 function Shot({ src, label }: { src: string; label: string }) {
-  const [failed, setFailed] = useState(false);
+  const [tries, setTries] = useState(0);
   const ref = useRef<HTMLImageElement>(null);
+  const url = tries === 0 ? small(src) : src;
+  const fail = () => setTries((t) => t + 1);
   /* 하이드레이션 전에 이미 실패한 그림은 onError 가 오지 않는다 */
   useEffect(() => {
     const el = ref.current;
-    if (el && el.complete && el.naturalWidth === 0) setFailed(true);
-  }, [src]);
-  if (failed) return null;
+    if (el && el.complete && el.naturalWidth === 0) setTries((t) => t + 1);
+  }, [url]);
+  if (tries > 1) return null;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img ref={ref} src={src} alt={label} loading="lazy" onError={() => setFailed(true)} />;
+  return <img ref={ref} src={url} alt={label} loading="lazy" decoding="async" onError={fail} />;
 }
 
 /**
