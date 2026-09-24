@@ -865,7 +865,7 @@ export default function Portfolio() {
       <ProjectScenes />
 
       {/* ── 일하는 방식 — 태블릿 장면 위로 사진 벽이 기울어진 채 올라와 덮는다 ── */}
-      <FlowArt aria-label="일하는 방식" snap>
+      <FlowArt aria-label="일하는 방식" snap snapIn>
         <FlowSection aria-label="일하는 방식 소개">
           <HowIntro />
         </FlowSection>

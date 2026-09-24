@@ -809,7 +809,12 @@ html { overflow-x: clip; }
 .hw-tab::before, .hw-tab::after { content: ""; position: absolute; top: -3px; height: 4px; border-radius: 3px 3px 0 0; background: #1e1e1e; }
 .hw-tab::before { left: 72px; width: 38px; }
 .hw-tab::after { left: 118px; width: 38px; }
-.hw-screen { position: relative; height: 100%; border-radius: 26px; overflow: hidden; background: radial-gradient(90% 80% at 50% 45%, #181818, #050505); display: flex; align-items: center; justify-content: center; }
-.hw-screen-title { font-family: 'Black Han Sans', sans-serif; font-size: 150px; font-weight: 400; line-height: 1; letter-spacing: 0.02em; color: #ffffff; }
+.hw-screen { position: relative; height: 100%; border-radius: 26px; overflow: hidden; background: radial-gradient(90% 80% at 50% 70%, #1c2230, #07080b 70%); }
+/* 행성 판이 화면을 채우고, HOW. 는 달리는 배달부의 머리 위에 뜬다 */
+.hw-screen .orbit-stage { position: absolute; inset: 0; cursor: grab; touch-action: pan-y; opacity: 0; transition: opacity .8s ease; }
+.hw-screen .orbit-stage.is-ready { opacity: 1; }
+.hw-screen .orbit-stage.is-dragging { cursor: grabbing; }
+.orbit-stage canvas { display: block; width: 100% !important; height: 100% !important; }
+.hw-screen-title { position: absolute; left: 0; right: 0; top: 12%; z-index: 2; text-align: center; pointer-events: none; font-family: 'Black Han Sans', sans-serif; font-size: 96px; font-weight: 400; line-height: 1; letter-spacing: 0.02em; color: #ffffff; text-shadow: 0 6px 30px rgba(0, 0, 0, 0.5); }
 .hw-screen-title i { font-style: normal; color: #da291c; }
 @media (prefers-reduced-motion: reduce) { .hw-copy, .hw-tab { opacity: 1; transform: none; transition: none; } }

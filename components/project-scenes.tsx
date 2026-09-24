@@ -540,6 +540,26 @@ export default function ProjectScenes() {
         tl.to(root.querySelectorAll(".pstage-dot")[i + 1], { backgroundColor: RED, scale: 1.25, duration: 0.14 }, P(0.62));
         tl.to(root.querySelectorAll(".pstage-dot")[i], { backgroundColor: "rgba(255,255,255,0.22)", scale: 1, duration: 0.14 }, P(0.62));
       }
+
+      /* ── 퇴장 ── 무대가 끝나고 다음 구역(HOW)이 올라오는 동안 마지막 장면이 흩어진다.
+         그림과 판은 서로 반대쪽 위로 기울며 날아가고, 번호와 이름은 왼쪽으로 빠지고, 빛은 번지며 꺼진다.
+         무대 트랙의 아랫변이 화면 아래에서 위로 지나가는 구간에 묶여 있어 되돌리면 다시 모인다 */
+      const last = scenes[n - 1];
+      const exit = gsap.timeline({
+        defaults: { ease: "power2.in" },
+        scrollTrigger: { trigger: track || root, start: "bottom bottom", end: "bottom top", scrub: 0.4, invalidateOnRefresh: true },
+      });
+      exit.to(
+        q(last, "[data-item]"),
+        { x: (idx) => (idx % 2 ? 110 : -110), y: (idx) => -140 - idx * 50, rotate: (idx) => (idx % 2 ? 7 : -7), scale: 0.84, opacity: 0, duration: 0.6, stagger: 0.08 },
+        0,
+      );
+      exit.to(q(last, "[data-num]"), { xPercent: -120, opacity: 0, duration: 0.35 }, 0);
+      exit.to(q(last, "[data-name]"), { x: -170, opacity: 0, duration: 0.4 }, 0.04);
+      exit.to(q(last, "[data-count]"), { y: 30, opacity: 0, duration: 0.3 }, 0);
+      exit.to(q(last, "[data-rule]"), { scaleX: 0, transformOrigin: "100% 50%", duration: 0.35 }, 0);
+      exit.to(q(last, "[data-bg]"), { scale: 1.5, opacity: 0, duration: 0.6, ease: "power1.in" }, 0);
+      exit.to(root.querySelectorAll(".pstage-dots"), { opacity: 0, duration: 0.3 }, 0);
     }, root);
 
     return () => ctx.revert();

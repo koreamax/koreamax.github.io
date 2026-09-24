@@ -46,12 +46,15 @@ export default function FlowArt({
   children,
   className,
   snap = false,
+  snapIn = false,
   "aria-label": ariaLabel,
 }: {
   children: React.ReactNode;
   className?: string;
   /** 장면 사이에서 조금만 굴려도 다음(또는 앞) 장면까지 한 번에 넘어간다 */
   snap?: boolean;
+  /** 바로 위 구역의 끝(첫 장면이 화면 아래에 닿은 자리)에서 첫 장면까지도 한 번에 넘어간다 */
+  snapIn?: boolean;
   "aria-label"?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -65,7 +68,12 @@ export default function FlowArt({
     let busy = false;
 
     /* 각 장면이 화면 맨 위에 닿는 스크롤 위치 */
-    const stops = () => [...root.querySelectorAll<HTMLElement>("[data-flow-mark]")].map((m) => Math.round(m.getBoundingClientRect().top + window.scrollY));
+    const stops = () => {
+      const s = [...root.querySelectorAll<HTMLElement>("[data-flow-mark]")].map((m) => Math.round(m.getBoundingClientRect().top + window.scrollY));
+      /* 앞 구역이 끝나는 자리 — 첫 장면의 윗변이 화면 아랫변에 닿는 스크롤 위치 */
+      if (snapIn && s.length) s.unshift(s[0] - window.innerHeight);
+      return s;
+    };
     /* 지금 위치에서 dir 방향으로 넘어갈 곳 — 장면 사이 구간 밖이면 없음 */
     const target = (dir: number) => {
       const s = stops();
@@ -129,7 +137,7 @@ export default function FlowArt({
       window.removeEventListener("touchmove", onTouchMove);
       gsap.killTweensOf(window);
     };
-  }, [snap, count]);
+  }, [snap, snapIn, count]);
 
   useEffect(() => {
     const root = ref.current;
