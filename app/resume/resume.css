@@ -1,0 +1,117 @@
+/* ───────────── 이력서 (Resume.dc.html) ─────────────
+   글꼴은 사이트와 같은 셋 — 제목은 Black Han Sans, 본문은 Nanum Gothic,
+   날짜 · 번호 · 기술 태그는 Nanum Gothic Coding. 포인트 색은 #FF4242 하나. */
+.rs {
+  --rs-red: #ff4242;
+  --rs-ink: #171719;
+  --rs-body: rgba(46, 47, 51, 0.88);
+  --rs-mute: rgba(55, 56, 60, 0.61);
+  --rs-line: rgba(112, 115, 124, 0.16);
+  min-height: calc(var(--vh) * 100);
+  padding: 64px 24px 96px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  background: #d9dadd;
+  font-family: 'Nanum Gothic', sans-serif;
+  color: var(--rs-ink);
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.rs a { color: inherit; text-decoration: none; transition: color .2s ease; }
+.rs a:hover { color: var(--rs-red); }
+.rs a:focus-visible { outline: 2px solid var(--rs-red); outline-offset: 3px; border-radius: 2px; }
+
+.rs-sheet {
+  width: 920px;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(23, 23, 23, .18), 0 2px 6px rgba(23, 23, 23, .08);
+}
+
+/* 제목 + 빨간 밑줄 */
+.rs-heading { display: flex; flex-direction: column; gap: 12px; }
+.rs-heading h2 { margin: 0; font-family: 'Black Han Sans', sans-serif; font-weight: 400; letter-spacing: 0; line-height: 1.2; }
+.rs-bar { width: 40px; height: 3px; background: var(--rs-red); }
+.rs-bar-48 { width: 48px; }
+
+/* 왼쪽 검은 칸 */
+.rs-aside { background: var(--rs-ink); color: #fff; display: flex; flex-direction: column; }
+.rs-aside-top { padding: 72px 40px 40px; display: flex; flex-direction: column; gap: 20px; }
+.rs-name { margin: 0; font-family: 'Black Han Sans', sans-serif; font-size: 56px; font-weight: 400; letter-spacing: 0.01em; line-height: 1.1; }
+.rs-links { display: flex; flex-direction: column; gap: 12px; }
+.rs-links a { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 700; color: rgba(255, 255, 255, .88); }
+.rs-links svg { flex: none; }
+.rs-photo { aspect-ratio: 4 / 5; overflow: hidden; background: #fff; }
+.rs-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
+.rs-aside-bottom { padding: 40px 40px 72px; display: flex; flex-direction: column; gap: 24px; }
+.rs-contact { display: flex; gap: 14px; align-items: flex-start; }
+.rs-contact svg { flex: none; margin-top: 2px; }
+.rs-contact > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rs-contact-label { font-size: 12px; color: rgba(255, 255, 255, .6); }
+.rs-contact-value { font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.rs-skills { padding-top: 0; }
+.rs-skill { display: flex; flex-direction: column; gap: 6px; }
+.rs-skill-area { font-family: 'Nanum Gothic Coding', monospace; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--rs-red); }
+.rs-skill-items { font-size: 14px; line-height: 1.7; color: rgba(255, 255, 255, .82); }
+
+/* 오른쪽 본문 */
+.rs-main { padding: 72px 64px 80px 56px; display: flex; flex-direction: column; gap: 56px; }
+.rs-section { display: flex; flex-direction: column; gap: 24px; }
+.rs-section-tight { gap: 20px; }
+.rs-lead { margin: 0; font-size: 15px; line-height: 1.8; color: var(--rs-body); text-wrap: pretty; }
+
+.rs-date { font-family: 'Nanum Gothic Coding', monospace; font-size: 13px; font-weight: 700; color: var(--rs-red); }
+.rs-sub { font-size: 13px; line-height: 1.5; color: var(--rs-mute); }
+
+/* 이름 아래 — 신입인지, 무엇을 해 왔는지 한눈에 */
+.rs-role { margin: -4px 0 0; font-size: 15px; font-weight: 700; line-height: 1.6; color: rgba(255, 255, 255, .72); }
+.rs-glance { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.rs-glance li { font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: rgba(112, 115, 124, .08); color: var(--rs-ink); }
+.rs-glance li:first-child { background: var(--rs-red); color: #fff; }
+.rs-inline { font-weight: 700; color: var(--rs-ink) !important; box-shadow: inset 0 -2px 0 rgba(255, 66, 66, .45); }
+.rs-inline:hover { color: var(--rs-red) !important; }
+
+/* 프로필 바로 아래 뜬금없이 걸린 글 한 편 */
+.rs-blog { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 20px 52px 20px 22px; border-radius: 12px; background: var(--rs-ink); color: #fff !important; transition: transform .25s cubic-bezier(.2, .7, .2, 1), box-shadow .25s ease; }
+.rs-blog:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(23, 23, 23, .22); }
+.rs-blog-label { font-family: 'Nanum Gothic Coding', monospace; font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--rs-red); }
+.rs-blog-title { font-size: 16px; font-weight: 800; line-height: 1.45; }
+.rs-blog-note { font-size: 13px; line-height: 1.6; color: rgba(255, 255, 255, .66); }
+.rs-blog-go { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--rs-red); }
+
+/* 프로젝트 — 문제 해결 줄이 먼저, 구현 줄, 곁가지 역할 */
+.rs-project { display: flex; flex-direction: column; gap: 14px; padding-top: 22px; border-top: 1px solid var(--rs-line); }
+.rs-project:first-of-type { border-top: 0; padding-top: 0; }
+.rs-project-head { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.rs-badge { margin-top: 4px; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 6px; color: var(--rs-red); background: rgba(255, 66, 66, .08); }
+.rs-lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.rs-lines li { position: relative; padding-left: 14px; font-size: 13.5px; line-height: 1.7; color: var(--rs-body); }
+.rs-lines li::before { content: ''; position: absolute; left: 0; top: .72em; width: 5px; height: 5px; border-radius: 50%; background: rgba(112, 115, 124, .45); }
+.rs-lines b { font-weight: 800; color: var(--rs-ink); }
+.rs-lines em { font-style: normal; font-weight: 800; color: var(--rs-red); }
+.rs-lines .rs-side { color: var(--rs-mute); }
+.rs-card-num { font-family: 'Nanum Gothic Coding', monospace; font-size: 13px; font-weight: 700; color: var(--rs-red); letter-spacing: 0.02em; }
+.rs-card-title { font-family: 'Black Han Sans', sans-serif; font-size: 24px; font-weight: 400; letter-spacing: 0.01em; line-height: 1.25; }
+.rs-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.rs-tags span { font-family: 'Nanum Gothic Coding', monospace; font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(112, 115, 124, .08); color: var(--rs-body); }
+
+/* 맨 아래 띠 — 활동 · 수상 · 자격증은 가볍게 한 줄씩 */
+.rs-band { grid-column: 1 / -1; padding: 56px 56px 64px; display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 40px; border-top: 1px solid var(--rs-line); color: var(--rs-ink); }
+.rs-band-col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.rs-mini { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.rs-mini li { display: flex; flex-direction: column; gap: 2px; }
+.rs-mini .rs-date { font-size: 12px; }
+.rs-mini-title { font-size: 14px; font-weight: 700; line-height: 1.45; }
+.rs-mini .rs-sub { font-size: 12px; }
+
+/* 종이로 뽑을 때는 회색 바탕과 그림자를 걷는다 */
+@media print {
+  html.fixed-canvas body { zoom: 1; width: auto; min-width: 0; }
+  .rs { padding: 0; background: #fff; }
+  .rs-sheet { box-shadow: none; }
+  .rs-aside, .rs-photo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
