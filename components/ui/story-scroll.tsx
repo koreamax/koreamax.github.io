@@ -3,9 +3,9 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { attachWheelSnap } from "@/lib/wheel-snap";
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+gsap.registerPlugin(ScrollTrigger);
 
 /** 한 장면에서 다음 장면으로 넘어가는 데 걸리는 시간(초) */
 const SNAP_DUR = 1.1;
@@ -64,9 +64,6 @@ export default function FlowArt({
   useEffect(() => {
     const root = ref.current;
     if (!root || !snap) return;
-    const html = document.documentElement;
-    let busy = false;
-
     /* 각 장면이 화면 맨 위에 닿는 스크롤 위치 */
     const stops = () => {
       const s = [...root.querySelectorAll<HTMLElement>("[data-flow-mark]")].map((m) => Math.round(m.getBoundingClientRect().top + window.scrollY));
@@ -74,69 +71,7 @@ export default function FlowArt({
       if (snapIn && s.length) s.unshift(s[0] - window.innerHeight);
       return s;
     };
-    /* 지금 위치에서 dir 방향으로 넘어갈 곳 — 장면 사이 구간 밖이면 없음 */
-    const target = (dir: number) => {
-      const s = stops();
-      const y = window.scrollY;
-      for (let i = 0; i < s.length - 1; i++) {
-        const [a, b] = [s[i], s[i + 1]];
-        if (dir > 0 && y >= a - 2 && y < b - 2) return b;
-        if (dir < 0 && y > a + 2 && y <= b + 2) return a;
-      }
-      return null;
-    };
-    const go = (to: number) => {
-      busy = true;
-      /* 사이트 전체의 부드러운 스크롤이 켜져 있으면 GSAP 가 매 프레임 옮기는 값과 싸운다 */
-      const prev = html.style.scrollBehavior;
-      html.style.scrollBehavior = "auto";
-      gsap.to(window, {
-        scrollTo: to,
-        duration: SNAP_DUR,
-        ease: "power2.inOut",
-        overwrite: true,
-        onComplete: () => {
-          html.style.scrollBehavior = prev;
-          /* 관성으로 남은 휠 입력이 곧바로 다음 넘김을 부르지 않게 잠깐 더 쉰다 */
-          window.setTimeout(() => (busy = false), 250);
-        },
-      });
-    };
-
-    const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) < 2) return;
-      if (busy) {
-        if (target(1) !== null || target(-1) !== null) e.preventDefault();
-        return;
-      }
-      const to = target(Math.sign(e.deltaY));
-      if (to === null) return;
-      e.preventDefault();
-      go(to);
-    };
-    let touchY = 0;
-    const onTouchStart = (e: TouchEvent) => (touchY = e.touches[0]?.clientY ?? 0);
-    const onTouchMove = (e: TouchEvent) => {
-      const dy = touchY - (e.touches[0]?.clientY ?? touchY);
-      if (busy) {
-        if (target(1) !== null || target(-1) !== null) e.preventDefault();
-        return;
-      }
-      if (Math.abs(dy) < 12) return;
-      const to = target(Math.sign(dy));
-      if (to === null) return;
-      e.preventDefault();
-      go(to);
-    };
-    window.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      gsap.killTweensOf(window);
-    };
+    return attachWheelSnap(stops, SNAP_DUR);
   }, [snap, snapIn, count]);
 
   useEffect(() => {

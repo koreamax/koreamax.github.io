@@ -819,7 +819,7 @@ import { useEffect as useEffect4, useRef as useRef3 } from "react";
 import { useFrame as useFrame3, useThree as useThree2 } from "@react-three/fiber";
 function AdaptiveResolution({ active }) {
   const setDpr = useThree2((state) => state.setDpr);
-  const maximum = Math.min((typeof window !== "undefined" ? window.devicePixelRatio : 1) || 1, renderQuality === "low" ? 1.25 : 2);
+  const maximum = Math.min((typeof window !== "undefined" ? window.devicePixelRatio : 1) || 1, renderQuality === "low" ? 1.25 : 1.5);
   const minimum = Math.min(maximum, renderQuality === "low" ? 1 : 1.25);
   const sample = useRef3({ warmup: 3, time: 0, frames: 0, goodWindows: 0, dpr: maximum });
   useEffect4(() => {
@@ -896,6 +896,15 @@ function World2({ motion, auto, reduced, onReady }) {
   useEffect5(() => {
     onReady?.(!!asset && courierReady);
   }, [asset, courierReady, onReady]);
+  /* 이 사이트에서 덧댄 것 — 모델이 다 오면 셰이더를 미리 굽는다. 그리기는 보일 때만 하는데,
+     그 첫 프레임에 셰이더를 굽느라 화면이 멈칫하지 않게 */
+  const three = useThree3();
+  useEffect5(() => {
+    if (!asset || !courierReady) return;
+    try {
+      three.gl.compile(three.scene, three.camera);
+    } catch {}
+  }, [asset, courierReady, three.gl, three.scene, three.camera]);
   const radius = useRef4(2.2);
   const surface2 = useRef4(createSurfaceMotion());
   const globe = useMemo(createGlobeMotion, []);
@@ -939,7 +948,7 @@ function PlanetScene2(props) {
     if (props.prototype) props.onReady?.(true);
   }, [props.prototype, props.onReady]);
   if (props.prototype) return <PlanetScene {...props} />;
-  return <Canvas2 orthographic camera={{ position: [0, 0, 9], zoom: 150, near: 0.1, far: 30 }} dpr={lowPower ? [1, 1.25] : [1, 2]} frameloop={props.active ? "always" : "never"} gl={{ antialias: true, alpha: true, powerPreference: lowPower ? "low-power" : "high-performance" }}>
+  return <Canvas2 orthographic camera={{ position: [0, 0, 9], zoom: 150, near: 0.1, far: 30 }} dpr={lowPower ? [1, 1.25] : [1, 1.5]} frameloop={props.active ? "always" : "never"} gl={{ antialias: true, alpha: true, powerPreference: lowPower ? "low-power" : "high-performance" }}>
     <ResponsiveCamera />
     <AdaptiveResolution active={props.active} />
     <ambientLight intensity={0.9} /><hemisphereLight args={["#f1f5ff", "#8aabc5", 1.4]} />
@@ -1202,6 +1211,30 @@ export function OrbitPlanet({ assetBaseUrl = "https://cdn.jsdelivr.net/gh/fadeic
   const drag = useRef5(null);
   const [near, setNear] = useState4(false), [visible, setVisible] = useState4(false), [tabVisible, setTabVisible] = useState4(true);
   const [reduced, setReduced] = useState4(false), [ready, setReady] = useState4(false), [dragging, setDragging] = useState4(false);
+  /* 다음 장면이 올라와 이 판을 다 덮으면 보이지 않아도 화면 안에 있는 것으로 잡힌다 — 그때는 그리지 않는다 */
+  const [covered, setCovered] = useState4(false);
+  useEffect6(() => {
+    const sec = stage.current?.closest(".flow-sec");
+    const all = sec?.parentElement ? [...sec.parentElement.querySelectorAll(".flow-sec")] : [];
+    const next = all[all.indexOf(sec) + 1];
+    if (!next) return;
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      setCovered(next.getBoundingClientRect().top <= 0);
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(check);
+    };
+    check();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
   useEffect6(() => {
     const query = matchMedia("(prefers-reduced-motion: reduce)");
     const change = () => setReduced(query.matches);
@@ -1262,7 +1295,7 @@ export function OrbitPlanet({ assetBaseUrl = "https://cdn.jsdelivr.net/gh/fadeic
       onPointerCancel={(event) => release(event.pointerId)}
       onLostPointerCapture={(event) => release(event.pointerId)}
     >
-      {near && <SceneBoundary><Suspense fallback={null}><PlanetScene3 motion={motion} active={visible && tabVisible} auto={true} reduced={reduced} prototype={false} onReady={setReady} /></Suspense></SceneBoundary>}
+      {near && <SceneBoundary><Suspense fallback={null}><PlanetScene3 motion={motion} active={visible && tabVisible && !covered} auto={true} reduced={reduced} prototype={false} onReady={setReady} /></Suspense></SceneBoundary>}
     </div>
   </AssetBaseContext.Provider>;
 }

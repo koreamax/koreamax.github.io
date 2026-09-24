@@ -7,6 +7,7 @@ import { categories, type CategoryItem, type CategoryIssue } from "@/components/
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { designViewport } from "@/components/fixed-canvas";
+import { attachWheelSnap } from "@/lib/wheel-snap";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -414,6 +415,7 @@ export default function ProjectScenes() {
       return () => io.disconnect();
     }
 
+    let detachSnap = () => {};
     const ctx = gsap.context(() => {
       const n = scenes.length;
       const q = (s: HTMLElement, sel: string) => gsap.utils.toArray<HTMLElement>(sel, s);
@@ -560,9 +562,25 @@ export default function ProjectScenes() {
       exit.to(q(last, "[data-rule]"), { scaleX: 0, transformOrigin: "100% 50%", duration: 0.35 }, 0);
       exit.to(q(last, "[data-bg]"), { scale: 1.5, opacity: 0, duration: 0.6, ease: "power1.in" }, 0);
       exit.to(root.querySelectorAll(".pstage-dots"), { opacity: 0, duration: 0.3 }, 0);
+
+      /* 장면마다 멈춤 자리 — 휠을 조금만 굴려도 다음 장면이 다 조립된 자리까지 한 번에 넘어간다.
+         k 번째 장면은 앞 구간 끝에서 조립을 마치고 제 구간 앞부분(0 ~ 0.34)에 머물러 있다 — 그 안쪽에 선다.
+         맨 앞은 무대가 화면 아래에서 올라오기 시작하는 자리, 맨 끝은 무대가 끝나는 자리(다음은 HOW 가 맡는다) */
+      const D = tl.duration();
+      const rest = [0, ...Array.from({ length: n - 2 }, (_, k) => k + 1.1), D];
+      const box = track || root;
+      detachSnap = attachWheelSnap(() => {
+        const r = box.getBoundingClientRect();
+        const top = r.top + window.scrollY;
+        const span = r.height - window.innerHeight;
+        return [top - window.innerHeight, ...rest.map((t) => Math.round(top + (t / D) * span))];
+      }, 1.2);
     }, root);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      detachSnap();
+    };
   }, []);
 
   return (

@@ -110,22 +110,23 @@ function Shot({ src, label }: { src: string; label: string }) {
     if (el && el.complete && el.naturalWidth === 0) setTries((t) => t + 1);
   }, [url]);
   if (tries > 1) return null;
+  /* 벽 전체가 한꺼번에 들어와야 하므로 게으른 불러오기를 쓰지 않는다 — 대신 구역에 가까워졌을 때 처음 그린다(Strengths 의 near) */
   // eslint-disable-next-line @next/next/no-img-element
-  return <img ref={ref} src={url} alt={label} loading="lazy" decoding="async" onError={fail} />;
+  return <img ref={ref} src={url} alt={label} decoding="async" onError={fail} />;
 }
 
 /**
  * 한 줄 — 같은 칸을 두 벌 이어 붙여 제 길이의 절반만큼 민다. 끝이 처음과 만난다.
  * 한 바퀴 시간은 줄 길이에 맞춰 잡아 어느 줄이든 같은 빠르기로 흐른다.
  */
-function Lane({ tiles, label, step, index }: { tiles: (string | null)[]; label: string; step: number; index: number }) {
+function Lane({ tiles, label, step, index, near }: { tiles: (string | null)[]; label: string; step: number; index: number; near: boolean }) {
   const spin = ((tiles.length * step) / SPEED) * JITTER[index % JITTER.length];
   return (
     <span className={`st-lane ${index % 2 ? "is-back" : ""}`} style={{ ["--spin" as string]: `${spin.toFixed(1)}s` }}>
       {[0, 1].map((dup) =>
         tiles.map((src, i) => (
           <span className={`st-tile ${src ? "" : "is-empty"}`} key={`${dup}-${i}`} aria-hidden={dup === 1 || undefined}>
-            {src && <Shot src={src} label={label} />}
+            {src && near && <Shot src={src} label={label} />}
           </span>
         )),
       )}
@@ -134,9 +135,9 @@ function Lane({ tiles, label, step, index }: { tiles: (string | null)[]; label: 
 }
 
 /** 한 화면 — 위에 번호와 제목, 그 아래를 사진 벽이 채운다 */
-function Screen({ item, flow }: { item: Strength; flow: Flow }) {
+function Screen({ item, flow, near }: { item: Strength; flow: Flow; near: boolean }) {
   const step = GEO[flow].len + GAP;
-  const body = lay(flow, item.shots).map((t, c) => <Lane key={c} tiles={t} label={item.ph} step={step} index={c} />);
+  const body = lay(flow, item.shots).map((t, c) => <Lane key={c} tiles={t} label={item.ph} step={step} index={c} near={near} />);
   return (
     <article className="st-screen" data-flow={flow}>
       <span className="st-caption">
@@ -154,6 +155,20 @@ function Screen({ item, flow }: { item: Strength; flow: Flow }) {
 
 export default function Strengths() {
   const rootRef = useRef<HTMLElement>(null);
+  /* 사진은 이 구역이 화면 한 장 반 앞까지 다가왔을 때 받기 시작한다.
+     게으른 불러오기에 맡기면 움직이는 줄 위의 칸이 화면에 들어온 뒤에야 받기 시작해 빈 칸으로 지나간다 */
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      setNear(true);
+      io.disconnect();
+    }, { rootMargin: "150% 0px" });
+    io.observe(root);
+    return () => io.disconnect();
+  }, []);
 
   /* 화면에 들어올 때 제목이 올라오고, 화면을 벗어나면 벽이 멈춘다 —
      화면 셋이 한꺼번에 사진 수십 장을 밀고 있을 이유가 없다 */
@@ -180,7 +195,7 @@ export default function Strengths() {
   return (
     <section id="how" ref={rootRef} className="st-sec">
       {strengths.filter((s) => !s.draft).map((item, i) => (
-        <Screen key={item.num} item={item} flow={FLOWS[i % FLOWS.length]} />
+        <Screen key={item.num} item={item} flow={FLOWS[i % FLOWS.length]} near={near} />
       ))}
     </section>
   );
