@@ -580,27 +580,22 @@ html { overflow-x: clip; }
   font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
 }
 
-/* 탭 한 장 = 문제 해결 한 덩어리의 제목. 고른 탭은 제목을 다 보이고, 나머지는 줄여 번호가 먼저 읽힌다 */
+/* 파일 탭 한 장 */
 .pw-ed-tabs { display: flex; background: var(--vs-bar); }
 .pw-ed-tab {
-  display: flex; align-items: center; gap: 7px; flex: 0 1 auto; min-width: 58px;
-  padding: 8px 14px 8px 12px; font: inherit; font-size: 12px; letter-spacing: 0.2px; text-align: left;
-  color: rgba(255,255,255,0.45); background: none; border: 0; border-right: 1px solid rgba(0,0,0,0.4);
-  cursor: pointer; transition: color .2s ease, background .2s ease;
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 18px 7px 14px; font-size: 12px; letter-spacing: 0.2px;
+  color: rgba(255,255,255,0.45); border-right: 1px solid rgba(0,0,0,0.4);
 }
-.pw-ed-tab:hover { color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.03); }
-.pw-ed-tab.is-on { flex-shrink: 0; background: var(--vs-bg); color: rgba(255,255,255,0.88); box-shadow: inset 0 1px 0 var(--cat); }
-.pw-ed-tab:focus-visible { outline: 1px solid var(--cat); outline-offset: -1px; }
-.pw-ed-tab-num { flex: none; font-variant-numeric: tabular-nums; color: var(--vs-gutter); }
-.pw-ed-tab.is-on .pw-ed-tab-num { color: var(--cat); }
-.pw-ed-tab-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pw-ed-dot { flex: none; width: 7px; height: 7px; border-radius: 9999px; background: var(--vs-fn); }
-.pw-ed-tab:not(.is-on) .pw-ed-dot { opacity: 0.35; }
+.pw-ed-tab.is-on { background: var(--vs-bg); color: rgba(255,255,255,0.85); box-shadow: inset 0 1px 0 var(--cat); }
+.pw-ed-dot { width: 7px; height: 7px; border-radius: 9999px; background: var(--vs-fn); }
 
 /* 코드 — 한 줄이 거터 + 본문 두 칸이다. 본문이 접혀도 번호는 맨 윗줄에 남는다 */
-.pw-ed-code { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-content: start; padding: 10px 0 12px; font-size: 13px; line-height: 1.66; }
-/* 덩어리마다 글 길이가 달라도 판 크기는 그대로 — 탭을 넘길 때 판이 들썩이지 않는다 */
-.pwide .pw-ed { min-height: 420px; }
+.pw-ed-code { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-content: start; padding: 8px 0 10px; font-size: 13px; line-height: 1.55; }
+/* 문제 항목 — 번호 칸을 띄워 항목이 접혀도 글머리가 번호 뒤에서 맞는다 */
+.pw-item { display: flex; gap: 6px; }
+.pw-item-n { flex: none; font-style: normal; color: #f85149; opacity: 0.8; font-variant-numeric: tabular-nums; }
+.pw-item > .cr { flex: 1; min-width: 0; }
 .pw-row { display: contents; }
 .pw-gutter { padding: 0 12px 0 14px; text-align: right; font-weight: 400; color: var(--vs-gutter); font-variant-numeric: tabular-nums; }
 .pw-pre { padding-right: 9px; font-weight: 400; white-space: nowrap; }
@@ -630,15 +625,6 @@ html { overflow-x: clip; }
 }
 .pw-ed-panel b { font-size: 10.5px; font-weight: 600; letter-spacing: 1.3px; color: rgba(255,255,255,0.32); }
 .pw-ed-panel b.is-on { color: rgba(255,255,255,0.72); box-shadow: 0 6px 0 -5px var(--cat); }
-/* 오른쪽 끝 — 앞뒤 덩어리로 넘기는 단추와 지금 몇 번째인지 */
-.pw-ed-nav { display: flex; align-items: center; gap: 4px; margin-left: auto; }
-.pw-ed-nav em { font-style: normal; font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.55); font-variant-numeric: tabular-nums; padding: 0 4px; }
-.pw-ed-nav button {
-  display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 20px; padding: 0;
-  font: inherit; font-size: 15px; line-height: 1; color: rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; cursor: pointer;
-}
-.pw-ed-nav button:hover { color: #ffffff; border-color: var(--cat); }
 
 /* 폴백(모바일·감속 모드)에서는 위아래로 흐른다 */
 .pstage.pstage-flow .pwide { grid-template-columns: 1fr; gap: 20px; height: auto; }
