@@ -6,6 +6,7 @@ import IntroBace from "@/components/intro-bace";
 import ProjectScenes from "@/components/project-scenes";
 import Strengths from "@/components/strengths";
 import HowIntro from "@/components/how-intro";
+import FlowArt, { FlowSection } from "@/components/ui/story-scroll";
 import SiteFooter from "@/components/site-footer";
 import { designViewport } from "@/components/fixed-canvas";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
@@ -463,7 +464,7 @@ export default function Portfolio() {
       ["[data-spread]", "#awards"],
       ["#work", "#work"],
       [".pstage", "#work"],
-      [".hw-track", "#how"],
+      [".flow-art", "#how"],
       ["#how", "#how"],
     ];
     let lastActive = "";
@@ -863,9 +864,15 @@ export default function Portfolio() {
 
       <ProjectScenes />
 
-      {/* ── 일하는 방식 — 수첩을 넘기며 들어간다 ── */}
-      <HowIntro />
-      <Strengths />
+      {/* ── 일하는 방식 — 태블릿 장면 위로 사진 벽이 기울어진 채 올라와 덮는다 ── */}
+      <FlowArt aria-label="일하는 방식">
+        <FlowSection aria-label="일하는 방식 소개">
+          <HowIntro />
+        </FlowSection>
+        <FlowSection aria-label="기록과 학습">
+          <Strengths />
+        </FlowSection>
+      </FlowArt>
 
       {/* ── CONTACT / FOOTER ── */}
       <SiteFooter />
