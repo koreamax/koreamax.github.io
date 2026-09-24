@@ -3,8 +3,12 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+/** 한 장면에서 다음 장면으로 넘어가는 데 걸리는 시간(초) */
+const SNAP_DUR = 1.1;
 
 /**
  * 장면이 한 장씩 겹쳐 쌓이며 넘어가는 스크롤 (21st.dev story-scroll 을 이 사이트에 맞게 옮긴 것).
@@ -38,9 +42,94 @@ export const FlowSection: React.FC<FlowSectionProps> = ({ className, style, chil
   </>
 );
 
-export default function FlowArt({ children, className, "aria-label": ariaLabel }: { children: React.ReactNode; className?: string; "aria-label"?: string }) {
+export default function FlowArt({
+  children,
+  className,
+  snap = false,
+  "aria-label": ariaLabel,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  /** 장면 사이에서 조금만 굴려도 다음(또는 앞) 장면까지 한 번에 넘어간다 */
+  snap?: boolean;
+  "aria-label"?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const count = React.Children.count(children);
+
+  /* 장면 사이 넘김 — 휠이나 손가락을 조금만 움직여도 끝까지 간다. 장면 사이 구간에 있을 때만 가로챈다 */
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !snap) return;
+    const html = document.documentElement;
+    let busy = false;
+
+    /* 각 장면이 화면 맨 위에 닿는 스크롤 위치 */
+    const stops = () => [...root.querySelectorAll<HTMLElement>("[data-flow-mark]")].map((m) => Math.round(m.getBoundingClientRect().top + window.scrollY));
+    /* 지금 위치에서 dir 방향으로 넘어갈 곳 — 장면 사이 구간 밖이면 없음 */
+    const target = (dir: number) => {
+      const s = stops();
+      const y = window.scrollY;
+      for (let i = 0; i < s.length - 1; i++) {
+        const [a, b] = [s[i], s[i + 1]];
+        if (dir > 0 && y >= a - 2 && y < b - 2) return b;
+        if (dir < 0 && y > a + 2 && y <= b + 2) return a;
+      }
+      return null;
+    };
+    const go = (to: number) => {
+      busy = true;
+      /* 사이트 전체의 부드러운 스크롤이 켜져 있으면 GSAP 가 매 프레임 옮기는 값과 싸운다 */
+      const prev = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+      gsap.to(window, {
+        scrollTo: to,
+        duration: SNAP_DUR,
+        ease: "power2.inOut",
+        overwrite: true,
+        onComplete: () => {
+          html.style.scrollBehavior = prev;
+          /* 관성으로 남은 휠 입력이 곧바로 다음 넘김을 부르지 않게 잠깐 더 쉰다 */
+          window.setTimeout(() => (busy = false), 250);
+        },
+      });
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < 2) return;
+      if (busy) {
+        if (target(1) !== null || target(-1) !== null) e.preventDefault();
+        return;
+      }
+      const to = target(Math.sign(e.deltaY));
+      if (to === null) return;
+      e.preventDefault();
+      go(to);
+    };
+    let touchY = 0;
+    const onTouchStart = (e: TouchEvent) => (touchY = e.touches[0]?.clientY ?? 0);
+    const onTouchMove = (e: TouchEvent) => {
+      const dy = touchY - (e.touches[0]?.clientY ?? touchY);
+      if (busy) {
+        if (target(1) !== null || target(-1) !== null) e.preventDefault();
+        return;
+      }
+      if (Math.abs(dy) < 12) return;
+      const to = target(Math.sign(dy));
+      if (to === null) return;
+      e.preventDefault();
+      go(to);
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      gsap.killTweensOf(window);
+    };
+  }, [snap, count]);
 
   useEffect(() => {
     const root = ref.current;

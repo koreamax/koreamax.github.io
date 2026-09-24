@@ -809,35 +809,7 @@ html { overflow-x: clip; }
 .hw-tab::before, .hw-tab::after { content: ""; position: absolute; top: -3px; height: 4px; border-radius: 3px 3px 0 0; background: #1e1e1e; }
 .hw-tab::before { left: 72px; width: 38px; }
 .hw-tab::after { left: 118px; width: 38px; }
-.hw-screen { position: relative; height: 100%; border-radius: 26px; overflow: hidden; background: #000; display: grid; grid-template-columns: 1fr 1fr; }
-
-/* 화면 왼쪽 반 — 가는 안내선과 빛살 */
-.hw-pane-l { position: relative; border-right: 1px solid rgba(255, 255, 255, 0.1); }
-.hw-guides { position: absolute; inset: 64px 0 40px; width: 100%; height: calc(100% - 104px); }
-.hw-guides line { stroke: rgba(255, 255, 255, 0.16); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.hw-burst { position: absolute; left: 50%; top: 50%; width: 132px; height: 132px; margin: -66px 0 0 -66px; }
-.hw-brand { position: absolute; left: 22px; top: 20px; font-family: 'Black Han Sans', sans-serif; font-size: 17px; color: #ffffff; }
-.hw-brand i, .hw-card-title i { font-style: normal; color: #da291c; }
-.hw-copyright { position: absolute; left: 22px; bottom: 16px; font-size: 9.5px; color: rgba(255, 255, 255, 0.35); }
-
-/* 화면 오른쪽 반 — 카드 */
-.hw-card {
-  position: relative; margin: 10px; border-radius: 20px; background: radial-gradient(120% 90% at 30% 40%, #1c1c1c, #121212);
-  display: flex; flex-direction: column; justify-content: center; padding: 0 22px;
-}
-.hw-card-top { position: absolute; right: 18px; top: 16px; font-size: 10px; color: rgba(255, 255, 255, 0.7); }
-.hw-card-title { font-family: 'Black Han Sans', sans-serif; font-size: 64px; font-weight: 400; line-height: 1; color: #ffffff; margin-top: -30px; }
-.hw-fields { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.hw-field { display: flex; flex-direction: column; gap: 5px; }
-.hw-field em { font-style: normal; font-size: 9.5px; font-weight: 700; color: rgba(255, 255, 255, 0.85); }
-.hw-field-v { padding-bottom: 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.4); font-size: 12.5px; color: #ffffff; white-space: nowrap; }
-.hw-field-w { font-size: 9.5px; color: rgba(255, 255, 255, 0.5); }
-.hw-go {
-  position: absolute; right: 16px; bottom: 16px; width: 76px; height: 76px; border-radius: 50%; border: 0; cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  background: #ffffff; color: #111111; font: inherit; font-size: 10px; font-weight: 800; letter-spacing: 0.8px;
-  transition: transform .25s cubic-bezier(.2, .7, .2, 1), background .2s ease, color .2s ease;
-}
-.hw-go:hover { transform: scale(1.06); background: #da291c; color: #ffffff; }
-.hw-go span { font-size: 13px; line-height: 1; }
+.hw-screen { position: relative; height: 100%; border-radius: 26px; overflow: hidden; background: radial-gradient(90% 80% at 50% 45%, #181818, #050505); display: flex; align-items: center; justify-content: center; }
+.hw-screen-title { font-family: 'Black Han Sans', sans-serif; font-size: 150px; font-weight: 400; line-height: 1; letter-spacing: 0.02em; color: #ffffff; }
+.hw-screen-title i { font-style: normal; color: #da291c; }
 @media (prefers-reduced-motion: reduce) { .hw-copy, .hw-tab { opacity: 1; transform: none; transition: none; } }
