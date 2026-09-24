@@ -52,7 +52,7 @@ export default function HowIntro() {
       {/* 태블릿 — 행성 위를 달리는 배달부, 그 머리 위에 HOW. */}
       <div className="hw-tab">
         <div className="hw-screen">
-          <OrbitPlanet zoomDiv={6.2} planetTop={0.62} />
+          <OrbitPlanet zoomDiv={5.7} planetTop={0.6} />
           <b className="hw-screen-title" aria-hidden>
             HOW<i>.</i>
           </b>

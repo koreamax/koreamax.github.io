@@ -1196,7 +1196,8 @@ export {
 export function OrbitPlanet({ assetBaseUrl = "https://cdn.jsdelivr.net/gh/fadeichev2121/planet@b3f70fbf4b577845b1d9d5947c9410fb4d925dae", zoomDiv = 6.2, planetTop = 0.62, className = "" }) {
   VIEW.div = zoomDiv;
   VIEW.top = planetTop;
-  const motion = useRef5(createMotion());
+  /* 원래는 들어온 뒤 3.5초 동안 가만히 있다가 돌기 시작한다 — 마지막으로 만진 때를 한참 전으로 두어 처음부터 달리게 한다 */
+  const motion = useRef5(Object.assign(createMotion(), { lastInteraction: -10 }));
   const stage = useRef5(null);
   const drag = useRef5(null);
   const [near, setNear] = useState4(false), [visible, setVisible] = useState4(false), [tabVisible, setTabVisible] = useState4(true);
