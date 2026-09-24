@@ -401,6 +401,8 @@ export interface CategoryIssue {
   lens?: string;
   /** 무엇에 관한 이야기인지 — 카드에서 번호 옆에 붙는 짧은 제목 */
   tag: string;
+  /** 어떤 상황이었는지 — 구조와 조건. 이 프로젝트를 처음 보는 사람도 문제를 따라올 수 있게 */
+  situation?: string;
   /** 무엇이 왜 문제였는지. 이 프로젝트를 처음 보는 사람도 알아듣게 적는다 */
   problem: string;
   /** 어떻게 풀었고 그래서 무엇이 달라졌는지 */
@@ -458,42 +460,50 @@ export const categories: Category[] = [
           {
             lens: "백엔드",
             tag: "말을 걸면 첫 턴이 실패",
+            situation:
+              "어르신이 말을 걸면 Spring Boot가 EKS 위 AI 오케스트레이터를 gRPC로 불러 답을 만드는 구조. 채널은 호출마다 새로 맺지 않고 서버가 뜰 때 한 번 연 ManagedChannel을 계속 재사용하며, 어르신 대화는 몇 분씩 끊겼다가 다시 이어지는 일이 잦음",
             problemCode: "ManagedChannel ch = NettyChannelBuilder.forAddress(AI_HOST, 50051).usePlaintext().build();  // keepAlive unset - an idle hop drops the socket and nobody finds out until the next turn",
             solutionCode: "NettyChannelBuilder.forAddress(AI_HOST, 50051).keepAliveTime(30, SECONDS).keepAliveTimeout(10, SECONDS).keepAliveWithoutCalls(true).idleTimeout(5, MINUTES).usePlaintext().build();",
             problem:
-              "Spring Boot와 AI 오케스트레이터를 gRPC 장기 연결로 묶었는데 대화가 뜸한 사이 중간 장비가 유휴 연결을 말없이 끊어, 다음 발화에서야 끊긴 것을 알고 첫 턴이 실패함",
+              "대화가 뜸한 사이 중간 장비가 유휴 TCP 연결을 말없이 정리했지만 keepAlive가 꺼져 있어 채널은 연결이 살아 있다고 판단함. 다음 발화의 RPC가 이미 끊긴 소켓 위로 나가 실패하고, 사용자에게는 오랜만에 건넨 첫마디에 대답이 없는 장애로 보임",
             solution:
-              "유휴 구간에도 연결 상태를 확인하도록 gRPC keep-alive ping을 켜고 끊긴 채널은 즉시 다시 맺게 해, 말을 걸었을 때 첫 턴이 실패하는 일이 사라짐",
+              "NettyChannelBuilder에 keepAliveTime 30초 · keepAliveTimeout 10초 · keepAliveWithoutCalls를 켜 호출이 없을 때도 HTTP/2 PING으로 연결을 확인하고, 응답이 없으면 채널이 스스로 끊고 다시 맺게 함. idleTimeout 5분으로 오래 쉰 채널도 미리 정리해, 한참 쉬었다 건넨 첫마디도 바로 응답이 나가고 첫 턴 실패가 재현되지 않음",
           },
           {
             lens: "백엔드",
             tag: "아침 첫 요청만 터지던 DB",
+            situation:
+              "Spring Boot는 HikariCP 커넥션 풀로 RDS에 붙어 대화 기록과 사용자 정보를 읽고 씀. 사용자가 어르신이라 새벽에는 요청이 거의 없어, 풀 안의 연결이 몇 시간씩 쓰이지 않고 쉬는 구간이 매일 생김",
             problemCode: "spring.datasource.hikari.max-lifetime=1800000   # rds wait_timeout=600 - the pool keeps sockets the server closed 20 minutes ago and hands one to the first morning request",
             solutionCode: "spring.datasource.hikari.max-lifetime=540000 ; hikari.keepalive-time=120000 ; hikari.connection-test-query=SELECT 1 ; hikari.validation-timeout=3000 ; hikari.minimum-idle=2",
             problem:
-              "새벽에는 요청이 없어 커넥션 풀의 연결이 오래 놀았는데 RDS가 먼저 그 연결을 닫아, 아침 첫 요청이 이미 죽은 연결을 집어 들고 실패함",
+              "DB가 유휴 연결을 끊는 시간은 600초인데 풀의 max-lifetime은 30분이라, 서버가 이미 닫은 연결을 풀은 살아 있다고 믿고 들고 있음. 아침 첫 요청이 이 죽은 연결을 받아 쿼리를 보내다 통신 오류로 실패하고 다음 요청부터는 정상이라, 재현이 어려운 간헐 장애로 나타남",
             solution:
-              "풀이 유휴 연결을 주기적으로 확인하게 하고 연결 수명을 DB가 끊는 시간보다 짧게 잡아 미리 교체되도록 해, 아침 첫 요청이 끊기는 일이 없어짐",
+              "max-lifetime을 9분으로 DB보다 짧게 잡아 서버가 끊기 전에 풀이 먼저 연결을 교체하고, keepalive-time 2분마다 유휴 연결에 검증 쿼리를 보내 끊긴 연결을 미리 걸러냄. minimum-idle 2개를 유지해 아침 첫 요청도 검증된 연결을 바로 받게 되면서 첫 요청 실패가 사라짐",
           },
           {
             lens: "클라우드",
             tag: "NAT를 거쳐 나가던 음성",
+            situation:
+              "대화 한 턴마다 어르신 음성을 S3에 올리고 TTS로 만든 음성을 다시 S3에서 꺼내는 구조. STT · TTS 파드는 외부에 노출되지 않도록 EKS 프라이빗 서브넷에 두고, 바깥으로 나가는 트래픽은 NAT 게이트웨이를 거치게 구성함",
             problemCode: "s3.put_object(Bucket=AUDIO, Key=key, Body=wav)  # stt/tts sit in a private subnet, so every clip is billed out through the NAT gateway and pays for the extra hop both ways",
             solutionCode: "resource \"aws_vpc_endpoint\" \"s3\" { service_name = \"com.amazonaws.ap-northeast-2.s3\" ; vpc_endpoint_type = \"Gateway\" ; route_table_ids = aws_route_table.private[*].id }",
             problem:
-              "STT·TTS 파드가 프라이빗 서브넷에 있어 S3에 음성을 넣고 꺼낼 때마다 NAT 게이트웨이를 통과했는데, 한 마디마다 오디오가 오가는 서비스라 사용자가 늘수록 NAT 처리 요금과 구간 지연이 같이 불어남",
+              "S3는 VPC 밖의 퍼블릭 엔드포인트라, 파드가 오디오를 넣고 꺼낼 때마다 NAT 게이트웨이를 통과함. NAT는 처리한 데이터 양만큼 요금이 붙어, 발화마다 오디오가 오가는 이 서비스는 대화량이 늘수록 NAT 비용과 구간 하나만큼의 지연이 함께 커지는 구조였음",
             solution:
-              "S3를 VPC 게이트웨이 엔드포인트로 붙여 오디오를 VPC 안에서 바로 주고받게 바꿔, NAT를 타는 구간과 거기서 나오던 전송 비용을 함께 걷어냄",
+              "S3용 VPC 게이트웨이 엔드포인트를 만들어 프라이빗 서브넷 라우팅 테이블에 연결함. S3로 가는 트래픽이 NAT를 거치지 않고 VPC 안에서 바로 오가게 되어, 오디오 전송에 붙던 NAT 데이터 처리 요금이 빠지고(게이트웨이 엔드포인트는 추가 요금 없음) 음성 경로에서 NAT 구간이 사라짐",
           },
           {
             lens: "클라우드",
             tag: "분석이 대답을 붙잡음",
+            situation:
+              "대화 음성을 HuBERT 모델로 분석해 치매 의심 신호를 찾고 보호자에게 전달하는 것이 서비스의 핵심 기능. 처음에는 대화 응답을 만드는 같은 요청 안에서 음성 분석까지 함께 수행함",
             problemCode: "dementia = hubert.analyze(wav) ; return Converse(reply=tts(text), risk=dementia)  # the turn cannot return until the analysis finishes, so the elder waits on a model, not on us",
             solutionCode: "sqs.send_message(QueueUrl=HUBERT_Q, MessageBody=key) ; return Converse(reply=tts(text))  # analysis leaves the dialogue path and lands on the guardian side a moment later",
             problem:
-              "치매 의심 신호를 찾는 HuBERT 음성 분석이 대화 응답과 한 요청에 묶여 있어, 분석이 끝나야 답이 나가는 탓에 정작 말벗으로 쓰기 어려운 대기가 생김",
+              "한 턴의 응답이 STT → LLM → TTS에 더해 HuBERT 분석까지 끝나야 반환되어, 대화와 무관한 분석 시간이 그대로 어르신의 대기 시간이 됨. 분석이 늦거나 실패하면 대답까지 함께 늦거나 실패하는 강한 결합도 있었음",
             solution:
-              "분석을 SQS로 떼어 내 대화 흐름 밖에서 처리하고 결과는 뒤따라 보호자 쪽에 쌓이게 해, 응답은 바로 나가면서 분석은 빠짐없이 남는 구조로 정리함",
+              "응답 경로에서는 음성 키만 SQS에 넣고 TTS 응답을 바로 반환하고, 별도 워커가 큐를 소비해 분석 결과를 보호자 쪽에 쌓게 분리함. 응답 시간에서 분석 시간이 빠지고, 분석이 느리거나 실패해도 대화는 영향을 받지 않으며, 처리되지 못한 메시지는 큐에 남아 다시 처리되므로 분석이 누락되지 않음",
           },
         ],
         repo: "https://github.com/koreamax/wilson_chatbot",
@@ -519,48 +529,56 @@ export const categories: Category[] = [
           {
             lens: "AI",
             tag: "설명이 길어 끝까지 못 듣는다",
+            situation:
+              "사용자가 화장품을 카메라에 비추면 VLM이 제품을 인식해 설명하고 그 문장을 TTS로 읽어 주는 흐름. 사용자는 화면을 볼 수 없어 음성으로만 정보를 얻고, 긴 설명 중 필요한 부분만 골라 들을 수도 없음",
             problem:
-              "화장품을 비추면 모델이 본 것을 문장으로 길게 풀어 쓰는데, 화면을 훑을 수 없는 사용자는 정작 필요한 색과 제형이 나올 때까지 그 문장을 끝까지 들어야 함",
+              "자유 형식 프롬프트라 모델이 제품 소개부터 길게 풀어 써, 정작 필요한 색상과 제형은 문장 뒷부분에 나옴. 출력 순서와 길이가 호출마다 달라 음성 안내 시간도 들쭉날쭉하고, 사용자는 원하는 정보가 나올 때까지 설명 전체를 들어야 했음",
             problemCode:
               'prompt = "Describe this cosmetic product."   # free-form answer: the shade turns up somewhere in the fourth sentence, forty seconds into the speech',
             solution:
-              "무엇을 어떤 순서로 말할지 칸을 정해 모델이 그 칸만 채우게 하고 색부터 읽도록 바꿔, 첫 마디만 들어도 무엇인지 알 수 있게 정리함",
+              "응답을 category · shade · finish · how_to 필드의 JSON 스키마로 고정하고 필드마다 12단어 이내, 색상 필드부터 채우도록 프롬프트를 바꿈. 앱이 필드 순서대로 읽어 첫 마디에 색상이 나오고, 출력 길이가 일정해져 안내 음성이 짧고 예측 가능하게 정리됨",
             solutionCode:
               'schema = {"category": str, "shade": str, "finish": str, "how_to": str} ; prompt = "Fill every field in under twelve words, shade first."',
           },
           {
             lens: "AI",
             tag: "빛에 따라 달라지던 색 판정",
+            situation:
+              "파운데이션 · 립처럼 색이 핵심인 제품은 사진에서 색을 뽑아 추천에 사용함. 사용자는 대부분 집 안 조명 아래에서 직접 촬영하므로 조명 조건을 통제할 수 없음",
             problem:
-              "화장품 색을 찍힌 픽셀에서 곧바로 읽어, 전구가 노랗거나 그늘이 지면 같은 제품이 볼 때마다 다른 색으로 나와 추천이 흔들림",
+              "제품 영역의 픽셀 RGB를 그대로 읽어, 따뜻한 전구 아래나 그늘에서는 같은 제품이 촬영할 때마다 다른 색으로 판정됨. 화이트밸런스가 틀어진 값이 그대로 추천 로직에 들어가, 같은 제품의 추천 결과가 촬영 환경에 따라 흔들림",
             problemCode:
               "rgb = frame[cy, cx]   # the shade is read straight off the pixel, so a warm bulb pushes every product half a tone to the right",
             solution:
-              "사진 안의 흰 기준면으로 색을 먼저 맞춘 뒤 읽게 해, 조명이 달라도 같은 제품이 같은 색으로 나오도록 고정함",
+              "프레임 안의 흰 기준면을 찾아 목표 흰색과의 비율(gain)을 구하고, 프레임 전체를 먼저 보정한 뒤 색을 읽도록 전처리 순서를 바꿈. 조명의 색온도가 달라도 같은 제품이 같은 색으로 판정되어, 추천 결과가 촬영 환경에 흔들리지 않게 고정됨",
             solutionCode:
               "gain = TARGET_WHITE / white_patch(frame) ; rgb = (frame * gain)[cy, cx]   # normalise the frame before anything reads a colour out of it",
           },
           {
             lens: "백엔드",
             tag: "한 요청에 묶여 있던 업로드와 분석",
+            situation:
+              "FastAPI의 /analyze 엔드포인트 하나가 사진 업로드부터 전처리, VLM 추론, 추천 생성까지 모두 처리하고 결과를 응답으로 돌려주는 동기 구조",
             problem:
-              "사진 업로드와 전처리, 모델 호출, 추천 생성이 한 요청 안에서 차례로 돌아, 사람이 몰리면 앞 요청이 끝날 때까지 뒤가 통째로 밀리고 결국 타임아웃으로 끊김",
+              "추론이 끝날 때까지 요청이 워커를 계속 점유해, 사용자가 몰리면 뒤 요청이 앞 요청을 기다리며 줄줄이 밀리고 결국 클라이언트 타임아웃으로 끊김. 같은 사진으로 다시 시도하면 같은 추론이 처음부터 다시 돌아 부하가 더 커지는 악순환이 있었음",
             problemCode:
               '@app.post("/analyze") def analyze(f): img = preprocess(f.read()) ; return recommend(vlm(img))   # upload, inference and recommendation all inside one request',
             solution:
-              "업로드와 분석을 갈라 분석은 작업 큐로 넘기고 결과만 따로 받아 가게 하고, 같은 사진의 재분석은 캐시로 건너뛰게 해 API 가 붙잡히지 않도록 정리함",
+              "업로드 API는 이미지 해시를 키로 작업을 Redis 기반 Celery 큐에 넣고 job id만 바로 돌려주게 바꾸고, 전처리 · 추론은 워커가 맡아 앱이 결과를 따로 조회하게 함. 같은 해시는 캐시된 결과를 돌려줘, API는 추론 시간과 무관하게 즉시 응답하고 몰린 요청은 큐에서 차례로 처리됨",
             solutionCode:
               'key = sha1(blob) ; job = queue.enqueue(analyze_task, key) ; return {"job": job.id}   # the worker preprocesses and infers, the same photo never runs twice',
           },
           {
             lens: "백엔드",
             tag: "같은 안내를 매번 다시 읽던 음성",
+            situation:
+              "앱의 화면 전환과 안내 문구를 모두 음성으로 읽어 주기 때문에 TTS 호출이 매우 잦음. 촬영 안내처럼 정해진 문구가 여러 화면에서 반복해서 나옴",
             problem:
-              "화면마다 나오는 같은 안내 문구를 그때그때 음성으로 새로 만들어, 말이 나오기까지 매번 같은 시간을 기다리고 호출 비용도 그만큼 반복됨",
+              "같은 문장도 나올 때마다 TTS API로 새로 합성해, 사용자는 이미 익숙한 안내에도 합성 시간만큼 매번 기다려야 했음. 호출 비용도 같은 문장이 반복되는 횟수만큼 그대로 쌓임",
             problemCode:
               "speech = tts.synthesize(text) ; return StreamingResponse(speech)   # the same sentence is synthesised again on every screen that happens to say it",
             solution:
-              "문구와 목소리가 같으면 만들어 둔 음성을 다시 쓰도록 해시로 캐시해, 반복되는 안내는 기다림 없이 나오고 호출은 새 문구에만 들어가게 함",
+              "문구와 목소리 설정을 합친 해시를 키로 합성된 음성을 저장해 두고, 같은 키가 오면 저장본을 바로 스트리밍하게 함. 반복되는 안내는 합성 대기 없이 즉시 재생되고, TTS 호출은 처음 나오는 문장에만 발생하게 됨",
             solutionCode:
               "key = sha1(text + voice) ; return cached(key) or store(key, tts.synthesize(text))   # repeats come back off disk, only new sentences reach the API",
           },
@@ -589,48 +607,56 @@ export const categories: Category[] = [
           {
             lens: "클라우드",
             tag: "추천 한 건이 서버 전체를 붙잡음",
+            situation:
+              "사용자의 취향과 위치를 받아 Bedrock의 Claude 모델이 산책 경로와 추천 이유를 생성하는 것이 핵심 기능. 처음에는 EC2의 Spring Boot가 지도 · 로그인 같은 일반 API와 함께 Bedrock 호출까지 직접 처리함",
             problem:
-              "추천 한 번에 생성 모델 응답을 수십 초 기다려야 하는데 이를 EC2 위 애플리케이션이 직접 호출해, 기다리는 동안 스레드를 붙잡아 지도·로그인 같은 일반 요청까지 밀림",
+              "추천 한 건에 모델 응답을 수십 초 기다리는 동안 요청 스레드가 블로킹되어, 추천이 몰리면 스레드 풀이 바닥나고 지도 · 로그인 같은 가벼운 요청까지 대기열에서 밀림. 무거운 호출 하나가 서비스 전체의 응답성을 결정하는 구조였음",
             problemCode:
               "answer = bedrock.invoke_model(modelId=CLAUDE, body=prompt)   # the request thread sits on this for the better part of a minute while the map and the login queue up behind it",
             solution:
-              "AI 추천만 Lambda 로 떼어 내 요청마다 따로 뜨고 끝나면 사라지게 하고 EC2 는 일반 트래픽만 맡게 해, 추천이 몰려도 나머지 화면이 느려지지 않게 됨",
+              "AI 추천을 Lambda로 분리해 요청마다 독립적으로 실행되게 하고, EC2는 일반 API만 처리하도록 역할을 나눔. 추천 부하는 Lambda의 동시 실행이 흡수하고 EC2 스레드는 모델 응답을 기다리지 않게 되어, 추천이 몰려도 지도 · 로그인 응답이 느려지지 않음",
             solutionCode:
               'lambda_client.invoke(FunctionName="walk-recommend", InvocationType="Event", Payload=body)   # EC2 hands it off and goes back to serving pages',
           },
           {
             lens: "클라우드",
             tag: "손으로 올리던 배포",
+            situation:
+              "초기에는 EC2에 SSH로 접속해 git pull → gradle build → 기존 프로세스 종료 → jar 재실행 순서로 직접 배포함. 빌드와 실행이 모두 같은 서버 위에서 이루어짐",
             problem:
-              "서버에 직접 들어가 받아 빌드하고 띄우다 보니 내 컴퓨터에서 되던 것이 서버에서 안 되는 일이 되풀이되고, 빌드가 도는 동안에는 서비스가 멈춰 있음",
+              "빌드가 서버에서 돌아 서버의 JDK와 환경 변수에 따라 로컬에서 되던 빌드가 실패하는 일이 반복되고, 빌드 · 재기동 동안 서비스가 내려가 매 배포마다 중단이 생김. 절차가 사람 손에 달려 있어 순서를 하나만 놓쳐도 장애로 이어짐",
             problemCode:
               "ssh ec2 'git pull && ./gradlew build && pkill -f app.jar && nohup java -jar app.jar &'   # the build runs on the box, so its jdk and env decide whether today's deploy works, and the site is down while it does",
             solution:
-              "GitHub Actions 가 이미지를 미리 구워 두고 EC2 는 컨테이너만 갈아끼우게 바꿔, 어디서 돌려도 같은 환경이 되고 배포가 교체 한 번으로 끝남",
+              "GitHub Actions가 푸시마다 Docker 이미지를 빌드해 커밋 SHA 태그로 ECR에 올리고, EC2는 이미지를 받아 새 컨테이너를 띄운 뒤 기존 컨테이너를 내리게 파이프라인을 구성함. 빌드 환경이 이미지로 고정되어 환경 차이로 인한 실패가 사라지고, 배포가 컨테이너 교체 한 번으로 끝나며 SHA 태그로 이전 버전 롤백도 가능해짐",
             solutionCode:
               "docker build -t app:$SHA . ; docker push $ECR/app:$SHA ; ssh ec2 'docker pull $ECR/app:$SHA && docker run -d app:$SHA && docker rm -f old'   # the image is already built, the box only swaps what is running",
           },
           {
             lens: "AI",
             tag: "공공데이터만큼 불어나던 토큰",
+            situation:
+              "동대문구 산책로 · 공원 공공데이터를 근거로 모델이 경로를 추천해야 해서, 처음에는 전체 데이터를 JSON으로 직렬화해 시스템 프롬프트에 함께 실어 보냄",
             problem:
-              "산책로·공원 공공데이터를 프롬프트에 통째로 실어, 호출 한 번에 드는 토큰이 데이터 양을 그대로 따라가 자료를 더할수록 비용과 응답 시간이 같이 늘어남",
+              "호출마다 전체 데이터셋이 입력 토큰으로 들어가, 데이터를 추가할수록 모든 요청의 토큰 비용과 응답 지연이 비례해 늘어남. 질문과 무관한 데이터가 대부분이라 모델이 참고해야 할 근거도 오히려 묻힘",
             problemCode:
               "prompt = SYSTEM + json.dumps(load_all_trails())   # every call carries the whole dataset, so adding a district adds tokens to every single request",
             solution:
-              "공공데이터를 미리 임베딩해 검색으로 올려 두고 질문과 가까운 몇 건만 프롬프트에 실어, 자료가 늘어도 한 호출에 들어가는 토큰은 그대로이게 만듦",
+              "공공데이터를 S3에 올리고 Titan 임베딩으로 벡터화해 OpenSearch 기반 Bedrock 지식 베이스를 구성하고, 질문과 가까운 상위 5건만 검색해 프롬프트에 넣는 RAG 구조로 바꿈. 데이터가 늘어도 호출당 입력 토큰이 일정하게 유지되고, 질문과 관련된 근거만 모델에 전달됨",
             solutionCode:
               "hits = opensearch.knn(embed(query), k=5) ; prompt = SYSTEM + render(hits)   # the dataset can grow all it likes, the prompt stays the size of five trails",
           },
           {
             lens: "AI",
             tag: "그날 날씨를 모르는 추천",
+            situation:
+              "산책 경로는 날씨의 영향을 크게 받지만, 모델은 호출 시점의 실시간 정보를 알 수 없음. 추천은 Bedrock 에이전트가 지식 베이스를 참고해 생성하는 구조",
             problem:
-              "모델은 오늘 날씨를 알 수 없어 비 오는 날에도 강변 코스를 권했는데, 그렇다고 예보를 프롬프트에 미리 실으면 쓰지도 않을 값이 호출마다 따라가고 읽힐 즈음엔 이미 지난 값이 됨",
+              "비 오는 날에도 강변 · 공원 코스를 추천하는 문제가 생김. 예보를 매 호출 프롬프트에 미리 넣으면 날씨가 필요 없는 요청에도 토큰이 들고, 프롬프트를 만든 시점의 값이라 최신성도 보장되지 않음",
             problemCode:
               'prompt = SYSTEM + trails + f"today: {forecast}"   # the forecast rides along on every call whether the answer needs it or not, and it is already stale by the time the model reads it',
             solution:
-              "날씨 조회를 Bedrock 에이전트의 액션 그룹에 Lambda 로 붙여, 권하려는 길이 날씨를 타는 경우에만 모델이 그 자리에서 불러 쓰게 함",
+              "좌표로 기상 예보를 조회하는 Lambda를 Bedrock 에이전트의 액션 그룹(getForecast)으로 등록해, 모델이 날씨가 판단에 필요할 때만 도구로 불러 쓰게 함. 날씨를 타는 경로를 추천할 때는 그 자리에서 받은 예보가 반영되고, 날씨와 무관한 요청은 추가 토큰 없이 처리됨",
             solutionCode:
               'actionGroups=[{"name": "weather", "lambda": FORECAST_ARN, "schema": "getForecast(lat, lon)"}]   # the agent reaches for it only when the route it is about to suggest depends on the sky',
           },
@@ -658,48 +684,56 @@ export const categories: Category[] = [
           {
             lens: "임베디드",
             tag: "다 올리니 보드가 먼저 뜨거워짐",
+            situation:
+              "착용형 장치라 외부 서버 없이 Jetson Orin Nano Super 한 대에서 YOLO 검출 · 광학 흐름 · VLM 장면 해석 · TTS를 모두 처리함. 배터리로 구동되고 몸에 걸치는 케이스라 방열 여유도 거의 없음",
             problem:
-              "몸에 걸치는 장치라 전력과 발열에 여유가 없는데 검출·흐름 추정·언어 모델·음성 합성을 한 보드에 다 올려, 오래 걸으면 온도가 올라가며 클럭이 내려가 안내가 끊김",
+              "모든 단계를 카메라 프레임 속도로 돌려 GPU · CPU가 쉬지 않고 최대 부하에 있었고, 보행 약 10분 뒤부터 온도가 오르며 서멀 스로틀링으로 클럭이 떨어짐. 추론 주기가 함께 늘어나 보행 중 음성 안내가 끊김",
             problemCode:
               "while True: detect(frame) ; flow(frame) ; describe(frame) ; speak(text)   # every stage runs at camera rate, the board throttles about ten minutes into a walk",
             solution:
-              "전력 모드와 클럭을 보드에 맞춰 잡고 처리 주기를 상황에 따라 늦추도록 해, 온도가 올라가도 안내가 끊기지 않게 정리함",
+              "보드의 전력 모드와 클럭을 장치에 맞게 고정하고, 온도에 따라 단계별 처리 주기를 조정하는 스케줄러를 둠. 검출은 15fps로 유지하되 무거운 VLM 해석부터 주기를 늦추게 해, 온도가 올라가도 안전에 직결되는 검출과 안내는 끊기지 않고 유지됨",
             solutionCode:
               "budget = thermal_budget(read_temp()) ; run_at(detect, 15) ; run_at(describe, budget)   # the heavy stages back off first, the guidance never stops",
           },
           {
             lens: "임베디드",
             tag: "안내가 늘 한 박자 늦음",
+            situation:
+              "카메라 입력 → 검출 → 장면 해석 → 음성 안내가 하나의 루프에서 차례로 실행되는 구조. 단계마다 처리 시간이 크게 다르고 VLM 장면 해석이 가장 느림",
             problem:
-              "카메라 한 장을 받아 모든 단계를 끝낸 뒤에야 다음 장을 받아, 가장 느린 단계가 전체 주기를 정하고 그만큼 안내가 실제 상황보다 늦게 나옴",
+              "한 프레임의 모든 단계가 끝나야 다음 프레임을 읽어, 전체 주기가 가장 느린 VLM 단계에 묶임. 그사이 카메라에 들어온 새 장면은 반영되지 못해, 안내가 실제 보행 상황보다 늦게 나오는 지연이 계속 생김",
             problemCode:
               "frame = cam.read() ; boxes = detect(frame) ; text = describe(frame, boxes) ; speak(text)   # one lane: the slowest stage sets the pace for everything",
             solution:
-              "단계를 갈라 각자 자기 속도로 돌게 하고 사이를 최신 한 장만 남는 버퍼로 이어, 느린 단계가 빠른 단계를 붙잡지 않도록 바꿈",
+              "각 단계를 독립된 루프로 분리해 자기 속도로 돌게 하고, 단계 사이를 최신 한 프레임만 남기는 버퍼로 연결해 느린 단계는 밀린 프레임을 쌓지 않고 버리게 함. 검출은 카메라 속도로 돌며 VLM에 붙잡히지 않고, 안내는 항상 가장 최근 프레임을 기준으로 나감",
             solutionCode:
               "cam >> Latest(1) >> detect >> Latest(1) >> describe >> speak   # each stage keeps its own rate, a slow describe drops stale frames instead of queueing them",
           },
           {
             lens: "AI",
             tag: "본 것을 다 읽어 주던 안내",
+            situation:
+              "YOLO가 한 프레임에서 사람 · 자전거 · 기둥 · 표지판 등 여러 객체를 동시에 검출하고 이를 음성으로 전달함. 사용자는 걸으면서 짧은 시간 안에 피할지 말지를 판단해야 함",
             problem:
-              "검출된 물체를 보이는 대로 다 말해, 걷는 사람에게 정작 중요한 앞을 막은 것과 그냥 지나가는 것이 같은 무게로 들려 판단이 늦어짐",
+              "검출된 라벨을 검출기가 돌려준 순서대로 모두 읽어, 진행 방향을 막는 장애물과 옆을 지나가는 물체가 같은 비중으로 전달됨. 안내가 길어질수록 정작 피해야 할 대상이 늦게 나와 판단이 늦어짐",
             problemCode:
               'speak(", ".join(labels))   # "person, bicycle, pole, sign, car, tree" — everything in view, in whatever order the detector returned it',
             solution:
-              "진행 방향과 거리로 걸림이 되는 것만 남기고 가까운 것부터 읽도록 바꿔, 한 마디로 무엇을 피해야 하는지 알 수 있게 정리함",
+              "진행 방향 경로 안에 있고 4m 이내인 객체만 남기고 가까운 순서로 정렬해 안내하도록 필터를 둠. 한 번의 안내에 실제로 피해야 할 대상만 가까운 것부터 전달되어, 짧은 안내만 듣고 바로 판단할 수 있게 됨",
             solutionCode:
               "blocking = [o for o in objs if in_path(o, heading) and o.dist < 4.0] ; speak(nearest_first(blocking))   # only what is actually in the way, closest first",
           },
           {
             lens: "AI",
             tag: "멈춰 있는 것과 다가오는 것을 못 가름",
+            situation:
+              "보행 중에는 세워 둔 자전거처럼 멈춰 있는 물체와 사용자 쪽으로 다가오는 물체가 섞여 있고, 위험도는 물체의 움직임에 따라 크게 달라짐",
             problem:
-              "한 장씩만 보고 판단해 세워 둔 자전거와 다가오는 자전거가 똑같이 들리고, 정작 비켜야 할 때와 그냥 지나가도 될 때를 구분해 주지 못함",
+              "한 장씩만 보는 검출로는 물체의 움직임을 알 수 없어, 멈춰 있는 자전거와 다가오는 자전거가 똑같이 안내됨. 비켜야 할 순간과 그냥 지나가도 되는 순간을 구분하지 못해 경고의 신뢰도가 떨어짐",
             problemCode:
               "label = detect(frame)   # a single still frame cannot tell a parked bicycle from one closing on you at walking speed",
             solution:
-              "장면 흐름을 함께 읽어 물체가 다가오는지 멀어지는지 가려내고 다가오는 것만 먼저 알리도록 해, 비켜야 할 순간에만 말이 나오게 함",
+              "이전 프레임과의 광학 흐름으로 검출 박스 안의 움직임을 구해 접근 속도를 추정하고, 기준 이상으로 다가오는 물체만 충돌 예상 시간(TTC)과 함께 먼저 경고하게 함. 멈춰 있는 물체에 대한 경고는 줄고, 다가오는 물체만 골라 비켜야 할 순간에 안내가 나옴",
             solutionCode:
               "v = flow_toward(prev, frame, box) ; if v > CLOSING: warn(label, ttc(v, dist))   # motion decides whether it is worth saying at all",
           },

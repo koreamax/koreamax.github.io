@@ -82,10 +82,24 @@ function codeNote(code?: string): string | undefined {
   return m ? `// ${m[1]}` : undefined;
 }
 
+/**
+ * 문제 해결 한 덩어리씩 — 상황 → 문제 → 해결(결과) 이 한 화면에 이어서 읽힌다.
+ * 넷을 한꺼번에 깔면 한 덩어리가 두세 줄로 잘려 흐름이 안 보인다. 그래서 위쪽 탭이
+ * 덩어리의 제목이고, 누르면 그 덩어리 하나가 판 전체를 쓴다. 넘길 때마다 코드가 다시 글로 풀린다.
+ */
 function ProblemWindow({ issues, title }: { issues: CategoryIssue[]; title: string }) {
-  const groups = groupByLens(issues);
-  /* 한 줄씩 차례로 넘기면 눈이 따라다니느라 정신없다 — 파일 전체가 한 번에 넘어간다 */
-  const slot = (len: number) => ({ delay: CODE_HOLD, dur: span(len) });
+  const [cur, setCur] = useState(0);
+  /* 처음 한 번은 코드가 깔려 있는 걸 보여 주고 천천히 푼다. 탭을 넘길 때는 읽으려고 누른 것이라 빨리 푼다 */
+  const [moved, setMoved] = useState(false);
+  const go = (i: number) => {
+    setMoved(true);
+    setCur(i);
+  };
+  const iss = issues[cur];
+  const n = issues.length;
+  const num = (i: number) => String(i + 1).padStart(2, "0");
+  /* 한 줄씩 차례로 넘기면 눈이 따라다니느라 정신없다 — 덩어리 전체가 한 번에 넘어간다 */
+  const slot = (len: number) => (moved ? { delay: 0.08, dur: span(len) * 0.45 } : { delay: CODE_HOLD, dur: span(len) });
   let ln = 0; // 빈 줄도 번호를 먹는다 — 에디터가 그렇다
   const rows: ReactNode[] = [];
   /* 한 줄은 번호 · 접두 · 본문 세 칸이다. 본문이 접혀도 접두 자리는 비어 있어 글머리가 맞는다 */
@@ -98,54 +112,77 @@ function ProblemWindow({ issues, title }: { issues: CategoryIssue[]; title: stri
       </span>,
     );
 
-  groups.forEach((g, gi) => {
-    if (gi) push("", null, null);
-    const head = `// ${g.lens}`;
-    push("is-comment", null, <CodeReveal text={head} code={LENS_NOTE[g.lens]} {...slot(head.length)} />);
-    g.issues.forEach((iss, k) => {
-      push(
-        "is-tag",
-        <em className="pw-idx">[{String(k + 1).padStart(2, "0")}]</em>,
-        <CodeReveal text={iss.tag} code={codeNote(iss.problemCode)} {...slot(iss.tag.length)} />,
-      );
-      /* 문제는 지워질 줄, 해결은 더해질 줄 — diff 로 읽으면 한눈에 갈린다 */
-      push(
-        "is-del",
-        <>
-          <em className="pw-sign">-</em>
-          <em className="pw-key">문제</em>
-        </>,
-        <CodeReveal text={iss.problem} code={iss.problemCode} {...slot(iss.problem.length)} />,
-      );
-      push(
-        "is-add",
-        <>
-          <em className="pw-sign">+</em>
-          <em className="pw-key">해결</em>
-        </>,
-        <CodeReveal text={iss.solution} code={iss.solutionCode} {...slot(iss.solution.length)} />,
-      );
-      if (k < g.issues.length - 1) push("", null, null);
-    });
-  });
+  const head = `// ${iss.lens ?? ""} · ${iss.tag}`;
+  push("is-comment", null, <CodeReveal text={head} code={LENS_NOTE[iss.lens ?? ""]} {...slot(head.length)} />);
+  push("", null, null);
+  /* 상황 — 무엇을 어떻게 만들어 둔 상태였는지 */
+  if (iss.situation) {
+    push(
+      "is-tag",
+      <em className="pw-idx">[{num(cur)}]</em>,
+      <CodeReveal text={iss.situation} code={codeNote(iss.problemCode)} {...slot(iss.situation.length)} />,
+    );
+    push("", null, null);
+  }
+  /* 문제는 지워질 줄, 해결은 더해질 줄 — diff 로 읽으면 한눈에 갈린다 */
+  push(
+    "is-del",
+    <>
+      <em className="pw-sign">-</em>
+      <em className="pw-key">문제</em>
+    </>,
+    <CodeReveal text={iss.problem} code={iss.problemCode} {...slot(iss.problem.length)} />,
+  );
+  push("", null, null);
+  push(
+    "is-add",
+    <>
+      <em className="pw-sign">+</em>
+      <em className="pw-key">해결</em>
+    </>,
+    <CodeReveal text={iss.solution} code={iss.solutionCode} {...slot(iss.solution.length)} />,
+  );
 
-  const n = issues.length;
+  const file = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   return (
     <span className="pw-ed">
-      <span className="pw-ed-tabs" aria-hidden>
-        <span className="pw-ed-tab is-on">
-          <i className="pw-ed-dot" />
-          {title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.problems.diff
-        </span>
-      </span>
-      <span className="pw-ed-code">{rows}</span>
-      <span className="pw-ed-panel" aria-hidden>
-        <b className="is-on">PROBLEMS {n}</b>
-        {groups.map((g) => (
-          <b key={g.lens}>
-            {g.lens.toUpperCase()} {g.issues.length}
-          </b>
+      <span className="pw-ed-tabs" role="tablist" aria-label={`${title} 문제 해결`}>
+        {issues.map((it, i) => (
+          <button
+            key={it.tag}
+            type="button"
+            role="tab"
+            aria-selected={i === cur}
+            className={`pw-ed-tab ${i === cur ? "is-on" : ""}`}
+            onClick={() => go(i)}
+            title={it.tag}
+          >
+            <i className="pw-ed-dot" />
+            <span className="pw-ed-tab-num">{num(i)}</span>
+            <span className="pw-ed-tab-name">{it.tag}</span>
+          </button>
         ))}
+      </span>
+      {/* 덩어리가 바뀌면 줄을 새로 세운다 — 코드가 깔렸다가 글로 풀리는 것도 처음부터 */}
+      <span className="pw-ed-code" key={cur} role="tabpanel">
+        {rows}
+      </span>
+      <span className="pw-ed-panel">
+        <b className="is-on" aria-hidden>
+          PROBLEMS {n}
+        </b>
+        <b aria-hidden>{file}.diff</b>
+        <span className="pw-ed-nav">
+          <button type="button" onClick={() => go((cur + n - 1) % n)} aria-label="이전 문제">
+            ‹
+          </button>
+          <em>
+            {num(cur)} / {num(n - 1)}
+          </em>
+          <button type="button" onClick={() => go((cur + 1) % n)} aria-label="다음 문제">
+            ›
+          </button>
+        </span>
       </span>
     </span>
   );
@@ -169,18 +206,6 @@ function IssueBlock({ iss, k }: { iss: CategoryIssue; k: number }) {
       </span>
     </span>
   );
-}
-
-/** 같은 관점끼리 묶는다 — 백엔드 이야기와 클라우드 이야기를 섞어 놓으면 읽히지 않는다 */
-function groupByLens(issues: CategoryIssue[]) {
-  const out: { lens: string; issues: CategoryIssue[] }[] = [];
-  for (const iss of issues) {
-    const lens = iss.lens ?? "";
-    const last = out[out.length - 1];
-    if (last && last.lens === lens) last.issues.push(iss);
-    else out.push({ lens, issues: [iss] });
-  }
-  return out;
 }
 
 /** 구조도 한 장. 그림 자체가 한 장의 도면이라 창틀을 씌우지 않는다 */
