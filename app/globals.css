@@ -602,6 +602,9 @@ html { overflow-x: clip; }
 .pw-line { padding-right: 16px; min-height: 1.56em; color: rgba(255,255,255,0.78); overflow-wrap: anywhere; }
 
 .pw-row.is-comment .pw-line { color: var(--vs-comment); }
+/* 맨 위 서비스 설명 주석은 들여 쓰지 않는다 — 접두 칸을 건너 줄 번호 바로 뒤에서 시작한다 */
+.pw-row.is-brief .pw-pre { display: none; }
+.pw-row.is-brief .pw-line { grid-column: 2 / -1; padding-left: 8px; }
 .pw-row.is-tag .pw-line { color: var(--vs-fn); }
 .pw-idx { padding-left: 8px; font-style: normal; color: var(--vs-gutter); }
 
@@ -654,10 +657,11 @@ html { overflow-x: clip; }
    아래쪽에 얹힌다. 칸 크기는 줄 수가, 줄 수는 사진 장수가 정한다(components/strengths.tsx).
    줄은 같은 칸을 두 벌 이어 붙이고 제 길이의 절반만큼 밀어 끝이 처음과 만나게 한다.
    그래서 칸 사이는 gap 이 아니라 margin 으로 띄운다 — gap 이면 반 바퀴가 딱 떨어지지 않는다. */
-.st-sec { position: relative; }
-/* 한 화면. 창 높이를 따르되 600~700 사이로 묶는다 — 줄 수를 정하는 자(strengths.tsx)가
+/* 01 과 02 가 한 화면에 — 구역이 창 높이를 갖고 두 화면이 반씩 나눈다. 위 88 은 떠 있는 메뉴 자리 */
+.st-sec { position: relative; display: flex; flex-direction: column; gap: 16px; height: clamp(680px, calc(var(--vh) * 100), 900px); padding: 88px 0 16px; box-sizing: border-box; }
+/* 한 화면. 구역 높이를 반씩 나눠 갖는다 — 줄 수를 정하는 자(strengths.tsx)가
    이 범위를 기준으로 재 두었다. 창이 이보다 길거나 짧아도 같은 사진이 두 번 걸리지 않는다 */
-.st-screen { position: relative; height: clamp(600px, calc(var(--vh) * 100), 700px); overflow: hidden; display: flex; flex-direction: column; }
+.st-screen { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
 /* 벽은 제목 띠 아래 남은 자리를 채운다 */
 .st-wall { position: relative; flex: 1; min-height: 0; display: flex; }
 
@@ -720,7 +724,7 @@ html { overflow-x: clip; }
 
 /* 번호와 제목 — 벽 위의 제 띠. 벽에 얹으면 벽의 한 줄이 통째로 가려진다.
    띠 위쪽은 떠 있는 메뉴(아래끝 70) 자리로 비워 둔다 — 화면을 맨 위에 맞춰도 제목이 메뉴에 안 걸린다 */
-.st-caption { flex: none; height: 150px; display: flex; align-items: flex-end; padding: 0 180px 22px; }
+.st-caption { flex: none; height: 56px; display: flex; align-items: flex-end; padding: 0 180px 12px; }
 /* 번호와 제목은 한 벌 — 크기도 줄 높이도 같게 두고 첫 줄 밑줄을 맞춘다 */
 .st-top {
   display: flex; align-items: baseline; gap: 16px; max-width: 1080px;
@@ -728,7 +732,7 @@ html { overflow-x: clip; }
   transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1);
 }
 .st-screen.is-in .st-top { opacity: 1; transform: none; }
-.st-num, .st-title { font-family: 'Black Han Sans', sans-serif; font-size: 32px; line-height: 1.2; letter-spacing: -0.01em; }
+.st-num, .st-title { font-family: 'Black Han Sans', sans-serif; font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; }
 .st-num { flex: none; color: #da291c; font-variant-numeric: tabular-nums; }
 .st-title { margin: 0; color: #ffffff; }
 

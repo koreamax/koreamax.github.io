@@ -105,7 +105,7 @@ function ProblemWindow({ issues, title, brief }: { issues: CategoryIssue[]; titl
   const reveal = (text: string, code?: string) => <CodeReveal text={text} code={code} {...slot(text.length)} />;
 
   if (brief) {
-    push("is-comment", null, reveal(`// ${title} — ${brief}`, LENS_NOTE[issues[0]?.lens ?? ""]));
+    push("is-comment is-brief", null, reveal(`// ${title} — ${brief}`, LENS_NOTE[issues[0]?.lens ?? ""]));
     push("", null, null);
   }
   issues.forEach((iss, k) => {

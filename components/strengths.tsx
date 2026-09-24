@@ -23,16 +23,21 @@ type Flow = "col" | "row" | "deck";
 const FLOWS: Flow[] = ["col", "row", "deck"];
 
 /* ── 칸을 정하는 자 ──
-   전부 도면 px 기준. 화면 가로는 늘 1440, 한 화면 높이는 600~700 이고 그중 위 150 은
-   제목 띠라 벽은 450~550 이다. 세로로 흐르는 벽은 가장 긴 벽을, 가로 줄은 칸이 가장
+   전부 도면 px 기준. 화면 가로는 늘 1440. 01 과 02 가 한 화면에 함께 들어온다 — 구역 전체가
+   창 높이(680~900)이고, 위 88 은 떠 있는 메뉴 자리, 아래 16 과 두 화면 사이 16 을 뺀 나머지를
+   둘이 반씩 나눈다. 한 화면에서 위 56 은 제목 띠라 벽은 224~334 이다. 세로로 흐르는 벽은 가장 긴 벽을, 가로 줄은 칸이 가장
    작아지는 가장 낮은 벽을 기준으로 재야 어느 창에서도 같은 사진이 두 번 안 보인다.
 
    기준은 엄격하게 잡는다 — 칸의 한 귀퉁이만 걸려도 보인 것으로 친다. 그러면 한 줄의
    칸 수가 (줄이 벽에 걸치는 길이 + 칸 길이) / 한 칸 간격 보다 많아야 한다. */
 const W = 1440;
-const BAND = 150;
-const WALL_MAX = 700 - BAND;
-const WALL_MIN = 600 - BAND;
+const SEC_MAX = 900;
+const SEC_MIN = 680;
+/** 구역 위 · 아래 여백과 두 화면 사이 — 메뉴 자리 88, 아래 16, 사이 16 */
+const SEC_PAD = 88 + 16 + 16;
+const BAND = 56;
+const WALL_MAX = (SEC_MAX - SEC_PAD) / 2 - BAND;
+const WALL_MIN = (SEC_MIN - SEC_PAD) / 2 - BAND;
 const GAP = 16;
 /** 벽 좌우 여백 — 제목 띠의 글머리와 맞춘다 */
 const SIDE = 180;
@@ -48,14 +53,18 @@ type Geo = {
   /** 한 줄이 벽에 걸치는 길이 (칸 길이만큼 앞뒤로 삐져나온 것까지 포함하기 전) */
   along: number;
 };
-const colLen = (W - 2 * SIDE - 2 * GAP) / 3 / 1.6;
-const rowLen = ((WALL_MIN - 4 * GAP) / 3) * 1.6;
+/* 01 은 네 줄로 갈라 칸을 작게, 02 는 벽이 낮아 두 줄로 — 칸이 너무 납작해지지 않게 */
+const COL_LANES = 4;
+const ROW_LANES = 2;
+const colLen = (W - 2 * SIDE - (COL_LANES - 1) * GAP) / COL_LANES / 1.6;
+/* 가로 줄 벽은 위아래 여백 16 씩에 줄 사이 16 */
+const rowLen = ((WALL_MIN - (ROW_LANES + 1) * GAP) / ROW_LANES) * 1.6;
 const deckLen = (1.3 * W - 6 * GAP) / 5;
 const GEO: Record<Flow, Geo> = {
-  /* 세 줄, 16:10 칸. 벽 높이만큼 걸친다 */
-  col: { lanes: 3, len: colLen, along: WALL_MAX },
-  /* 세 줄, 벽 높이를 셋으로 나눈 16:10 칸. 좌우 여백을 뺀 폭만큼 걸친다 */
-  row: { lanes: 3, len: rowLen, along: W - 2 * SIDE },
+  /* 네 줄, 16:10 칸. 벽 높이만큼 걸친다 */
+  col: { lanes: COL_LANES, len: colLen, along: WALL_MAX },
+  /* 두 줄, 벽 높이를 둘로 나눈 16:10 칸. 좌우 여백을 뺀 폭만큼 걸친다 */
+  row: { lanes: ROW_LANES, len: rowLen, along: W - 2 * SIDE },
   /* 다섯 줄, 폭 1.3배 판을 다섯으로 나눈 네모 칸. 기울고 원근이 걸려 걸치는 길이는 재서
      얻었다 — 900 화면에서 1200 + 0.8t 였고, 벽이 짧아진 만큼 줄여 쓴다. 기운 칸은 외곽
      상자가 아니라 실제로 그려진 픽셀을 짚어 가며 쟀다 */
