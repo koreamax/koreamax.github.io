@@ -7,6 +7,7 @@ import { categories, type CategoryItem, type CategoryIssue } from "@/components/
 import { ProgressiveFluxLoader } from "@/components/ui/progressive-flux-loader";
 import { GlowCard } from "@/components/ui/spotlight-card";
 import { designViewport } from "@/components/fixed-canvas";
+import { completeSnap } from "@/lib/scroll-complete";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -445,6 +446,8 @@ export default function ProjectScenes() {
       // 화면 전체가 확대·축소된 이 사이트에서는 어긋난다.
       if (track) track.style.height = `calc(var(--vh) * ${100 * (1 + (n - 1) * SEG * SCENE_SCROLL)})`;
 
+      /* 장면이 다 보이는 자리(0~1 진행도) — 타임라인을 다 짠 뒤에 채운다 */
+      let rests = [0, 1];
       const tl = gsap.timeline({
         defaults: { ease: "power2.inOut" },
         scrollTrigger: {
@@ -453,6 +456,8 @@ export default function ProjectScenes() {
           end: "bottom bottom",
           scrub: 0.75,
           invalidateOnRefresh: true,
+          /* 전환 한가운데서 손을 떼면 그 전환을 끝까지 보여 준다 */
+          snap: completeSnap(() => rests),
           onUpdate: (self) => {
             const v = gsap.utils.clamp(0, 1, Math.abs(self.getVelocity()) / 2600);
             setPush(1 + v * 0.012);
@@ -548,13 +553,19 @@ export default function ProjectScenes() {
         tl.to(root.querySelectorAll(".pstage-dot")[i], { backgroundColor: "rgba(255,255,255,0.22)", scale: 1, duration: 0.14 }, P(0.62));
       }
 
+      /* 쉼 자리 — 첫 장면은 맨 앞, k 번째 장면은 제 구간이 시작되고 조금 뒤(머무는 몫 안), 마지막 장면은 맨 끝 */
+      {
+        const D = tl.duration();
+        rests = [0, ...Array.from({ length: n - 2 }, (_, k) => ((k + 1) * SEG + HOLD / 2) / D), 1];
+      }
+
       /* ── 퇴장 ── 무대가 끝나고 다음 구역(HOW)이 올라오는 동안 마지막 장면이 흩어진다.
          그림과 판은 서로 반대쪽 위로 기울며 날아가고, 번호와 이름은 왼쪽으로 빠지고, 빛은 번지며 꺼진다.
          무대 트랙의 아랫변이 화면 아래에서 위로 지나가는 구간에 묶여 있어 되돌리면 다시 모인다 */
       const last = scenes[n - 1];
       const exit = gsap.timeline({
         defaults: { ease: "power2.in" },
-        scrollTrigger: { trigger: track || root, start: "bottom bottom", end: "bottom top", scrub: 0.4, invalidateOnRefresh: true },
+        scrollTrigger: { trigger: track || root, start: "bottom bottom", end: "bottom top", scrub: 0.4, invalidateOnRefresh: true, snap: completeSnap(() => [0, 1]) },
       });
       exit.to(
         q(last, "[data-item]"),

@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { completeSnap } from "@/lib/scroll-complete";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -76,6 +77,8 @@ export default function FlowArt({
             scrollTrigger: { trigger: marks[i], start: "top bottom", end: "top 25%", scrub: true, invalidateOnRefresh: true },
           },
         );
+        /* 올라오다 멈추면 끝까지 — 다음 장면이 화면 맨 위에 닿을 때까지(또는 굴리던 방향이 위면 앞 장면으로) 마저 굴러간다 */
+        ScrollTrigger.create({ trigger: marks[i], start: "top bottom", end: "top top", invalidateOnRefresh: true, snap: completeSnap(() => [0, 1]) });
       });
       ScrollTrigger.refresh();
     }, root);
