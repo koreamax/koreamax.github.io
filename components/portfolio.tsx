@@ -7,6 +7,7 @@ import ProjectScenes from "@/components/project-scenes";
 import Strengths from "@/components/strengths";
 import HowIntro from "@/components/how-intro";
 import FlowArt, { FlowSection } from "@/components/ui/story-scroll";
+import AiSpread from "@/components/ai-spread";
 import SiteFooter from "@/components/site-footer";
 import { designViewport } from "@/components/fixed-canvas";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
@@ -433,7 +434,7 @@ export default function Portfolio() {
        제 입장을 스스로 챙기는 구간은 건드리지 않는다 — 여기서 얹은 translateY 가 남아
        그 구간의 타임라인과 겹치면, 나란히 놓인 번호와 제목이 서로 다른 만큼 밀려
        줄이 어긋난다. */
-    const rv = [...root.querySelectorAll<HTMLElement>("section h2, section h3, blockquote")].filter((el) => !el.closest("[data-spread], .pstage, .st-sec, .hw-intro"));
+    const rv = [...root.querySelectorAll<HTMLElement>("section h2, section h3, blockquote")].filter((el) => !el.closest("[data-spread], .pstage, .st-sec, .hw-intro, .ai-track"));
     rv.forEach((el) => {
       el.style.opacity = "0";
       el.style.transform = "translateY(36px)";
@@ -871,6 +872,9 @@ export default function Portfolio() {
         </FlowSection>
         <FlowSection aria-label="기록과 학습">
           <Strengths />
+        </FlowSection>
+        <FlowSection aria-label="AI 활용 능력">
+          <AiSpread />
         </FlowSection>
       </FlowArt>
 

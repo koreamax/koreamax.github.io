@@ -70,7 +70,14 @@ export default function FlowArt({
         if (!inner) return;
         gsap.fromTo(
           inner,
-          { rotation: 30, transformOrigin: "0% 100%" },
+          /* 축은 판의 왼쪽 아래 — 한 화면보다 긴 장면은 첫 화면의 아랫변을 축으로 삼아야 같은 모양으로 들어온다 */
+          {
+            rotation: 30,
+            transformOrigin: () => {
+              const screen = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--vh")) || 8.6) * 100;
+              return `0px ${Math.min(inner.offsetHeight, screen)}px`;
+            },
+          },
           {
             rotation: 0,
             ease: "none",

@@ -194,7 +194,7 @@ export default function Strengths() {
 
   return (
     <section id="how" ref={rootRef} className="st-sec">
-      {strengths.filter((s) => !s.draft).map((item, i) => (
+      {strengths.filter((s) => !s.draft && !s.spread).map((item, i) => (
         <Screen key={item.num} item={item} flow={FLOWS[i % FLOWS.length]} near={near} />
       ))}
     </section>

@@ -780,6 +780,12 @@ export interface Strength {
   shots: string[];
   /** 아직 사진이 덜 모인 화면 — 데이터는 두되 페이지에는 싣지 않는다 */
   draft?: boolean;
+  /** 줄이 바뀌어도 쪼개지 않을 제목 끝 말 — 모자라면 통째로 다음 줄로 내린다 */
+  keep?: string;
+  /** 사진 벽 대신 카드가 부채꼴로 펼쳐지는 화면(components/ai-spread.tsx) */
+  spread?: boolean;
+  /** 펼치는 카드 아래 적는 이름 — shots 와 같은 순서 */
+  labels?: string[];
 }
 
 export const strengths: Strength[] = [
@@ -806,6 +812,7 @@ export const strengths: Strength[] = [
   {
     num: '02',
     title: '꾸준히 학습하는 스터디와 GitHub와 Velog 등에 학습 내용 정리',
+    keep: '학습 내용 정리',
     ph: '스터디 · 정리',
     shots: [
       '/uploads/study-velog-3tier.webp',
@@ -831,23 +838,21 @@ export const strengths: Strength[] = [
   /* 세로로 긴 휴대폰 화면 셋은 맨 앞에 — 앞에서부터 줄마다 하나씩 돌아가 흩어진다 */
   {
     num: '03',
-    draft: true,
-    title: 'AWS SBG Core Member와 대학교 조교로서 발표와 공지 및 알림',
-    ph: '발표 · 공지',
+    title: 'AI 활용 능력: 나만의 지식을 그래프로 잇고 자동화하는 디지털 트윈',
+    keep: '디지털 트윈',
+    ph: 'AI 활용',
+    spread: true,
+    /* 왼쪽부터 기록 → 연결 → 구조화 → 시뮬레이션 → 자동화. 가운데 둘이 가장 앞에 크게 선다 */
     shots: [
-      '/uploads/notice-devconf-poster.webp',
-      '/uploads/notice-asbg-recruit.webp',
-      '/uploads/notice-devconf-post.webp',
-      '/uploads/notice-lunch-start.webp',
-      '/uploads/notice-ai901.webp',
-      '/uploads/notice-course.webp',
-      '/uploads/notice-lunch-last.webp',
-      '/uploads/notice-assignment.webp',
-      '/uploads/notice-devops-recruit.webp',
-      '/uploads/notice-bedrock-talk.webp',
-      '/uploads/notice-asbg-intro.webp',
-      '/uploads/notice-skt-qna.webp',
-      '/uploads/notice-asbg-session.webp',
+      '/uploads/ai-obsidian-graph.webp',
+      '/uploads/ai-neo4j-graph.webp',
+      '/uploads/ai-neo4j-table.webp',
+      '/uploads/ai-palantir-ontology.webp',
+      '/uploads/ai-twin-home.webp',
+      '/uploads/ai-twin-problems.webp',
+      '/uploads/ai-n8n-workflow.webp',
+      '/uploads/ai-n8n-executions.webp',
     ],
+    labels: ['Obsidian', 'Neo4j', 'Neo4j', 'Palantir Ontology', 'Digital Twin', 'Digital Twin', 'n8n', 'n8n'],
   },
 ];

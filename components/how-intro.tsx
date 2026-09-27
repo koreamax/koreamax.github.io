@@ -43,7 +43,17 @@ export default function HowIntro() {
           {shown.map((s) => (
             <li key={s.num}>
               <b>{s.num}</b>
-              <span>{s.title}</span>
+              <span>
+                {/* 끝말(keep)은 쪼개지 않는다 — 모자라면 통째로 다음 줄로 */}
+                {s.keep && s.title.endsWith(s.keep) ? (
+                  <>
+                    {s.title.slice(0, -s.keep.length)}
+                    <span className="nowrap">{s.keep}</span>
+                  </>
+                ) : (
+                  s.title
+                )}
+              </span>
             </li>
           ))}
         </ol>
