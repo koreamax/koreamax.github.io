@@ -685,77 +685,78 @@ export const categories: Category[] = [
     num: "04",
     name: "Embedded & AI",
     color: "#fbbf24",
-    stack: ["NVIDIA Jetson", "YOLO", "Optical Flow", "VLM", "TTS", "C/C++"],
+    stack: ["NVIDIA Jetson", "YOLO", "Optical Flow", "llama.cpp", "faster-whisper", "MeloTTS", "Flask"],
     items: [
       {
         title: "VIAssist",
-        brief: "시각장애인 보행 보조 웨어러블 · Jetson 한 대에서 검출부터 음성까지",
+        brief: "시각장애인 보행 보조 웨어러블 · Jetson 한 대에서 탐지부터 음성까지",
         summary:
-          "시각장애인 보행 보조 웨어러블. 카메라 입력부터 음성 안내까지 Jetson Orin Nano Super 한 대 안에서 끝난다 — 검출, 흐름 추정, 장면 해석, 음성 합성이 모두 보드 위에 올라간다.",
+          "시각장애인 보행 보조 웨어러블. 카메라로 시설물을 찾고 움직이는 방향을 판정하고, 물어보면 말로 답한다 — YOLO · Optical Flow · STT · VLM · TTS 가 Jetson Orin Nano 8GB 한 대 안에서 돈다.",
         arch: {
-          src: "/uploads/viassist-arch.webp",
-          caption: "착용 장치와 보행 안내 화면 — 직접 찍은 네 장",
+          src: "/uploads/viassist-arch.svg",
+          caption:
+            "Jetson Orin Nano 8GB 한 대 안에서 카메라는 YOLO 와 Optical Flow 로, 마이크는 faster-whisper 로 들어가 라우터에 모인다. 라우터는 위치 · 방향이면 규칙으로 바로, 상태나 장면이면 llama.cpp 의 SmolVLM 으로 보내고, VLM 답은 Safety Validator 를 거쳐 MeloTTS 로 읽힌다.",
         },
         issues: [
           {
             lens: "임베디드",
-            tag: "발열 스로틀링으로 끊기는 안내",
+            tag: "메모리 고갈로 멈추는 보드",
             problem: [
-              "검출 · 광학 흐름 · VLM · TTS를 한 보드에서 프레임마다 실행",
-              "보행 약 10분 뒤 온도 상승으로 클럭 저하",
-              "추론 주기가 늘어 음성 안내 끊김",
+              "YOLO · Flow · STT · TTS · VLM을 통합 메모리 7.6 GB에 동시 적재",
+              "메모리 바닥에서 zram 스왑 스래싱이 OOM 킬러보다 먼저 발생",
+              "GPU 매핑 메모리는 스왑 불가, 실측 하루 4회 시스템 완전 정지",
             ],
             problemCode:
-              "while True: detect(frame) ; flow(frame) ; describe(frame) ; speak(text)   # every stage runs at camera rate, the board throttles about ten minutes into a walk",
+              "# 09-05: microSD root, zram swap in RAM, MAXN_SUPER — four full freezes in one day, GPU-mapped memory cannot swap out",
             solution:
-              "전력 모드 고정 + 온도 기반 주기 조절(검출 15fps 유지, VLM부터 감속) → 안내 유지",
+              "earlyoom 5% 개입 · 25W 전원 모드 · 가용 350 MB 미만 VLM 차단 → 멈추기 전 정리",
             solutionCode:
-              "budget = thermal_budget(read_temp()) ; run_at(detect, 15) ; run_at(describe, budget)   # the heavy stages back off first, the guidance never stops",
+              "sudo nvpmodel -m 1 ; earlyoom -m 5 -s 100 ; MEMORY_GUARD_MB=350   # step in before zram thrashes, refuse a VLM call when the budget is gone",
           },
           {
             lens: "임베디드",
-            tag: "순차 파이프라인의 안내 지연",
+            tag: "느리고 무거운 VLM 호출",
             problem: [
-              "입력 → 검출 → 해석 → 음성이 한 루프에서 순차 실행",
-              "전체 주기가 가장 느린 VLM에 묶임",
-              "새 장면 반영이 늦어 안내가 실제보다 늦음",
+              "HF transformers로 SmolVLM-500M 실행, 호출당 4.3 s (25W 9 s)",
+              "상주 1.7 GB로 전체 스택 여유 메모리 1.3 GB",
+              "보행 중 질문에 답이 늦어 안내 가치 저하",
             ],
             problemCode:
-              "frame = cam.read() ; boxes = detect(frame) ; text = describe(frame, boxes) ; speak(text)   # one lane: the slowest stage sets the pace for everything",
+              "VLMService(engine=\"local\", model=\"SmolVLM-500M\")   # transformers on the Orin: 4.3 s a call at MAXN, 9 s at 25 W, 1.7 GB resident",
             solution:
-              "단계별 독립 루프 + 최신 1프레임 버퍼 → 검출은 카메라 속도, 안내는 최신 프레임 기준",
+              "같은 모델을 Q8 + llama.cpp 서버로 교체 → 0.62 s · 89 tok/s, 여유 1.3 → 2.5 GB",
             solutionCode:
-              "cam >> Latest(1) >> detect >> Latest(1) >> describe >> speak   # each stage keeps its own rate, a slow describe drops stale frames instead of queueing them",
+              "llama-server -m smolvlm-500m-q8_0.gguf --cache-ram 0   # same weights, 0.62 s a call; without --cache-ram 0 every call leaks 35 MB",
           },
           {
             lens: "AI",
-            tag: "검출 결과를 전부 나열하는 안내",
+            tag: "2.5초 질문에 22초 걸리던 음성 인식",
             problem: [
-              "검출 라벨을 반환 순서대로 전부 읽음",
-              "장애물과 지나가는 물체가 같은 비중",
-              "피해야 할 대상이 늦게 전달",
+              "faster-whisper의 온도 fallback으로 디코딩 반복",
+              "생성 길이 상한 없음으로 짧은 발화에도 과다 생성",
+              "2.5 s 음성 → 텍스트까지 22 s, 대화 불가",
             ],
             problemCode:
-              'speak(", ".join(labels))   # "person, bicycle, pole, sign, car, tree" — everything in view, in whatever order the detector returned it',
+              "segments, _ = model.transcribe(wav)   # default temperature ladder retries the decode and nothing caps the length — 22 s for a 2.5 s question",
             solution:
-              "진행 경로 · 4m 이내만 남기고 가까운 순 정렬 → 피할 대상만 한 마디로 안내",
+              "온도 0 고정 · 64토큰 상한 · 침묵 650 ms에 종료 → 말 끝에서 텍스트까지 1.3 s",
             solutionCode:
-              "blocking = [o for o in objs if in_path(o, heading) and o.dist < 4.0] ; speak(nearest_first(blocking))   # only what is actually in the way, closest first",
+              "model.transcribe(wav, temperature=0.0, max_new_tokens=64, vad_filter=True, vad_parameters={\"min_silence_duration_ms\": 650})",
           },
           {
             lens: "AI",
-            tag: "정지 물체와 접근 물체 미구분",
+            tag: "질문마다 다른 근거가 필요한 안내",
             problem: [
-              "단일 프레임 검출이라 움직임 정보 없음",
-              "세워 둔 자전거와 다가오는 자전거가 같은 안내",
-              "경고 신뢰도 저하",
+              "VLM 호출 0.62~4.3 s, 즉답이 필요한 위치 · 방향엔 과함",
+              "소형 VLM의 사물 판별 부정확 (벤치 object 정답 0%)",
+              "질문마다 필요한 근거(탐지 · 움직임 · 장면)가 다름",
             ],
             problemCode:
-              "label = detect(frame)   # a single still frame cannot tell a parked bicycle from one closing on you at walking speed",
+              "answer = vlm.describe(frame, question)   # every question pays a model call, and a 500M model is the one naming what is ahead",
             solution:
-              "광학 흐름으로 접근 속도 추정, 접근 물체만 TTC와 함께 경고 → 필요한 순간에만 경고",
+              "라우터로 규칙 · VLM 상태 · VLM 장면 분기 + Safety Validator → 위치 · 방향 1.4 ms",
             solutionCode:
-              "v = flow_toward(prev, frame, box) ; if v > CLOSING: warn(label, ttc(v, dist))   # motion decides whether it is worth saying at all",
+              "route = guidance_router.decide(question, detections)   # YOLO + flow answer place and direction, the VLM only states and open scenes, every message passes the validator",
           },
         ],
         repo: "https://github.com/koreamax/VIAssist_Total",
