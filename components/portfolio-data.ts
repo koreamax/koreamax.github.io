@@ -693,9 +693,9 @@ export const categories: Category[] = [
         summary:
           "시각장애인 보행 보조 웨어러블. 카메라로 시설물을 찾고 움직이는 방향을 판정하고, 물어보면 말로 답한다 — YOLO · Optical Flow · STT · VLM · TTS 가 Jetson Orin Nano Super 한 대 안에서 돈다.",
         arch: {
-          src: "/uploads/viassist-arch.svg",
+          src: "/uploads/viassist-arch-hanium.webp",
           caption:
-            "Jetson Orin Nano Super 한 대 안에서 카메라는 YOLO 와 Optical Flow 로, 마이크는 faster-whisper 로 들어가 라우터에 모인다. 라우터는 위치 · 방향이면 규칙으로 바로, 상태나 장면이면 llama.cpp 의 SmolVLM 으로 보내고, VLM 답은 Safety Validator 를 거쳐 MeloTTS 로 읽힌다.",
+            "Jetson Orin Nano Super 한 대 안에서 카메라는 YOLO26n 과 Optical Flow 로, 마이크는 Faster-Whisper 로 들어가 Flask 백엔드 라우터에 모인다. 탐지로 답할 수 있으면 규칙으로 바로 답하고, 찾지 못하면 SmolVLM-500M 이 판단한다. 답은 MeloTTS 로 읽어 스피커로 낸다.",
         },
         issues: [
           {
