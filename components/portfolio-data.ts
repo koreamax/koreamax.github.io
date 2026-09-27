@@ -455,7 +455,7 @@ export const categories: Category[] = [
         arch: {
           caption:
             "React Native 앱이 ALB를 지나 EC2의 Spring Boot에 닿고, Spring Boot는 gRPC로 EKS 위의 오케스트레이터 · RAG · Ollama · STT/TTS · Chroma를 부른다. 상태는 RDS와 Redis에, 음성은 S3에, 분석 요청은 SQS에 둔다.",
-          src: "/uploads/wilson-arch.webp",
+          src: "/uploads/wilson-arch-hq.webp",
         },
         issues: [
           {
@@ -528,7 +528,7 @@ export const categories: Category[] = [
         summary:
           "시각장애인·저시력 사용자를 위한 메이크업 도우미. 앱이 찍은 화면을 백엔드가 받아 전처리하고, 화장품·메이크업 판정을 모델에 맡긴 뒤 결과를 음성으로 돌려준다.",
         arch: {
-          src: "/uploads/beauty-arch.webp",
+          src: "/uploads/beauty-arch-hq.webp",
           caption: "Flutter 앱 → FastAPI → 전처리 · VLM 판정 → TTS. 무거운 일은 작업 큐로 넘기고 결과만 따로 받아 간다.",
         },
         issues: [
@@ -693,7 +693,7 @@ export const categories: Category[] = [
         summary:
           "시각장애인 보행 보조 웨어러블. 카메라로 시설물을 찾고 움직이는 방향을 판정하고, 물어보면 말로 답한다 — YOLO · Optical Flow · STT · VLM · TTS 가 Jetson Orin Nano Super 한 대 안에서 돈다.",
         arch: {
-          src: "/uploads/viassist-arch-hanium-v2.webp",
+          src: "/uploads/viassist-arch-hq.webp",
           caption:
             "Jetson Orin Nano Super 한 대 안에서 카메라는 YOLO26n 과 Optical Flow 로, 마이크는 Faster-Whisper 로 들어가 Flask 백엔드 라우터에 모인다. 탐지로 답할 수 있으면 규칙으로 바로 답하고, 찾지 못하면 llama.cpp 로 띄운 SmolVLM-500M 이 판단한다. 답은 MeloTTS 로 읽어 스피커로 낸다.",
         },

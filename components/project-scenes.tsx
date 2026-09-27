@@ -386,6 +386,11 @@ export default function ProjectScenes() {
       const v = designViewport();
       const s = Math.min(v.w / CANVAS_W, v.h / CANVAS_H, 1.35);
       canvas.style.setProperty("--ps", String(s));
+      /* 배율이 바뀐 뒤 한 번 다시 그리게 한다. will-change 가 걸린 층은 처음 그린 크기의 그림을
+         그대로 늘려 쓰는데, 배율이 나중에 붙으면 구조도의 글자가 흐리게 늘어난다 */
+      const layers = canvas.querySelectorAll<HTMLElement>(".pscene, .pscene-inner, .pcard-link");
+      layers.forEach((el) => (el.style.willChange = "auto"));
+      requestAnimationFrame(() => requestAnimationFrame(() => layers.forEach((el) => (el.style.willChange = ""))));
     };
     fit();
     window.addEventListener("resize", fit);
