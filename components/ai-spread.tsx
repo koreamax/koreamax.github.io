@@ -20,16 +20,22 @@ gsap.registerPlugin(ScrollTrigger);
 const item = strengths.find((s) => s.spread);
 const VW = 14.4;
 
+/* 펼치기 시작 · 끝 (트랙 진행도) */
+const OPEN_AT = 0.08;
+const OPEN_END = 0.5;
+
 const vh = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--vh")) || 8.6;
 
-/* 가운데를 기준으로 좌우로 몇 번째인지에 따라 겹친 자리와 펼친 자리를 정한다 */
+/* 가운데를 기준으로 좌우로 몇 번째인지에 따라 겹친 자리와 펼친 자리를 정한다.
+   원본은 간격이 18vw 라 양 끝 카드가 화면 밖으로 나간다 — 여덟 장이 다 들어오게 카드를 줄이고(17vw)
+   간격을 12vw, 바깥 기울기를 조금 덜(-10°씩) 준다. 양 끝 카드도 화면 안쪽에 여백을 두고 선다 */
 const layout = (i: number, n: number) => {
   const o = i - (n - 1) / 2;
   const a = Math.abs(o);
   return {
     z: Math.round(10 - a),
     stacked: { x: o * 2 * VW, y: o * -2, rotationZ: o * 2.5, rotationY: 0, scale: 0.75 },
-    spread: { x: o * 18 * VW, y: a * 3, rotationZ: o * 1.5, rotationY: o * -12, scale: 1 - a * 0.05 },
+    spread: { x: o * 12 * VW, y: a * 3, rotationZ: o * 1.5, rotationY: o * -10, scale: 1 - a * 0.05 },
   };
 };
 
@@ -44,6 +50,12 @@ export default function AiSpread() {
     const copy = track.querySelector<HTMLElement>(".ai-copy");
     const n = cards.length;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* 중간에 멈추면 끝까지 — 다 접힌 자리(0)나 다 펼친 자리(OPEN_END)로 간다.
+       다 펼친 뒤 머무는 구간 안에서는 붙잡지 않는다 — 거기서 트랙 끝까지 끌고 가면 다 보기도 전에 넘어간다 */
+    const baseSnap = completeSnap(() => [0, OPEN_END + 0.01]);
+    const baseTo = baseSnap.snapTo as (v: number, s?: ScrollTrigger) => number;
+    const holdSnap = { ...baseSnap, snapTo: (v: number, self?: ScrollTrigger) => (v > OPEN_END + 0.012 ? v : baseTo(v, self)) };
 
     const ctx = gsap.context(() => {
       const at = (i: number, key: "stacked" | "spread") => {
@@ -60,7 +72,8 @@ export default function AiSpread() {
       cards.forEach((c, i) => gsap.set(c, at(i, "stacked")));
       gsap.set(copy, { y: () => 10 * vh(), scale: 0.85, opacity: 0 });
 
-      /* 구간: 앞 15% 는 겹친 채, 15~85% 에 펼치고, 뒤 15% 는 펼친 채 머문다 */
+      /* 구간: 앞 8% 는 겹친 채, 8~50% 에 펼치고, 나머지 절반은 다 펼친 채 머문다 —
+         펼쳐지자마자 다음 구역으로 넘어가 버리지 않게, 다 본 뒤에 한참 더 굴려야 내려간다 */
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: track,
@@ -69,15 +82,15 @@ export default function AiSpread() {
           scrub: 0.6,
           invalidateOnRefresh: true,
           /* 펼치다 멈추면 끝까지 — 굴리던 방향으로 다 펼치거나 다 접는다 */
-          snap: completeSnap(() => [0, 1]),
+          snap: holdSnap,
           onUpdate: (self) => track.classList.toggle("is-open", self.progress > 0.95),
         },
       });
-      tl.to({}, { duration: 0.15 });
-      cards.forEach((c, i) => tl.to(c, { ...at(i, "spread"), duration: 0.7, ease: "power3.inOut" }, 0.15));
-      tl.to(copy, { y: () => -22 * vh(), scale: 1, duration: 0.65, ease: "none" }, 0.2);
-      tl.to(copy, { opacity: 1, duration: 0.35, ease: "none" }, 0.4);
-      tl.to({}, { duration: 0.15 }, 0.85);
+      tl.to({}, { duration: OPEN_AT });
+      cards.forEach((c, i) => tl.to(c, { ...at(i, "spread"), duration: OPEN_END - OPEN_AT, ease: "power3.inOut" }, OPEN_AT));
+      tl.to(copy, { y: () => -22 * vh(), scale: 1, duration: OPEN_END - OPEN_AT - 0.04, ease: "none" }, OPEN_AT + 0.04);
+      tl.to(copy, { opacity: 1, duration: 0.2, ease: "none" }, OPEN_AT + 0.14);
+      tl.to({}, { duration: 1 - OPEN_END }, OPEN_END);
     }, track);
 
     /* 다 펼친 뒤에는 마우스를 따라 판 전체가 살짝 기운다 */

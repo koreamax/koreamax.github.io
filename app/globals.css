@@ -824,7 +824,8 @@ html { overflow-x: clip; }
 
 /* ───────── HOW 03 · AI 활용 능력 — 부채꼴로 펼쳐지는 카드 (components/ai-spread.tsx) ───────── */
 .nowrap { white-space: nowrap; }
-.ai-track { position: relative; height: calc(var(--vh) * 200); }
+/* 한 화면은 무대, 나머지 한 화면 반 남짓이 펼치기(약 0.8화면)와 다 펼친 채 머무는 자리 */
+.ai-track { position: relative; height: calc(var(--vh) * 290); }
 .ai-stage { position: sticky; top: 0; height: calc(var(--vh) * 100); overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 1200px; }
 /* 원본의 흰 번짐(blur 120px)은 무거워 같은 모양의 방사 그라데이션으로 대신한다 */
 .ai-glow { position: absolute; left: 50%; top: 50%; width: calc(var(--vw) * 60); height: calc(var(--vw) * 60); margin: calc(var(--vw) * -30) 0 0 calc(var(--vw) * -30); border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, 0.07), transparent 62%); pointer-events: none; }
@@ -832,7 +833,7 @@ html { overflow-x: clip; }
 .ai-slot { position: absolute; left: 50%; top: 50%; pointer-events: none; }
 .ai-card {
   position: relative; box-sizing: border-box; margin: 0;
-  width: calc(var(--vw) * 22); height: calc(var(--vh) * 32); margin-left: calc(var(--vw) * -11); margin-top: calc(var(--vh) * -16);
+  width: calc(var(--vw) * 17); height: calc(var(--vw) * 14); margin-left: calc(var(--vw) * -8.5); margin-top: calc(var(--vw) * -7);
   padding: 8px 8px 26px; border-radius: 6px; background: #f4f2ee;
   box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
   transform-origin: 50% 50% -50px; will-change: transform; pointer-events: auto; cursor: pointer;
