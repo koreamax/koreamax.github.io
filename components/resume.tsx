@@ -1,44 +1,46 @@
-import { awards, events, quals, skills } from "@/components/portfolio-data";
-
 /**
- * 이력서 한 장 — Claude Design 의 Resume.dc.html 틀에 이력서 작성 원칙을 얹었다.
+ * 이력서 — Claude Design 의 Resume.dc.html 틀(왼쪽 검은 칸 + 오른쪽 본문)에
+ * 이력서_20261021.pdf 의 내용을 그대로 담았다.
  *
- *  - 이름 아래에서 바로 신입이라는 것과 한눈에 보이는 경력을 밝힌다.
- *  - 자기소개는 믿을 수 있는 사실(수상 · 활동 · 만든 것)과 링크로만 쓴다.
- *  - 프로필 바로 아래, 뜬금없는 자리에 깊게 쓴 블로그 글 하나를 건다.
- *  - 프로젝트는 세 개, 한 개에 예닐곱 줄. 위에서부터 "도메인 · 문제 · 해결 · 결과"가
- *    다 들어간 문제 해결 줄, 그다음 구현 줄(무엇을 해서 무엇이 좋아졌는지), 맨 아래 곁가지 역할.
- *  - 활동 · 수상 · 자격증은 맨 아래 한 띠에 가볍게 모은다.
- *
- * 학교 이름과 아르바이트 · 군 복무(Work, Military)는 푸터와 같은 규칙으로 싣지 않는다.
+ * 화면에서도 A4 두 장(210 × 297mm)을 그대로 쌓아 보여 준다. 그래서 화면에서 보이는
+ * 모습이 곧 인쇄(PDF 저장) 결과다. 어느 내용이 몇 쪽에 오는지는 아래 PAGES 에서 정한다 —
+ * 항목을 늘려 한 쪽에서 넘치면 다음 쪽으로 옮기면 된다.
  */
 
-const EMAIL = "koreamax012@gmail.com";
+const PROFILE = {
+  name: "이민형",
+  /** 두 줄로 — 의미가 끊기는 자리에서 줄을 바꾼다 */
+  headline: ["여러 가지 일에 몰두할 수 있는", "이 시대의 멀티 플레이어 개발자"],
+  personal: "남 · 2001년 (만 25세)",
+  phone: "010-7421-8280",
+  email: "koreamax012@gmail.com",
+  address: "서울 용산구 용산동2가",
+};
 
 const LINKS = [
   {
     href: "https://www.linkedin.com/in/koreamax",
-    label: "LinkedIn",
+    label: "linkedin.com/in/koreamax",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
       </svg>
     ),
   },
   {
     href: "https://github.com/koreamax",
-    label: "GitHub",
+    label: "github.com/koreamax",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
         <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
       </svg>
     ),
   },
   {
     href: "https://velog.io/@koreamax01/posts",
-    label: "velog",
+    label: "velog.io/@koreamax01",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
         <rect x="2" y="2" width="20" height="20" rx="5" />
         <path d="M7.2 8.4c.9-.3 1.7-.2 2 .9l1.5 5.6c1.9-2 3.4-4.5 3.4-6 0-.5-.2-.8-.5-1h2.6c.3.3.4.7.4 1.2 0 2.4-2.6 6-5.4 8.4H9.3L7.8 10c-.1-.5-.3-.7-.6-.8z" fill="#171719" />
       </svg>
@@ -46,149 +48,177 @@ const LINKS = [
   },
 ];
 
-/** 프로필 바로 아래 거는 글 한 편 — 더 깊게 쓴 글이 생기면 이것만 바꾼다 */
-const BLOG = {
-  title: "외부에서 트래픽이 들어올 때 처리방법 (ALB, Auto Scaling)",
-  href: "https://velog.io/@koreamax01/" + encodeURIComponent("외부에서-트래픽이-들어올-때-처리방법ALB-Auto-Scailing"),
-  note: "요청이 몰릴 때 ALB가 트래픽을 나누고 Auto Scaling이 인스턴스를 늘리는 과정을 직접 구성하며 정리",
+/** PDF 첫머리의 네 칸 요약 */
+const SUMMARY = [
+  { label: "학력", value: "동국대학교 (서울)", note: "대학교(4년) · 졸업예정" },
+  { label: "경력", value: "신입", accent: true },
+  { label: "인턴·대외활동", value: "AWS Student Builder Groups 운영진", note: "외 5" },
+  { label: "자격증", value: "AWS Certified Cloud Practitioner", note: "외 3" },
+];
+
+const EDUCATION = {
+  school: "동국대학교 (서울)",
+  major: "정보통신공학전공",
+  date: "2021.03 – 2027.02",
+  status: "졸업예정",
+  gpa: "3.8 / 4.5",
 };
 
-/** 한 줄 = 무엇에서(도메인) + 무엇이 깨졌고 어떻게 고쳤는지 + 그래서 무엇이 달라졌는지(결과).
- *  body 는 domain 바로 뒤에 붙는다 — 조사로 이어지면 그대로, 새 말이면 앞에 빈칸을 둔다. */
-type Line = { domain: string; body: string; result: string };
+/** 한 항목 = 이름 · 기간 · 꼬리표 · 한두 줄 설명 */
+type Entry = { title: string; org?: string; date: string; span?: string; tag?: string; desc: string };
 
-type Project = {
-  num: string;
-  title: string;
-  what: string;
-  field: string;
-  badge?: string;
-  stack: string[];
-  repo: string;
-  solved: Line[];
-  built: Line[];
-  side?: string;
-};
-
-const PROJECTS: Project[] = [
+const ACTIVITIES: Entry[] = [
   {
-    num: "01",
-    title: "Wilson",
-    what: "치매 노인을 위한 말벗 챗봇",
-    field: "Backend & Cloud",
-    stack: ["Spring Boot", "gRPC", "EKS", "RDS", "Redis", "SQS", "S3"],
-    repo: "https://github.com/koreamax/wilson_chatbot",
-    solved: [
-      { domain: "AI 대화 gRPC 채널", body: " 유휴 끊김으로 첫 발화 실패 문제 발생 및 keepAlive PING 30s · idleTimeout 5분 적용으로", result: "첫 턴 실패 제거" },
-      { domain: "DB 커넥션 풀", body: " 새벽 유휴 뒤 닫힌 연결로 아침 첫 요청 실패 발생 및 max-lifetime 9분 · 2분 주기 keepalive 검증으로", result: "첫 요청 실패 제거" },
-      { domain: "치매 음성 분석", body: "이 대화 응답을 붙잡는 문제 발생 및 SQS 비동기 워커 분리로", result: "응답 즉시 반환, 분석 누락 없이 처리" },
-      { domain: "STT · TTS 오디오 전송", body: "의 NAT 경유 비용 증가 문제 발생 및 S3 게이트웨이 엔드포인트 적용으로", result: "NAT 처리 요금 · 경유 구간 제거" },
-    ],
-    built: [
-      { domain: "gRPC 기반 AI 서비스 연동", body: "(오케스트레이터 · RAG · Ollama · STT/TTS) 구현 및", result: "앱 서버와 AI 추론 분리" },
-    ],
-    side: "인프라 — EKS · RDS · Redis · S3 · SQS 구성",
+    title: "AWS Student Builder Groups 운영진(Core Member)",
+    date: "2026.05 – 2026.09",
+    span: "5개월",
+    tag: "동아리",
+    desc: "신규 멤버 모집·면접 및 온보딩 가이드 제작부터 AWS 클라우드 관련 세션 진행, K8s 스터디 리딩, 외부 네트워킹, 출석 및 수료 기준 관리까지 동아리 운영 전반을 총괄",
   },
   {
-    num: "02",
-    title: "WalkingCity",
-    what: "동대문구 주민 취향 맞춤 산책 경로 추천",
-    field: "AI & Cloud",
-    badge: "2025 K-HTML 해커톤 동대문구청장상",
-    stack: ["Spring Boot", "AWS Bedrock", "Lambda", "OpenSearch", "EC2", "GitHub Actions"],
-    repo: "https://github.com/koreamax/walk_web",
-    solved: [
-      { domain: "경로 추천 API", body: "의 Bedrock 동기 호출로 지도 · 로그인까지 지연 발생 및 추천 Lambda 분리로", result: "추천 부하와 무관하게 일반 API 응답 유지" },
-      { domain: "추천 프롬프트", body: "에 공공데이터 전체를 넣어 토큰 · 지연 증가 발생 및 Titan 임베딩 + OpenSearch 상위 5건 검색 적용으로", result: "호출당 토큰 일정" },
-      { domain: "날씨 반영", body: " 부재로 비 오는 날 강변 코스 추천 발생 및 예보 Lambda를 에이전트 액션 그룹으로 등록해", result: "필요할 때만 실시간 조회" },
-      { domain: "배포", body: " 시 SSH 수동 빌드로 환경 차이 실패 · 서비스 중단 발생 및 GitHub Actions → ECR → EC2 컨테이너 교체로", result: "빌드 환경 고정, SHA 태그 롤백" },
-    ],
-    built: [
-      { domain: "Bedrock 에이전트(Claude Sonnet) 추천", body: " 구현 및", result: "추천 경로와 그 이유까지 함께 제시" },
-    ],
+    title: "Computer Security & Distributed Computing 연구실",
+    date: "2025.07 – 2026.09",
+    span: "1년 3개월",
+    tag: "교내활동",
+    desc: "학부연구생으로서 Google Street View 이미지 기반 OCR 및 VLM(Vision-Language Model) 하이브리드 모델을 활용한 간판 인식·텍스트 추출 연구를 수행하며 관련 논문 작성 중",
   },
   {
-    num: "03",
-    title: "VIAssist",
-    what: "시각장애인 보행 보조 웨어러블 (한이음)",
-    field: "Embedded & AI",
-    stack: ["NVIDIA Jetson", "YOLO", "Optical Flow", "VLM", "TTS", "C/C++"],
-    repo: "https://github.com/koreamax/VIAssist_Total",
-    solved: [
-      { domain: "온디바이스 추론", body: " 보행 10분 뒤 발열 스로틀링으로 안내 끊김 발생 및 전력 모드 고정 · 온도 기반 주기 조절로", result: "검출 15fps 유지, 안내 지속" },
-      { domain: "안내 파이프라인", body: "이 가장 느린 VLM에 묶여 지연 발생 및 단계별 독립 루프 + 최신 1프레임 버퍼로", result: "검출은 카메라 속도, 안내는 최신 장면 기준" },
-      { domain: "음성 안내 문장", body: "이 검출 결과 전부를 나열하는 문제 발생 및 진행 경로 · 4m 이내 가까운 순 정렬로", result: "피할 대상만 한 마디로 안내" },
-      { domain: "접근 물체 경고", body: " 시 정지 · 접근 물체 미구분 발생 및 광학 흐름 접근 속도 + TTC 추정으로", result: "필요한 순간에만 경고" },
-    ],
-    built: [
-      { domain: "Jetson Orin Nano Super 한 대에", body: " 검출 · 흐름 추정 · VLM · TTS 탑재 구현 및", result: "서버 없이 보드 안에서 안내 완결" },
-    ],
+    title: "IoT 마이크로프로세서 강의 조교",
+    date: "2026.09 – 2026.09",
+    span: "1개월",
+    tag: "교내활동",
+    desc: "ARM64 마이크로프로세서 아키텍처 이론 지도 및 실습을 진행하고, 실습 과제 출제와 시험·과제 채점을 담당하여 수강생들의 임베디드 시스템 이해도를 향상",
+  },
+  {
+    title: "컴퓨터 구성 강의 조교",
+    date: "2026.03 – 2026.06",
+    span: "4개월",
+    tag: "교내활동",
+    desc: "컴퓨터 구조 이론 지도 및 회로 실습을 진행하고, 회로·CPU 설계 과제 및 실습 문제를 직접 출제·채점하여 수강생들의 실습 이해도 향상을 지원",
+  },
+  {
+    title: "AWS Cloud Club 일반 부원(General Member)",
+    date: "2025.07 – 2026.04",
+    span: "10개월",
+    tag: "동아리",
+    desc: "AWS 기술 학습과 정기 세션 발표를 수행하고, 소그룹 스터디 및 현직자 네트워킹 행사 참여를 통해 클라우드 실무 역량과 기술 인사이트를 확충",
+  },
+  {
+    title: "FARM SYSTEM 4기 웹/보안 트랙 일반 부원",
+    date: "2025.03 – 2025.12",
+    span: "10개월",
+    tag: "동아리",
+    desc: "백엔드 중심의 웹 개발 팀 프로젝트와 코딩테스트 스터디를 진행하고, 보안 기술 논문 분석을 병행하여 웹 개발 실무와 보안 지식을 함께 강화",
   },
 ];
 
-/** 맨 아래 띠 — 날짜 · 이름 · 자리 한 줄씩 */
-type Mini = { date: string; title: string; sub?: string };
+const TRAINING: Entry[] = [
+  {
+    title: "SKT FLY AI CHALLENGER 9기",
+    org: "SK텔레콤",
+    date: "2026.06 – 2026.09",
+    desc: "AI 모델링·생성형 AI 서비스 개발, Cloud·컨테이너 기반 AI 시스템 운영, 프로젝트 기반 실무 협업 역량을 바탕으로 '사회적 가치 창출 AI 서비스 개발 프로젝트'를 완수",
+  },
+  {
+    title: "JSP & Spring Boot 웹개발 백엔드 과정",
+    org: "코리아 IT 아카데미",
+    date: "2023.01 – 2023.06",
+    desc: "Java 객체지향 파악 및 RDBMS 설계를 바탕으로, JSP/Servlet 구조 이해부터 Spring Boot 기반의 RESTful API 구축까지 백엔드 개발 전반의 기술을 이수",
+  },
+];
 
-const activities: Mini[] = events
-  .filter((e) => ["Program", "Community", "Research", "TA"].includes(e.kind))
-  .map((e) => ({ date: e.date, title: e.title, sub: e.sub }));
-const awardList: Mini[] = awards.map((a) => ({ date: a.date, title: a.prize, sub: a.title }));
-const certList: Mini[] = quals.map((q) => ({ date: q.date, title: q.title, sub: q.org }));
+const CERTS = [
+  { date: "2026.08", title: "AWS Certified Cloud Practitioner", org: "AWS" },
+  { date: "2026.08", title: "Azure AI Fundamentals", org: "Microsoft" },
+  { date: "2025.04", title: "네트워크관리사 2급", org: "한국정보통신자격협회" },
+  { date: "2023.07", title: "2종보통운전면허", org: "경찰청(운전면허시험관리단)" },
+];
 
-/** 이름 아래 한눈에 보이는 경력 — 전부 데이터에서 센다 */
-const research = events.find((e) => e.kind === "Research");
-const taCount = events.filter((e) => e.kind === "TA").length;
-const AT_A_GLANCE = [
-  "신입",
-  research && `학부연구생 ${research.date}`,
-  `강의 조교 ${taCount}회`,
-  `수상 ${awards.length}회`,
-  `자격증 ${quals.length}개`,
-].filter(Boolean) as string[];
+const AWARDS: Entry[] = [
+  {
+    title: "SKT FLY AI CHALLENGER 9기 개인 최우수상",
+    org: "SK텔레콤 대표이사상",
+    date: "2026",
+    desc: "SKT FLY AI CHALLENGER 9기 과정 전반에서 교육 성적, 역량 실습, 프로젝트 기여도 및 기술 리더십을 인정받아 최고 성적자로서 개인 최우수상(SK텔레콤 대표이사상)을 수상",
+  },
+  {
+    title: "SKT FLY AI CHALLENGER 9기 프로젝트 우수상",
+    org: "SK텔레콤 대표이사상",
+    date: "2026",
+    desc: "AI 모델링 및 Cloud·컨테이너 인프라를 결합한 '사회적 가치 창출 AI 서비스' 프로젝트의 기술적 완성도와 높은 실무 가치를 인정받아 프로젝트 우수상(SK텔레콤 대표이사상)을 수상",
+  },
+  {
+    title: "제15회 피우다 프로젝트 공모전 장려상",
+    org: "정보통신산업진흥원장상",
+    date: "2025",
+    desc: "ICT·AI 기반의 창의적인 사회 문제 해결형 프로젝트를 완성도 높게 기획 및 구현하여 혁신성과 실용성을 인정받아 장려상(정보통신산업진흥원장상)을 입상",
+  },
+  {
+    title: "2025 K-HTML 해커톤 우수상",
+    org: "동대문구청장상 · 동대문구청 & 교육혁신사업단",
+    date: "2025",
+    desc: "해커톤 제한 시간 내에 웹 및 IT 기술 기반의 완성도 높은 프로토타입을 구현하여 서비스 완성도와 기획력을 바탕으로 우수상(동대문구청장상)을 수상",
+  },
+];
 
-function Heading({ children, size = 28 }: { children: React.ReactNode; size?: number }) {
+function Heading({ children, dark }: { children: React.ReactNode; dark?: boolean }) {
   return (
-    <div className="rs-heading">
-      <h2 style={{ fontSize: size }}>{children}</h2>
+    <div className={`rs-heading${dark ? " is-dark" : ""}`}>
+      <h2>{children}</h2>
       <div className="rs-bar" />
     </div>
   );
 }
 
-function LineItem({ l }: { l: Line }) {
+function Entries({ items }: { items: Entry[] }) {
   return (
-    <li>
-      <b>{l.domain}</b>
-      {l.body} <em>{l.result}</em>
-    </li>
-  );
-}
-
-function MiniList({ title, items }: { title: string; items: Mini[] }) {
-  return (
-    <div className="rs-band-col">
-      <Heading size={22}>{title}</Heading>
-      <ul className="rs-mini">
-        {items.map((m) => (
-          <li key={m.title + m.date}>
-            <span className="rs-date">{m.date}</span>
-            <span className="rs-mini-title">{m.title}</span>
-            {m.sub && <span className="rs-sub">{m.sub}</span>}
-          </li>
-        ))}
-      </ul>
+    <div className="rs-entries">
+      {items.map((e) => (
+        <article key={e.title} className="rs-entry">
+          <div className="rs-entry-head">
+            <h3>{e.title}</h3>
+            {e.tag && <span className={`rs-tag${e.tag === "동아리" ? " is-club" : ""}`}>{e.tag}</span>}
+          </div>
+          <div className="rs-entry-meta">
+            <span className="rs-date">{e.date}</span>
+            {e.span && <span>{e.span}</span>}
+            {e.org && <span>{e.org}</span>}
+          </div>
+          <p>{e.desc}</p>
+        </article>
+      ))}
     </div>
   );
 }
 
+function Contact({ label, children, icon }: { label: string; children: React.ReactNode; icon: React.ReactNode }) {
+  return (
+    <div className="rs-contact">
+      {icon}
+      <div>
+        <span className="rs-contact-label">{label}</span>
+        <span className="rs-contact-value">{children}</span>
+      </div>
+    </div>
+  );
+}
+
+const ICON = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true } as const;
+
 export default function Resume() {
   return (
     <div className="rs">
-      <div className="rs-sheet" data-screen-label="Resume">
+      {/* ───────── 1쪽 ───────── */}
+      <section className="rs-page" aria-label="이력서 1쪽">
         <aside className="rs-aside">
-          <div className="rs-aside-top">
-            <h1 className="rs-name">이민형</h1>
-            <p className="rs-role">신입 개발자<br />AI & Cloud · Backend</p>
+          <div className="rs-aside-block rs-aside-top">
+            <h1 className="rs-name">{PROFILE.name}</h1>
+            <p className="rs-personal">{PROFILE.personal}</p>
+            <p className="rs-headline">
+              {PROFILE.headline[0]}
+              <br />
+              {PROFILE.headline[1]}
+            </p>
             <div className="rs-bar rs-bar-48" />
             <div className="rs-links">
               {LINKS.map((l) => (
@@ -205,95 +235,121 @@ export default function Resume() {
             <img src="/uploads/profile.webp" alt="이민형 프로필 사진" />
           </div>
 
-          <div className="rs-aside-bottom">
-            <Heading size={24}>Contact</Heading>
-            <div className="rs-contact">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <rect x="2" y="4" width="20" height="16" rx="2" />
-                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-              </svg>
-              <div>
-                <span className="rs-contact-label">Email</span>
-                <a className="rs-contact-value" href={`mailto:${EMAIL}`}>{EMAIL}</a>
-              </div>
-            </div>
-          </div>
-
-          <div className="rs-aside-bottom rs-skills">
-            <Heading size={24}>Skills</Heading>
-            {skills.map((s) => (
-              <div key={s.area} className="rs-skill">
-                <span className="rs-skill-area">{s.area}</span>
-                <span className="rs-skill-items">{s.items.join(" · ")}</span>
-              </div>
-            ))}
+          <div className="rs-aside-block">
+            <Heading dark>Contact</Heading>
+            <Contact
+              label="휴대폰"
+              icon={
+                <svg {...ICON}>
+                  <rect x="6" y="2" width="12" height="20" rx="2.5" />
+                  <path d="M11 18h2" />
+                </svg>
+              }
+            >
+              <a href={`tel:${PROFILE.phone}`}>{PROFILE.phone}</a>
+            </Contact>
+            <Contact
+              label="Email"
+              icon={
+                <svg {...ICON}>
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+              }
+            >
+              {/* 칸이 좁으면 @ 앞에서만 줄을 바꾼다 */}
+              <a href={`mailto:${PROFILE.email}`}>
+                {PROFILE.email.split("@")[0]}
+                <wbr />@{PROFILE.email.split("@")[1]}
+              </a>
+            </Contact>
+            <Contact
+              label="주소"
+              icon={
+                <svg {...ICON}>
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              }
+            >
+              {PROFILE.address}
+            </Contact>
           </div>
         </aside>
 
         <main className="rs-main">
-          <section className="rs-section rs-section-tight">
-            <Heading>Profile</Heading>
-            <ul className="rs-glance">
-              {AT_A_GLANCE.map((g) => (
-                <li key={g}>{g}</li>
-              ))}
-            </ul>
-            <p className="rs-lead">
-              AI · Backend · Cloud · Embedded 네 분야에서 직접 만든 프로젝트가 있습니다 — EKS 위 AI 말벗 챗봇,
-              Bedrock 산책 경로 추천, Jetson 보행 보조 웨어러블. SKT FLY AI CHALLENGER 9기에서 개인 최우수상과
-              프로젝트 부문 SK텔레콤 대표이사상을 받았고, AWS Student Builder Groups 1기 Core Member로 커뮤니티를
-              운영하고 있습니다. 코드는{" "}
-              <a className="rs-inline" href="https://github.com/koreamax" target="_blank" rel="noopener noreferrer">GitHub</a>
-              에, 공부한 내용은{" "}
-              <a className="rs-inline" href="https://velog.io/@koreamax01/posts" target="_blank" rel="noopener noreferrer">Velog</a>
-              에 남깁니다.
-            </p>
-          </section>
-
-          <a className="rs-blog" href={BLOG.href} target="_blank" rel="noopener noreferrer">
-            <span className="rs-blog-label">Blog</span>
-            <span className="rs-blog-title">{BLOG.title}</span>
-            <span className="rs-blog-note">{BLOG.note}</span>
-            <span className="rs-blog-go" aria-hidden>→</span>
-          </a>
+          <ul className="rs-summary">
+            {SUMMARY.map((s) => (
+              <li key={s.label}>
+                <span className="rs-summary-label">{s.label}</span>
+                <span className={`rs-summary-value${s.accent ? " is-accent" : ""}`}>{s.value}</span>
+                {s.note && <span className="rs-summary-note">{s.note}</span>}
+              </li>
+            ))}
+          </ul>
 
           <section className="rs-section">
-            <Heading>Projects</Heading>
-            {PROJECTS.map((p) => (
-              <article key={p.title} className="rs-project">
-                <div className="rs-project-head">
-                  <span className="rs-card-num">{p.num}</span>
-                  <a className="rs-card-title" href={p.repo} target="_blank" rel="noopener noreferrer">
-                    {p.title}
-                  </a>
-                  <span className="rs-sub">{p.what} · {p.field}</span>
-                  {p.badge && <span className="rs-badge">{p.badge}</span>}
-                </div>
-                <ul className="rs-lines">
-                  {p.solved.map((l) => (
-                    <LineItem key={l.domain} l={l} />
-                  ))}
-                  {p.built.map((l) => (
-                    <LineItem key={l.domain} l={l} />
-                  ))}
-                  {p.side && <li className="rs-side">{p.side}</li>}
-                </ul>
-                <div className="rs-tags">
-                  {p.stack.map((s) => (
-                    <span key={s}>{s}</span>
-                  ))}
-                </div>
-              </article>
-            ))}
+            <Heading>학력</Heading>
+            <article className="rs-entry">
+              <div className="rs-entry-head">
+                <h3>{EDUCATION.school}</h3>
+                <span className="rs-entry-sub">{EDUCATION.major}</span>
+              </div>
+              <div className="rs-entry-meta">
+                <span className="rs-date">{EDUCATION.date}</span>
+                <span>{EDUCATION.status}</span>
+                <span>
+                  학점 <b>{EDUCATION.gpa}</b>
+                </span>
+              </div>
+            </article>
+          </section>
+
+          <section className="rs-section">
+            <Heading>인턴·대외활동</Heading>
+            <Entries items={ACTIVITIES} />
           </section>
         </main>
+      </section>
 
-        <section className="rs-band">
-          <MiniList title="Activities" items={activities} />
-          <MiniList title="Awards" items={awardList} />
-          <MiniList title="Certification" items={certList} />
-        </section>
-      </div>
+      {/* ───────── 2쪽 ───────── */}
+      <section className="rs-page" aria-label="이력서 2쪽">
+        <aside className="rs-aside">
+          <div className="rs-aside-block rs-aside-top rs-aside-p2">
+            <span className="rs-name-sm">{PROFILE.name}</span>
+            <span className="rs-running">
+              {PROFILE.phone}
+              <br />
+              {PROFILE.email}
+            </span>
+            <div className="rs-bar rs-bar-48" />
+          </div>
+          <div className="rs-aside-block">
+            <Heading dark>자격증</Heading>
+            <ul className="rs-certs">
+              {CERTS.map((c) => (
+                <li key={c.title}>
+                  <span className="rs-date">{c.date}</span>
+                  <span className="rs-cert-title">{c.title}</span>
+                  <span className="rs-cert-org">{c.org}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+
+        <main className="rs-main">
+          <section className="rs-section">
+            <Heading>교육</Heading>
+            <Entries items={TRAINING} />
+          </section>
+
+          <section className="rs-section">
+            <Heading>수상</Heading>
+            <Entries items={AWARDS} />
+          </section>
+        </main>
+      </section>
     </div>
   );
 }
